@@ -1,6 +1,11 @@
 #pragma once
 
+// It would be ideal to summarize all parameters in a single header file, so that a single file uniquely defines
+// a certain model. Is it possible to move the content of this file into the init/GI.h file? It can then be duplicated and changed
+// for every additional model setup
+
 namespace PARAM{
+
 	#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 	const short int Dim = 2;
 	#else

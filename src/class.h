@@ -27,6 +27,8 @@ public:
 	}
 };
 
+// This namespace name can be confusing, because it is very close to std::
+// What about FDPS_SPH? Or whatever name you decide on.
 namespace STD{
 	namespace RESULT{
 		//Density summation
@@ -78,6 +80,13 @@ namespace STD{
 
 	class RealPtcl{
 		public:
+
+	        // Instead of using abbreviations and explaining them in the comments,
+	        // we have found it is much easier to read the code if you just use the
+	        // full names. 'dens' is not much shorter than 'density', but 'density'
+	        // is much easier to read (the same holds true for all other variables below).
+	        // If I would encounter 'snds' in the code I would need to look up what it means
+	        // but 'sound_speed' would be self-explanatory.
 		PS::F64 mass;
 		PS::F64vec pos, vel, acc;
 		PS::F64 dens;//DENSity
@@ -389,6 +398,16 @@ namespace STD{
 	}
 }
 
+// As far as I can see the only 'Problem' that is currently implemented is init/GI.h?
+// This class acts as the base class for any problem that might be implemented later,
+// and it technically acts as something that is called an 'Interface' class. See
+// https://www.tutorialspoint.com/cplusplus/cpp_interfaces.htm for a description of
+// interface classes. Thus, I would recommend
+// moving it to a new file called init/interface.h, and make it the only content
+// of this file.
+// Additionally, I find 'init' might not be fully explaining the content of that folder, it is not
+// only describing the initial state, but also the equation of state, and the forces (and the domain).
+// What about renaming it to 'model_setup' or 'problem_setup'?
 template <class Ptcl> class Problem{
 	Problem(){
 	}
