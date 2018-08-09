@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "param.h"
 #include "mathfunc.h"
@@ -18,6 +19,17 @@
 
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
+
+	// There should be a capitalization rule for names, you currently use ALLCAPS
+	// for namespaces, but here you also use it for GI which is a class type. I would
+	// recommend using 'CamelCase' for everything except variable names, which you already
+	// name as 'names_with_underscores', but that is a personal preference and you are welcome
+	// to use your own.
+
+	// Also there needs to be a way to include tests into the program. For example you could add a
+	// problem description called 'test' instead of 'GI' and if the program is started with a '--test'
+	// flag this test setup is executed. The results could then be compared to a reference test result.
+
 	typedef GI<PTCL::RealPtcl> PROBLEM;
 	//////////////////
 	//Create vars.
@@ -56,27 +68,37 @@ int main(int argc, char* argv[]){
 	PS::TreeForForceShort<PTCL::RESULT::Dens , PTCL::EPI::Dens , PTCL::EPJ::Dens >::Gather   dens_tree;
 	PS::TreeForForceShort<PTCL::RESULT::Drvt , PTCL::EPI::Drvt , PTCL::EPJ::Drvt >::Gather   drvt_tree;
 	PS::TreeForForceShort<PTCL::RESULT::Hydro, PTCL::EPI::Hydro, PTCL::EPJ::Hydro>::Symmetry hydr_tree;
-	#ifdef SELF_GRAVITY
-	PS::TreeForForceLong <PTCL::RESULT::Grav , PTCL::EPI::Grav , PTCL::EPJ::Grav >::Monopole grav_tree;
-	#endif
+
+	// It would be advantageous if you could settle on a single style for input parameters, currently
+	// the code mixes variables, templates, and preprocessor macros. Ultimately it would be nice to
+	// have text files outside the source code that specify the model, but settling on a single header
+	// file would also be fine for the moment. If you want to save memory by not allocating a tree if this
+	// parameter is not set, consider making it an owning pointer (std::unique_ptr) like the following:
+
+	std::unique_ptr<PS::TreeForForceLong <PTCL::RESULT::Grav , PTCL::EPI::Grav , PTCL::EPJ::Grav >::Monopole> grav_tree;
+	if (PROBLEM::self_gravity)
+	  grav_tree.reset(new PS::TreeForForceLong <PTCL::RESULT::Grav , PTCL::EPI::Grav , PTCL::EPJ::Grav >::Monopole());
+
+	// This way only the memory for a single pointer is allocated if the tree is not needed, and you can
+	// check for that by using if (grav_tree)
 
 	dens_tree.initialize(sph_system.getNumberOfParticleLocal(), 0.5, 4, 128);
 	drvt_tree.initialize(sph_system.getNumberOfParticleLocal(), 0.5, 4, 128);
 	hydr_tree.initialize(sph_system.getNumberOfParticleLocal(), 0.5, 4, 128);
-	#ifdef SELF_GRAVITY
-	grav_tree.initialize(sph_system.getNumberOfParticleLocal(), 0.5, 8, 256);
-	#endif
-	for(short int loop = 0 ; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP ; ++ loop){
+        if (PROBLEM::self_gravity)
+                grav_tree->initialize(sph_system.getNumberOfParticleLocal(), 0.5, 8, 256);
+
+        for(short int loop = 0 ; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP ; ++ loop){
 		dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
 	}
 
 	PTCL::CalcPressure(sph_system);
 	drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
 	hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
-	#ifdef SELF_GRAVITY
-	grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(), PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
-	#endif
-	sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
+        if (PROBLEM::self_gravity)
+          grav_tree->calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(), PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+
+        sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
 	PROBLEM::addExternalForce(sph_system, sysinfo);
 	OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::END_TIME);
 
@@ -106,10 +128,10 @@ int main(int argc, char* argv[]){
 		PTCL::CalcPressure(sph_system);
 		drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
 		hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
-		#ifdef SELF_GRAVITY
-		grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(), PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
-		#endif
-		PROBLEM::addExternalForce(sph_system, sysinfo);
+	        if (PROBLEM::self_gravity)
+	          grav_tree->calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(), PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+
+	        PROBLEM::addExternalForce(sph_system, sysinfo);
 		#pragma omp parallel for
 		for(int i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			sph_system[i].finalKick(sysinfo.dt);
