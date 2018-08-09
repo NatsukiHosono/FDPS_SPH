@@ -5,7 +5,7 @@
 #endif
 template <class Ptcl> class GI : public Problem<Ptcl>{
 	public:
-	static const double END_TIME = 1.0e+4;
+	static const double END_TIME;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
 		const bool createTarget = true;//set false if you make an impactor.
 		const double Corr = .98;//Correction Term
@@ -246,3 +246,5 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	}
 };
 
+template <class Ptcl>
+const double GI<Ptcl>::END_TIME = 1.0e+4;
