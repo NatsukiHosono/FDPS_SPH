@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 #include "param.h"
 #include "mathfunc.h"
