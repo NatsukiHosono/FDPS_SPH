@@ -406,3 +406,31 @@ template <class Ptcl> class Problem{
 	}
 };
 
+
+class ReadInputParameters
+{
+public:
+  template <typename T>
+    double UpdateNumbers(std::string input, T parameter)
+  {
+    std::string line;
+    std::string delimiter = "=";
+    size_t pos = 0;
+    std::ifstream inputfile ("init/input.txt");
+
+    if (inputfile.is_open())
+      {
+	while (getline(inputfile,line)){
+	  if (line.find(input) != std::string::npos){
+	    while ((pos = line.find(delimiter)) != std::string::npos) {
+	      line.erase(0, pos + delimiter.length());
+	      std::stringstream convert_from_string_to_value(line);
+	      convert_from_string_to_value  >> parameter;
+	    }
+	  }
+	}
+	inputfile.close();
+      }
+    return parameter;
+  }
+};
