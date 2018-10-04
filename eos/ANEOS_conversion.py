@@ -1,5 +1,5 @@
 # This is a python script that converts u(rho, T), P(rho, T), Cs(rho,T), S(rho, T)
-# to T(rho, u), P(rho, u), Cs(rho, T), S(rho, T), which is more useful for SPH calculaitons
+# to T(rho, u), P(rho, u), Cs(rho, u), S(rho, u), which is more useful for SPH calculaitons
 #
 
 import matplotlib.pyplot as plt
