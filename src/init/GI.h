@@ -16,18 +16,36 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::vector<Ptcl> tar;//Target
 		std::vector<Ptcl> imp;//Impactor
 		/////////
-		const PS::F64 UnitMass = 6.0e+24; // Earth mass
-		const PS::F64 UnitRadi = 6400e+3; // Earth radii
-		//total-to-core frac.
-		const PS::F64 coreFracRadi = 3500.0e+3 / 6400.0e+3;//Earth
-		const PS::F64 coreFracMass = 0.3;//Earth
+
+		ReadInputParameters RI;  //this is added in class.h
+		std::string  parameterlist;
+		parameterlist =  RI.ReadFile("init/input.txt");
+		
+		/// default values
+		PS::F64 UnitMass = 6.0e+24; // Earth mass
+		PS::F64 UnitRadi = 6400e+3; // Earth radii
+		PS::F64 coreFracRadi = 3500.0e+3 / 6400.0e+3;//core radius fraction
+		PS::F64 coreFracMass = 0.3; // core mass fraction 
+		PS::F64 imptarMassRatio = 0.1; // mass fraction 
+ 		// updating default values from the input parameters
+		// input file is under src/init/input.txt
+		//ReadInputParameters RI;  //this is added in class.h
+
+		//std::cout << "test";
+		UnitMass = RI.UpdateNumbers("UnitMass", UnitMass, parameterlist);
+		UnitRadi = RI.UpdateNumbers("UnitRadi", UnitRadi, parameterlist);
+		coreFracRadi = RI.UpdateNumbers("coreFracRadi", coreFracRadi, parameterlist);
+		coreFracMass = RI.UpdateNumbers("coreFracMass", coreFracMass, parameterlist);
+		imptarMassRatio = RI.UpdateNumbers("imptarMassRatio", imptarMassRatio, parameterlist);
+
+		
 		/////////
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
 		const PS::F64 tarCoreMass = tarMass * coreFracMass;
 		const PS::F64 tarCoreRadi = tarRadi * coreFracRadi;
-		const PS::F64 impMass = 0.1 * tarMass;
+		const PS::F64 impMass = imptarMassRatio * tarMass;
 		const PS::F64 impRadi = Expand * cbrt(impMass / tarMass) * UnitRadi;
 		const PS::F64 impCoreMass = impMass * coreFracMass;
 		const PS::F64 impCoreRadi = impRadi * coreFracRadi;
@@ -248,3 +266,4 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 template <class Ptcl>
 const double GI<Ptcl>::END_TIME = 1.0e+4;
+
