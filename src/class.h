@@ -406,3 +406,49 @@ template <class Ptcl> class Problem{
 	}
 };
 
+
+
+/**
+ * This class handles reading in model input parameters from input files.
+ */
+
+class ReadInputParameters
+{
+public:
+  template <typename T>
+    double UpdateNumbers(std::string input, T parameter, std::string parameterlist)
+  {
+    std::string line;
+    std::string delimiter = "=";
+    size_t pos = 0;
+    std::stringstream inputfile(parameterlist);
+
+    while (getline(inputfile,line)){
+      if (line.find(input) != std::string::npos){
+	while ((pos = line.find(delimiter)) != std::string::npos) {
+	  line.erase(0, pos + delimiter.length());
+	  std::stringstream convert_from_string_to_value(line);
+	  convert_from_string_to_value  >> parameter;
+	}
+      }
+    } 
+    return parameter;
+  }
+
+/**
+ * Read a file named filename and return its content as a string.
+ */
+  std::string ReadFile (std::string filename)
+    {
+      std::ifstream filestream(filename);
+      std::stringstream filecontent;
+      filecontent << filestream.rdbuf();
+
+      return filecontent.str(); 
+  }
+  
+};
+
+
+
+    
