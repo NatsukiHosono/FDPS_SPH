@@ -1,3 +1,5 @@
+#include <parse.h>
+
 #define SELF_GRAVITY
 #define FLAG_GI
 #ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
@@ -17,26 +19,15 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::vector<Ptcl> imp;//Impactor
 		/////////
 
-		ReadInputParameters RI;  //this is added in class.h
-		std::string  parameterlist;
-		parameterlist =  RI.ReadFile("init/input.txt");
-		
-		/// default values
-		PS::F64 UnitMass = 6.0e+24; // Earth mass
-		PS::F64 UnitRadi = 6400e+3; // Earth radii
-		PS::F64 coreFracRadi = 3500.0e+3 / 6400.0e+3;//core radius fraction
-		PS::F64 coreFracMass = 0.3; // core mass fraction 
-		PS::F64 imptarMassRatio = 0.1; // mass fraction 
- 		// updating default values from the input parameters
-		// input file is under src/init/input.txt
-		//ReadInputParameters RI;  //this is added in class.h
-
-		//std::cout << "test";
-		UnitMass = RI.UpdateNumbers("UnitMass", UnitMass, parameterlist);
-		UnitRadi = RI.UpdateNumbers("UnitRadi", UnitRadi, parameterlist);
-		coreFracRadi = RI.UpdateNumbers("coreFracRadi", coreFracRadi, parameterlist);
-		coreFracMass = RI.UpdateNumbers("coreFracMass", coreFracMass, parameterlist);
-		imptarMassRatio = RI.UpdateNumbers("imptarMassRatio", imptarMassRatio, parameterlist);
+		// Use parameters from input file, or defaults if none provided
+		// TODO: Currently the input file has to be in the same directory as the executable
+		//       Change this into a command-line parameter.
+		ParameterFile parameter_file("input.txt");
+		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
+		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
+		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
+		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
+		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
 
 		
 		/////////
@@ -266,4 +257,3 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 template <class Ptcl>
 const double GI<Ptcl>::END_TIME = 1.0e+4;
-

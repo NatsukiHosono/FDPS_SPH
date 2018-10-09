@@ -1,6 +1,0 @@
-# input parameters
-UnitMass = 5.97e+24 // target mass
-UnitRadi = 6100e+3 // target radius
-coreFracRadi = 0.54 // core fraction in radius
-coreFracMass = 0.3 //core fraction in mass
-imptarMassRatio = 0.2 // impator-to-target mass ratio
