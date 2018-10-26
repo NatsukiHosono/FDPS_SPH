@@ -144,6 +144,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
+					// TODO: Modify this line for all particles that need new EoS
 					ith.setPressure(&Granite);
 					ith.tag = 0;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
@@ -163,6 +164,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
+					// TODO: Modify this line for all particles that need new EoS
 					ith.setPressure(&Iron);
 					ith.tag = 1;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
@@ -183,6 +185,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
+					// TODO: Modify this line for all particles that need new EoS
 					ith.setPressure(&Granite);
 					ith.tag = 2;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
@@ -202,6 +205,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
+					// TODO: Modify this line for all particles that need new EoS
 					ith.setPressure(&Iron);
 					ith.tag = 3;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
@@ -237,6 +241,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 	static void setEoS(PS::ParticleSystem<Ptcl>& sph_system){
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+			// TODO: Modify the lines below for all particles that need new EoS
 			if(sph_system[i].tag % 2 == 0){
 				sph_system[i].setPressure(&Granite);
 			}else{
