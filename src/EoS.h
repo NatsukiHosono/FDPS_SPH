@@ -90,14 +90,14 @@ namespace EoS{
 		 * are
 		 * Density (kg/m3) Temperature (K) Energy (J/kg) Pressure (Pa) Sound speed (m/s) Entropy (J/kg/K).
 		 */
-		const std::vector<std::vector<std::array<type, 6> > > eos_data;
+		std::vector<std::vector<std::array<type, 6> > > eos_data;
 
 		/**
 		 * Linear vectors of the values of the corresponding fields in eos_data. Stored
 		 * for making finding correct lines in eos_data simpler.
 		 */
-		const std::vector<double> densities;
-		const std::vector<double> energies;
+		std::vector<double> densities;
+		std::vector<double> energies;
 
 		/**
 		 * A function that returns the corresponding table indices for a given
@@ -187,5 +187,5 @@ static const EoS::IdealGas<PS::F64>  Monoatomic(5./3.);
 static const EoS::IdealGas<PS::F64>  Diatomic  (1.4);
 static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0);
 static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
-static const EoS::Tillotson<PS::F64> ANEOS     ("TODO Place filename of a data file here");
+static const EoS::ANEOS<PS::F64> ANEOS     ("TODO Place filename of a data file here");
 
