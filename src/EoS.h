@@ -107,7 +107,7 @@ namespace EoS{
 		 * should first check if this actually matters in terms of performance.
 		 */
 		std::pair<unsigned int, unsigned int>
-		get_table_index(const type density, const type energy){
+		get_table_index(const type density, const type energy) const{
 			auto line = std::find(densities.begin(),densities.end(),density);
 			const unsigned int line_index = std::distance(densities.begin(),line);
 			auto column = std::find(energies.begin(),energies.end(),energy);
