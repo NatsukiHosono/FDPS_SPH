@@ -153,7 +153,7 @@ namespace EoS{
 				unsigned int field_index = 0;
 				type tmp;
 
-				while(tmp << stream)
+				while(stream >> tmp)
 				{
 					eos_data[line_index][column_index][field_index] = tmp;
 
