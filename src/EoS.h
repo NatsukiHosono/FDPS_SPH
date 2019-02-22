@@ -130,7 +130,7 @@ namespace EoS{
 				return;
 			}
 
-			unsigned int line_index = 0;
+			unsigned int n_lines = 0;
 			unsigned int column_index = 0;
 			std::string line;
 			while(std::getline(input, line)){
@@ -139,14 +139,15 @@ namespace EoS{
 				// an empty line signals a new row
 				if(line.empty() == true)
 					{
-					++line_index;
+					++n_lines;
 					column_index = 0;
 					eos_data.push_back(std::vector<std::array<type,6> >());
 
 					continue;
 					}
 
-				eos_data[line_index].push_back(std::array<type,6>());
+				const unsigned int current_line_index = n_lines - 1;
+				eos_data[current_line_index].push_back(std::array<type,6>());
 
 				// make stream for reading
 				std::istringstream stream(line);
@@ -155,7 +156,7 @@ namespace EoS{
 
 				while(stream >> tmp)
 				{
-					eos_data[line_index][column_index][field_index] = tmp;
+					eos_data[current_line_index][column_index][field_index] = tmp;
 
 					if (field_index == 0)
 						densities.push_back(tmp);
