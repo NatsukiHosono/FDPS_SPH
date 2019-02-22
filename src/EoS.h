@@ -160,7 +160,7 @@ namespace EoS{
 
 					if (field_index == 0)
 						densities.push_back(tmp);
-					if (field_index == 3)
+					if (field_index == 2)
 						energies.push_back(tmp);
 
 					++field_index;
