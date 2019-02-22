@@ -28,7 +28,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 		header.time = sysinfo.time;
 		header.Nbody = sph_system.getNumberOfParticleLocal();
 		char filename[20];
-        sprintf(filename, "results.%05d", sysinfo.output_id);
+        sprintf(filename, "results.%05lld", sysinfo.output_id);
 		std::string full_filename = out_dir + filename;
 
 		sph_system.writeParticleAscii(full_filename.c_str(), "%s_%05d_%05d.dat", header);
@@ -45,7 +45,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo){
 	FileHeader header;
 	char filename[256];
-    sprintf(filename, "results/%05d", sysinfo.step);
+    sprintf(filename, "results/%05lld", sysinfo.step);
 	sph_system.readParticleAscii(filename, "%s_%05d_%05d.dat", header);
 	sysinfo.time = header.time;
 	std::cout << header.time << std::endl;
