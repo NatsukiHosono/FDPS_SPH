@@ -102,18 +102,21 @@ namespace EoS{
 		/**
 		 * A function that returns the corresponding table indices for a given
 		 * density and energy. Note that the current implementation is very naive (but short).
-		 * Since we know the vectors are sorted a binary search could be much faster, and if the data
-		 * points are equidistant we do not even need a search. But before optimizing we
+		 * If the data
+		 * points were equidistant we do not even need a search. But before optimizing we
 		 * should first check if this actually matters in terms of performance.
 		 */
 		std::pair<unsigned int, unsigned int>
 		get_table_index(const type density, const type energy) const{
-			auto line = std::find(densities.begin(),densities.end(),density);
+			auto line = std::lower_bound(densities.begin(),densities.end(),density);
 			const unsigned int line_index = std::distance(densities.begin(),line);
-			auto column = std::find(energies.begin(),energies.end(),energy);
+			auto column = std::lower_bound(energies.begin(),energies.end(),energy);
 			const unsigned int column_index = std::distance(energies.begin(),column);
 
-			return std::make_pair(line_index,column_index);
+			const unsigned int max_line_index = densities.size()-1;
+			const unsigned int max_column_index = energies.size()-1;
+
+			return std::make_pair(std::min(line_index,max_line_index),std::min(column_index,max_column_index));
 		}
 
 		public:
@@ -130,15 +133,35 @@ namespace EoS{
 				return;
 			}
 
+			const unsigned int n_expected_fields = 5;
+			unsigned int n_expected_lines = 0;
+			unsigned int n_expected_columns = 0;
+
 			unsigned int n_lines = 0;
 			unsigned int column_index = 0;
 			std::string line;
+
 			while(std::getline(input, line)){
-				// ignore comments
-				if(line[0] == '#') continue;
-				// an empty line signals a new row
-				if(line.empty() == true)
-					{
+				// read the table size, which has to be of the format # n_rows n_cols
+				if (n_lines == 0 && n_expected_lines == 0 && n_expected_columns == 0){
+					std::string tmp;
+					std::istringstream stream(line);
+
+					stream >> tmp;
+					stream >> n_expected_lines;
+					stream >> n_expected_columns;
+
+					++n_lines;
+					column_index = 0;
+					eos_data.push_back(std::vector<std::array<type,6> >());
+				}
+
+				// skip other comments
+				if(line[0] == '#')
+					continue;
+
+				// an empty line signals a new row, also add a new row at the beginning of the file.
+				if(column_index == n_expected_columns){
 					++n_lines;
 					column_index = 0;
 					eos_data.push_back(std::vector<std::array<type,6> >());
@@ -146,8 +169,8 @@ namespace EoS{
 					continue;
 					}
 
-				const unsigned int current_line_index = n_lines - 1;
-				eos_data[current_line_index].push_back(std::array<type,6>());
+				const unsigned int line_index = n_lines - 1;
+				eos_data[line_index].push_back(std::array<type,6>());
 
 				// make stream for reading
 				std::istringstream stream(line);
@@ -156,11 +179,11 @@ namespace EoS{
 
 				while(stream >> tmp)
 				{
-					eos_data[current_line_index][column_index][field_index] = tmp;
+					eos_data[line_index][column_index][field_index] = tmp;
 
-					if (field_index == 0)
+					if (column_index == 0 && field_index == 0)
 						densities.push_back(tmp);
-					if (field_index == 2)
+					if (line_index == 0 && field_index == 1)
 						energies.push_back(tmp);
 
 					++field_index;
@@ -188,5 +211,5 @@ static const EoS::IdealGas<PS::F64>  Monoatomic(5./3.);
 static const EoS::IdealGas<PS::F64>  Diatomic  (1.4);
 static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0);
 static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
-static const EoS::ANEOS<PS::F64> ANEOS     ("TODO Place filename of a data file here");
+static const EoS::ANEOS<PS::F64> AGranite      ("TODO Place filename of a data file here. Eventually avoid the use of static objects to make this a run time parameter.");
 
