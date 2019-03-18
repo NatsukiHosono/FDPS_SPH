@@ -160,13 +160,11 @@ namespace EoS{
 				if(line[0] == '#')
 					continue;
 
-				// an empty line signals a new row, also add a new row at the beginning of the file.
+				// if we have reached the expected number of columns add a new row
 				if(column_index == n_expected_columns){
 					++n_lines;
 					column_index = 0;
 					eos_data.push_back(std::vector<std::array<type,6> >());
-
-					continue;
 					}
 
 				const unsigned int line_index = n_lines - 1;
@@ -191,6 +189,8 @@ namespace EoS{
 				++column_index;
 			}
 			input.close();
+
+			test_data();
 		}
 
 		inline type Pressure(const type dens, const type eng) const{
@@ -203,6 +203,34 @@ namespace EoS{
 			const std::pair<unsigned int, unsigned int> data_index = get_table_index(dens, eng);
 
 			return eos_data[data_index.first][data_index.second][4];
+		}
+
+		void test_data() const{
+			std::ofstream output;
+			output.open("test_output.txt", std::ios::out);
+			output.setf(std::ios::scientific);
+			output.precision(8);
+			if(output.fail() == true){
+				std::cout << "Cannot open file test_output.txt" << std::endl;
+				return;
+			}
+
+			const unsigned int n_expected_fields = 5;
+			unsigned int n_expected_lines = densities.size();
+			unsigned int n_expected_columns = energies.size();
+
+			for (unsigned int line = 0; line < n_expected_lines; ++line)
+				for (unsigned int column = 0; column < n_expected_columns; ++column)
+				{
+					output << ' ';
+					for (unsigned int field = 0; field < n_expected_fields; ++field)
+					{
+						output << eos_data[line][column][field] << "  ";
+					}
+
+					output << std::endl;
+				}
+			output.close();
 		}
 	};
 }
