@@ -105,6 +105,7 @@ namespace EoS{
 		 * If the data
 		 * points were equidistant we do not even need a search. But before optimizing we
 		 * should first check if this actually matters in terms of performance.
+		 * The function returns the table index of the next larger density and energy.
 		 */
 		std::pair<unsigned int, unsigned int>
 		get_table_index(const type density, const type energy) const{
@@ -117,6 +118,37 @@ namespace EoS{
 			const unsigned int max_column_index = energies.size()-1;
 
 			return std::make_pair(std::min(line_index,max_line_index),std::min(column_index,max_column_index));
+		}
+
+		const type
+		get_interpolated_value (const type density,
+				const type energy,
+				const unsigned int property_index) const{
+			const std::pair<unsigned int, unsigned int> data_index = get_table_index(density, energy);
+
+			// If we are not at the boundaries of the data table
+			if ((data_index.first < densities.size()-1) &&
+					(data_index.second < energies.size()-1))
+			{
+				// compute the interpolation weights of this density and energy
+				const type xi = (density - densities[data_index.first-1]) /
+						(densities[data_index.first] - densities[data_index.first-1]);
+
+				const type eta = (energy - energies[data_index.second-1]) /
+						(energies[data_index.second] - energies[data_index.second-1]);
+
+				// use these coordinates for a bilinear interpolation
+				return  (1-xi)*(1-eta) * eos_data[data_index.first-1][data_index.second-1][property_index] +
+						xi    *(1-eta) * eos_data[data_index.first]  [data_index.second-1][property_index] +
+						(1-xi)*eta     * eos_data[data_index.first-1][data_index.second]  [property_index] +
+						xi    *eta     * eos_data[data_index.first]  [data_index.second]  [property_index];
+			}
+			else
+			{
+				// Return the boundary value
+				return eos_data[data_index.first][data_index.second][property_index];
+			}
+			return eos_data[data_index.first][data_index.second][property_index];
 		}
 
 		public:
@@ -194,15 +226,11 @@ namespace EoS{
 		}
 
 		inline type Pressure(const type dens, const type eng) const{
-			const std::pair<unsigned int, unsigned int> data_index = get_table_index(dens, eng);
-
-			return eos_data[data_index.first][data_index.second][3];
+			return get_interpolated_value(dens,eng,3);
 		}
 
 		inline type SoundSpeed(const type dens, const type eng) const{
-			const std::pair<unsigned int, unsigned int> data_index = get_table_index(dens, eng);
-
-			return eos_data[data_index.first][data_index.second][4];
+			return get_interpolated_value(dens,eng,4);
 		}
 
 		void test_data() const{
