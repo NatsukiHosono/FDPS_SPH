@@ -1,3 +1,5 @@
+#include "../parse.h"
+
 #define SELF_GRAVITY
 #define FLAG_GI
 #ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
@@ -5,7 +7,7 @@
 #endif
 template <class Ptcl> class GI : public Problem<Ptcl>{
 	public:
-	static const double END_TIME = 1.0e+4;
+	static const double END_TIME;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
 		const bool createTarget = true;//set false if you make an impactor.
 		const double Corr = .98;//Correction Term
@@ -16,18 +18,25 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::vector<Ptcl> tar;//Target
 		std::vector<Ptcl> imp;//Impactor
 		/////////
-		const PS::F64 UnitMass = 6.0e+24; // Earth mass
-		const PS::F64 UnitRadi = 6400e+3; // Earth radii
-		//total-to-core frac.
-		const PS::F64 coreFracRadi = 3500.0e+3 / 6400.0e+3;//Earth
-		const PS::F64 coreFracMass = 0.3;//Earth
+
+		// Use parameters from input file, or defaults if none provided
+		// TODO: Currently the input file has to be in the same directory as the executable
+		//       Change this into a command-line parameter.
+		ParameterFile parameter_file("input.txt");
+		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
+		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
+		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
+		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
+		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
+
+		
 		/////////
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
 		const PS::F64 tarCoreMass = tarMass * coreFracMass;
 		const PS::F64 tarCoreRadi = tarRadi * coreFracRadi;
-		const PS::F64 impMass = 0.1 * tarMass;
+		const PS::F64 impMass = imptarMassRatio * tarMass;
 		const PS::F64 impRadi = Expand * cbrt(impMass / tarMass) * UnitRadi;
 		const PS::F64 impCoreMass = impMass * coreFracMass;
 		const PS::F64 impCoreRadi = impRadi * coreFracRadi;
@@ -135,7 +144,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
-					ith.setPressure(&Granite);
+					// TODO: Modify this line for all particles that need new EoS
+					ith.setPressure(&AGranite);
 					ith.tag = 0;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
 				}
@@ -154,6 +164,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
+					// TODO: Modify this line for all particles that need new EoS
 					ith.setPressure(&Iron);
 					ith.tag = 1;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
@@ -174,7 +185,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
-					ith.setPressure(&Granite);
+					// TODO: Modify this line for all particles that need new EoS
+					ith.setPressure(&AGranite);
 					ith.tag = 2;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
 				}
@@ -193,6 +205,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
+					// TODO: Modify this line for all particles that need new EoS
 					ith.setPressure(&Iron);
 					ith.tag = 3;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
@@ -228,8 +241,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 	static void setEoS(PS::ParticleSystem<Ptcl>& sph_system){
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+			// TODO: Modify the lines below for all particles that need new EoS
 			if(sph_system[i].tag % 2 == 0){
-				sph_system[i].setPressure(&Granite);
+				sph_system[i].setPressure(&AGranite);
 			}else{
 				sph_system[i].setPressure(&Iron);
 			}
@@ -246,3 +260,5 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	}
 };
 
+template <class Ptcl>
+const double GI<Ptcl>::END_TIME = 1.0e+4;
