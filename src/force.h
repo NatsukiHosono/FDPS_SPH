@@ -18,7 +18,6 @@ namespace STD{
 			}
 		}
 	};
-
 	void CalcPressure(PS::ParticleSystem<STD::RealPtcl>& sph_system){
 		#pragma omp parallel for
 		for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
@@ -26,7 +25,6 @@ namespace STD{
 			sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
 		}
 	}
-
 	class CalcDerivative{
 		kernel_t kernel;
 		public:
@@ -80,9 +78,8 @@ namespace STD{
 			}
 		}
 	};
-
 	template <class TPtclJ> class CalcGravityForce{
-		static const double G;
+		static const double G = 6.67e-11;
 		public:
 		void operator () (const EPI::Grav* const __restrict ep_i, const PS::S32 Nip, const TPtclJ* const __restrict ep_j, const PS::S32 Njp, RESULT::Grav* const grav){
 			for(PS::S32 i = 0; i < Nip ; ++ i){
@@ -99,8 +96,5 @@ namespace STD{
 			}
 		}
 	};
-
-	template <class TPtclJ>
-	const double CalcGravityForce<TPtclJ>::G = 6.67e-11;
 }
 
