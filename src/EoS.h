@@ -33,7 +33,7 @@ namespace EoS{
 			return hcr;
 		}
 	};
-
+    //Tillotson equation "is applicable to the prediction of the shock and release of materials undergoing hypervelocity impacts."
 	template <typename type> class Tillotson : public EoS_t<type>{
 		type rho0, a, b, A, B, u0, alpha, beta, uiv, ucv;
 		inline type P_co(const type dens, const type eng) const{
@@ -56,17 +56,19 @@ namespace EoS{
 		}
 		public:
 		Tillotson(const type a_rho0, const type a_u0, const type a_uiv, const type a_ucv, const type a_A, const type a_B, const type a_a, const type a_b, const type a_alpha, const type a_beta){
-			//in MKS unit...
-			rho0  = a_rho0; // kg/m^3
-			u0    = a_u0;   // J/kg
-			uiv   = a_uiv;  // J/kg
-			ucv   = a_ucv;  // J/kg
-			A     = a_A;    // Pa
-			B     = a_B;    // Pa
-			a     = a_a;    // dimension-less
-			b     = a_b;    //
-			alpha = a_alpha;//
-			beta  = a_beta; //
+            //in MKS unit...
+            //From Brundage 2013
+            //"Implementation of Tillotson Equation of State for Hypervelocity Impact of Metals, Geologic Materials, and Liquids"
+            rho0  = a_rho0; // Density                          [kg/m^3]
+            u0    = a_u0;   // Initial Energy                   [J/kg]
+            uiv   = a_uiv;  // Energy at incipient vaporization [J/kg]
+            ucv   = a_ucv;  // Energy at complete vaporization  [J/kg]
+            A     = a_A;    // Bulk modulus                     [Pa]
+            B     = a_B;    // Tillotson parameter              [Pa]
+            a     = a_a;    // Tillotson parameter              [dimension-less]
+            b     = a_b;    // Tillotson parameter
+            alpha = a_alpha;// Tillotson parameter
+            beta  = a_beta; // Tillotson parameter
 		}
 		inline type Pressure(const type dens, const type eng) const{
 			const type p_min = 1.0e+7;
