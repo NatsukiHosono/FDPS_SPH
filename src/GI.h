@@ -1,4 +1,4 @@
-#include <parse.h>
+#include "parse.h"
 
 #define SELF_GRAVITY
 #define FLAG_GI
@@ -9,7 +9,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	public:
 	static const double END_TIME;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
-		const bool createTarget = true;//set false if you make an impactor.
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -28,7 +27,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
-
+        mode = parameter_file.getValueOf("mode",0);
+        PS::F64 impVel = parameter_file.getValueOf("impVel",0);
+        
 		
 		/////////
 		const PS::F64 Expand = 1.1;
@@ -123,6 +124,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::cout << "    core density     : " << impCoreMass / (4.0 * math::pi / 3.0 * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr) << std::endl;
 		std::cout << "    mantle density   : " << (impMass - impCoreMass) / (4.0 * math::pi / 3.0 * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi)) << std::endl;
 		std::cout << "    mean density     : " << impMass / (4.0 * math::pi / 3.0 * impRadi * impRadi * impRadi) << std::endl;
+        std::cout << "    velocity         : " << impVel << std::endl;
 		std::cout << "Total:" << Nptcl << std::endl;
 		std::cout << "Tar-to-Imp mass ratio: " << (double)(impNmntl) / (double)(tarNmntl) << std::endl;
 		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
@@ -130,104 +132,109 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		//Real put
 		///////////////////
 		PS::S32 id = 0;
-		//Put Tar.
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= tarRadi || r <= tarCoreRadi) continue;
-					Ptcl ith;
-					ith.pos.x = UnitRadi * x;
-					ith.pos.y = UnitRadi * y;
-					ith.pos.z = UnitRadi * z;
-					ith.dens = (tarMass - tarCoreMass) / (4.0 / 3.0 * math::pi * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi));
-					ith.mass = tarMass + impMass;
-					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-					ith.id   = id++;
-					// TODO: Modify this line for all particles that need new EoS
-					ith.setPressure(&Granite);
-					ith.tag = 0;
-					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
-				}
-			}
-		}
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= Corr * tarCoreRadi) continue;
-					Ptcl ith;
-					ith.pos.x = tarCoreShrinkFactor * UnitRadi * x;
-					ith.pos.y = tarCoreShrinkFactor * UnitRadi * y;
-					ith.pos.z = tarCoreShrinkFactor * UnitRadi * z;
-					ith.dens = tarCoreMass / (4.0 / 3.0 * math::pi * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr);
-					ith.mass = tarMass + impMass;
-					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-					ith.id   = id++;
-					// TODO: Modify this line for all particles that need new EoS
-					ith.setPressure(&Iron);
-					ith.tag = 1;
-					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
-				}
-			}
-		}
-		//imp
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = Expand * sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= impRadi || r <= impCoreRadi) continue;
-					Ptcl ith;
-					ith.pos.x = Expand * UnitRadi * x + offset;
-					ith.pos.y = Expand * UnitRadi * y;
-					ith.pos.z = Expand * UnitRadi * z;
-					ith.dens = (impMass - impCoreMass) / (4.0 / 3.0 * math::pi * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi));
-					ith.mass = tarMass + impMass;
-					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-					ith.id   = id++;
-					// TODO: Modify this line for all particles that need new EoS
-					ith.setPressure(&Granite);
-					ith.tag = 2;
-					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
-				}
-			}
-		}
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = Expand * impCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= impCoreRadi) continue;
-					Ptcl ith;
-					ith.pos.x = Expand * impCoreShrinkFactor * UnitRadi * x + offset;
-					ith.pos.y = Expand * impCoreShrinkFactor * UnitRadi * y;
-					ith.pos.z = Expand * impCoreShrinkFactor * UnitRadi * z;
-					ith.dens = impCoreMass / (4.0 / 3.0 * math::pi * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr);
-					ith.mass = tarMass + impMass;
-					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-					ith.id   = id++;
-					// TODO: Modify this line for all particles that need new EoS
-					ith.setPressure(&Iron);
-					ith.tag = 3;
-					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
-				}
-			}
-		}
-		for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
-			tar[i].mass /= (PS::F64)(Nptcl);
-		}
-		for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-			imp[i].mass /= (PS::F64)(Nptcl);
-		}
-		
-		if(createTarget == true){
-			for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
-				ptcl.push_back(tar[i]);
-			}
-		}else{
-			for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-				ptcl.push_back(imp[i]);
-			}
-		}
+        
+        switch (mode){
+            case 1:
+                //Put Tar.
+                std::cout << "creating target" << std::endl;
+                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+                            const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
+                            if(r >= tarRadi || r <= tarCoreRadi) continue;
+                            Ptcl ith;
+                            ith.pos.x = UnitRadi * x;
+                            ith.pos.y = UnitRadi * y;
+                            ith.pos.z = UnitRadi * z;
+                            ith.dens = (tarMass - tarCoreMass) / (4.0 / 3.0 * math::pi * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi));
+                            ith.mass = tarMass + impMass;
+                            ith.eng  = 0.1 * Grav * tarMass / tarRadi;
+                            ith.id   = id++;
+                            // TODO: Modify this line for all particles that need new EoS
+                            ith.setPressure(&AGranite);
+                            ith.tag = 0;
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+                        }
+                    }
+                }
+                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+                            const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
+                            if(r >= Corr * tarCoreRadi) continue;
+                            Ptcl ith;
+                            ith.pos.x = tarCoreShrinkFactor * UnitRadi * x;
+                            ith.pos.y = tarCoreShrinkFactor * UnitRadi * y;
+                            ith.pos.z = tarCoreShrinkFactor * UnitRadi * z;
+                            ith.dens = tarCoreMass / (4.0 / 3.0 * math::pi * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr);
+                            ith.mass = tarMass + impMass;
+                            ith.eng  = 0.1 * Grav * tarMass / tarRadi;
+                            ith.id   = id++;
+                            // TODO: Modify this line for all particles that need new EoS
+                            ith.setPressure(&Iron);
+                            ith.tag = 1;
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+                        }
+                    }
+                }
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                    tar[i].mass /= (PS::F64)(Nptcl);
+                }
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                    ptcl.push_back(tar[i]);
+                }
+                break;
+            case 2:
+                //imp
+                std::cout << "creating impactor" << std::endl;
+                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+                            const PS::F64 r = Expand * sqrt(x*x + y*y + z*z) * UnitRadi;
+                            if(r >= impRadi || r <= impCoreRadi) continue;
+                            Ptcl ith;
+                            ith.pos.x = Expand * UnitRadi * x + offset;
+                            ith.pos.y = Expand * UnitRadi * y;
+                            ith.pos.z = Expand * UnitRadi * z;
+                            ith.dens = (impMass - impCoreMass) / (4.0 / 3.0 * math::pi * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi));
+                            ith.mass = tarMass + impMass;
+                            ith.eng  = 0.1 * Grav * tarMass / tarRadi;
+                            ith.id   = id++;
+                            // TODO: Modify this line for all particles that need new EoS
+                            ith.setPressure(&AGranite);
+                            ith.tag = 2;
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
+                        }
+                    }
+                }
+                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+                            const PS::F64 r = Expand * impCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
+                            if(r >= impCoreRadi) continue;
+                            Ptcl ith;
+                            ith.pos.x = Expand * impCoreShrinkFactor * UnitRadi * x + offset;
+                            ith.pos.y = Expand * impCoreShrinkFactor * UnitRadi * y;
+                            ith.pos.z = Expand * impCoreShrinkFactor * UnitRadi * z;
+                            ith.dens = impCoreMass / (4.0 / 3.0 * math::pi * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr);
+                            ith.mass = tarMass + impMass;
+                            ith.eng  = 0.1 * Grav * tarMass / tarRadi;
+                            ith.id   = id++;
+                            // TODO: Modify this line for all particles that need new EoS
+                            ith.setPressure(&Iron);
+                            ith.tag = 3;
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
+                        }
+                    }
+                }
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    imp[i].mass /= (PS::F64)(Nptcl);
+                }
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    ptcl.push_back(imp[i]);
+                }
+                break;
+        }
 
 		const PS::S32 numPtclLocal = ptcl.size();
 		sph_system.setNumberOfParticleLocal(numPtclLocal);
@@ -243,7 +250,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			// TODO: Modify the lines below for all particles that need new EoS
 			if(sph_system[i].tag % 2 == 0){
-				sph_system[i].setPressure(&Granite);
+				sph_system[i].setPressure(&AGranite);
 			}else{
 				sph_system[i].setPressure(&Iron);
 			}

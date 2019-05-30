@@ -33,7 +33,15 @@ namespace EoS{
 			return hcr;
 		}
 	};
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> fa6e6eb... Add files via upload
+    //Tillotson equation "is applicable to the prediction of the shock and release of materials undergoing hypervelocity impacts."
+>>>>>>> Add files via upload
 	template <typename type> class Tillotson : public EoS_t<type>{
 		type rho0, a, b, A, B, u0, alpha, beta, uiv, ucv;
 		inline type P_co(const type dens, const type eng) const{
@@ -56,17 +64,19 @@ namespace EoS{
 		}
 		public:
 		Tillotson(const type a_rho0, const type a_u0, const type a_uiv, const type a_ucv, const type a_A, const type a_B, const type a_a, const type a_b, const type a_alpha, const type a_beta){
-			//in MKS unit...
-			rho0  = a_rho0; // kg/m^3
-			u0    = a_u0;   // J/kg
-			uiv   = a_uiv;  // J/kg
-			ucv   = a_ucv;  // J/kg
-			A     = a_A;    // Pa
-			B     = a_B;    // Pa
-			a     = a_a;    // dimension-less
-			b     = a_b;    //
-			alpha = a_alpha;//
-			beta  = a_beta; //
+            //in MKS unit...
+            //From Brundage 2013
+            //"Implementation of Tillotson Equation of State for Hypervelocity Impact of Metals, Geologic Materials, and Liquids"
+            rho0  = a_rho0; // Density                          [kg/m^3]
+            u0    = a_u0;   // Initial Energy                   [J/kg]
+            uiv   = a_uiv;  // Energy at incipient vaporization [J/kg]
+            ucv   = a_ucv;  // Energy at complete vaporization  [J/kg]
+            A     = a_A;    // Bulk modulus                     [Pa]
+            B     = a_B;    // Tillotson parameter              [Pa]
+            a     = a_a;    // Tillotson parameter              [dimension-less]
+            b     = a_b;    // Tillotson parameter
+            alpha = a_alpha;// Tillotson parameter
+            beta  = a_beta; // Tillotson parameter
 		}
 		inline type Pressure(const type dens, const type eng) const{
 			const type p_min = 1.0e+7;
@@ -268,4 +278,5 @@ static const EoS::IdealGas<PS::F64>  Diatomic  (1.4);
 static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0);
 static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
 static const EoS::ANEOS<PS::F64> AGranite      ("eos/granite.rho_u.txt");
+
 
