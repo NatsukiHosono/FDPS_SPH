@@ -33,6 +33,10 @@ namespace EoS{
 			return hcr;
 		}
 	};
+<<<<<<< HEAD
+=======
+
+>>>>>>> a4dbabc8242229d27592959090ddc38d4abd65dd
     //Tillotson equation "is applicable to the prediction of the shock and release of materials undergoing hypervelocity impacts."
 	template <typename type> class Tillotson : public EoS_t<type>{
 		type rho0, a, b, A, B, u0, alpha, beta, uiv, ucv;
