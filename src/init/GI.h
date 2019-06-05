@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "../parse.h"
 
 #define SELF_GRAVITY
 #define FLAG_GI
@@ -6,9 +6,11 @@
 #error
 #endif
 template <class Ptcl> class GI : public Problem<Ptcl>{
-	public:
-	static const double END_TIME;
-	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
+    public:
+	static double end_time;
+    static double damping;
+	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
+                        const char* in_file){
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -21,17 +23,21 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// Use parameters from input file, or defaults if none provided
 		// TODO: Currently the input file has to be in the same directory as the executable
 		//       Change this into a command-line parameter.
-		ParameterFile parameter_file("input.txt");
+        //system("pwd");
+        char initdir[20];
+        strcpy(initdir, "input/");
+        ParameterFile parameter_file(strcat(initdir, in_file));
+        std::cout << "reading from input/" << in_file << std::endl;
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
-        mode = parameter_file.getValueOf("mode",0);
-        PS::F64 impVel = parameter_file.getValueOf("impVel",0);
+        int mode = parameter_file.getValueOf("mode", 0 );
+        PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
+        end_time = parameter_file.getValueOf("end_time",1.0e+4);
+        damping = parameter_file.getValueOf("damping",1.);
         
-		
-		/////////
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
@@ -45,8 +51,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const double offset = 5.0 * UnitRadi;
 		const PS::F64 dx = 1.0 / 39;
 		const PS::F64 Grav = 6.67e-11;
-		std::cout << impRadi / tarRadi << std::endl;
-		std::cout << impCoreRadi / impRadi << std::endl;
+		//std::cout << impRadi / tarRadi << std::endl;
+		//std::cout << impCoreRadi / impRadi << std::endl;
 		///////////////////
 		//Dummy put to determine # of ptcls
 		///////////////////
@@ -134,6 +140,46 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::S32 id = 0;
         
         switch (mode){
+            case 0:
+                std::cout << "creating target from tar.dat" << std::endl;
+                FILE * tarFile;
+                tarFile = fopen("input/tar.dat","r");
+                FileHeader tarheader;
+                int nptcltar;
+                nptcltar = tarheader.readAscii(tarFile);
+                std::cout << "num tar ptcl: " << nptcltar << std::endl;
+                for(int i=0; i<nptcltar; i++){
+                    Ptcl ith;
+                    ith.readAscii(tarFile);
+                    if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+                }
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                    tar[i].mass /= (PS::F64)(Nptcl);
+                }
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                    ptcl.push_back(tar[i]);
+                }
+                
+                std::cout << "creating impactor from imp.dat" << std::endl;
+                FILE * impFile;
+                impFile = fopen("input/imp.dat","r");
+                FileHeader impheader;
+                int nptclimp;
+                nptclimp = impheader.readAscii(impFile);
+                std::cout << "num imp ptcl: " << nptclimp << std::endl;
+                for(int i=0; i<nptclimp; i++){
+                    Ptcl ith;
+                    ith.readAscii(impFile);
+                    ith.vel.x += (-1) * impVel;
+                    if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
+                }
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    imp[i].mass /= (PS::F64)(Nptcl);
+                }
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    ptcl.push_back(imp[i]);
+                }
+                break;
             case 1:
                 //Put Tar.
                 std::cout << "creating target" << std::endl;
@@ -266,6 +312,3 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		}
 	}
 };
-
-template <class Ptcl>
-const double GI<Ptcl>::END_TIME = 1.0e+4;

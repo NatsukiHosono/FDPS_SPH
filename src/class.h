@@ -190,6 +190,9 @@ namespace STD{
 			vel = vel_half + 0.5 * dt_glb * (acc + grav);
 			eng = eng_half + 0.5 * dt_glb * eng_dot;
 		}
+        void dampMotion(double damping) {
+            vel *= damping;
+        }
 	};
 
 	namespace EPI{
