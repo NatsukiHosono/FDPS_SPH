@@ -34,5 +34,6 @@
 # Other Files
 .DS_Store
 
-#FDPS Directory
+# Directories
 FDPS/
+build/
