@@ -21,7 +21,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// Use parameters from input file, or defaults if none provided
 		// TODO: Currently the input file has to be in the same directory as the executable
 		//       Change this into a command-line parameter.
-		ParameterFile parameter_file("input.txt");
+		ParameterFile parameter_file("init/input.txt");
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
@@ -134,6 +134,46 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::S32 id = 0;
         
         switch (mode){
+            case 0:
+                std::cout << "creating target from tar.dat" << std::endl;
+                FILE * tarFile;
+                tarFile = fopen("init/tar.dat","r");
+                FileHeader tarheader;
+                int nptcltar;
+                nptcltar = tarheader.readAscii(tarFile);
+                std::cout << "num tar ptcl: " << nptcltar << std::endl;
+                for(int i=0; i<nptcltar; i++){
+                    Ptcl ith;
+                    ith.readAscii(tarFile);
+                    if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+                }
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                    tar[i].mass /= (PS::F64)(Nptcl);
+                }
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                    ptcl.push_back(tar[i]);
+                }
+                
+                std::cout << "creating impactor from imp.dat" << std::endl;
+                FILE * impFile;
+                impFile = fopen("init/imp.dat","r");
+                FileHeader impheader;
+                int nptclimp;
+                nptclimp = impheader.readAscii(impFile);
+                std::cout << "num imp ptcl: " << nptclimp << std::endl;
+                for(int i=0; i<nptclimp; i++){
+                    Ptcl ith;
+                    ith.readAscii(impFile);
+                    ith.vel.x = (-1) * impVel;
+                    if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
+                }
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    imp[i].mass /= (PS::F64)(Nptcl);
+                }
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    ptcl.push_back(imp[i]);
+                }
+                break;
             case 1:
                 //Put Tar.
                 std::cout << "creating target" << std::endl;
