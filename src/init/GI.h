@@ -6,8 +6,9 @@
 #error
 #endif
 template <class Ptcl> class GI : public Problem<Ptcl>{
-	public:
+    public:
 	static const double END_TIME;
+    static int mode;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
 		const double Corr = .98;//Correction Term
 		/////////
@@ -21,17 +22,16 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// Use parameters from input file, or defaults if none provided
 		// TODO: Currently the input file has to be in the same directory as the executable
 		//       Change this into a command-line parameter.
+        system("pwd");
 		ParameterFile parameter_file("init/input.txt");
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
-        mode = parameter_file.getValueOf("mode",0);
+        //mode = parameter_file.getValueOf("mode", 0 );
         PS::F64 impVel = parameter_file.getValueOf("impVel",0);
         
-		
-		/////////
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
@@ -307,5 +307,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	}
 };
 
-template <class Ptcl>
-const double GI<Ptcl>::END_TIME = 1.0e+4;
+template <class Ptcl> const double GI<Ptcl>::END_TIME = 1.0e+4;
+
+ParameterFile parameter_file("init/input.txt");
+template <class Ptcl> int GI<Ptcl>::mode = parameter_file.getValueOf("mode", 0 );

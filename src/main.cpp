@@ -1,7 +1,5 @@
 #include <particle_simulator.hpp>
 
-int mode;
-
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -37,6 +35,7 @@ int main(int argc, char* argv[]){
 	//////////////////
 	if(argc == 1){
 		PROBLEM::setupIC(sph_system, sysinfo, dinfo);
+        //std::cout << PROBLEM::mode << std::endl;
 		PROBLEM::setEoS(sph_system);
 		PTCL::CalcPressure(sph_system);
 	}else{
@@ -49,7 +48,7 @@ int main(int argc, char* argv[]){
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 		sph_system[i].initialize();
 	}
-	OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::END_TIME);
+    OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::END_TIME);
 
 	//Dom. info
 	dinfo.decomposeDomainAll(sph_system);
