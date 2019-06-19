@@ -33,16 +33,34 @@ int main(int argc, char* argv[]){
 	//////////////////
 	//Setup Initial
 	//////////////////
-	if(argc == 1){
-		PROBLEM::setupIC(sph_system, sysinfo, dinfo);
+    bool newSim = true;
+    char in_file[255], out_dir[255];
+    strcpy(in_file, "input.txt");
+    strcpy(out_dir, "default");
+    for (int i=0; i<argc; i++) {
+        std::cout << i << argv[i] << std::endl;
+        if (strcmp(argv[i],"-i")==0 || strcmp(argv[i], "--input")==0) {
+            strcpy(in_file, argv[i+1]);
+        }
+        if (strcmp(argv[i],"-o")==0 || strcmp(argv[i], "--output")==0)
+            strcpy(out_dir, argv[i+1]);
+        if (strcmp(argv[i],"-r")==0 || strcmp(argv[i], "--resume")==0) {
+            sysinfo.step = atoi(argv[i+1]);
+            newSim = false;
+        }
+    }
+    
+    if (newSim) {
+        //std::cout << "INPUT: " << in_file << std::endl;
+        //std::cout << "OUTPUT: " << out_dir << std::endl;
+        PROBLEM::setupIC(sph_system, sysinfo, dinfo, in_file, out_dir);
         //std::cout << PROBLEM::mode << std::endl;
-		PROBLEM::setEoS(sph_system);
-		PTCL::CalcPressure(sph_system);
-	}else{
-		sysinfo.step = atoi(argv[1]);
-		InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
-		PROBLEM::setEoS(sph_system);
-	}
+        PROBLEM::setEoS(sph_system);
+        PTCL::CalcPressure(sph_system);
+    } else {
+        InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
+        PROBLEM::setEoS(sph_system);
+    }
 
 	#pragma omp parallel for
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
