@@ -23,8 +23,10 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// Use parameters from input file, or defaults if none provided
 		// TODO: Currently the input file has to be in the same directory as the executable
 		//       Change this into a command-line parameter.
-        system("pwd");
-        char initdir[] = "init/";
+        //system("pwd");
+        char initdir[20];
+        strcpy(initdir, "init/");
+        //std::cout << initdir << std::endl;
         ParameterFile parameter_file(strcat(initdir, in_file));
         std::cout << "reading from init/" << in_file << std::endl;
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);

@@ -34,11 +34,11 @@ int main(int argc, char* argv[]){
 	//Setup Initial
 	//////////////////
     bool newSim = true;
-    char in_file[255], out_dir[255];
+    char in_file[20], out_dir[20];
     strcpy(in_file, "input.txt");
     strcpy(out_dir, "default");
     for (int i=0; i<argc; i++) {
-        std::cout << i << argv[i] << std::endl;
+        //std::cout << i << argv[i] << std::endl;
         if (strcmp(argv[i],"-i")==0 || strcmp(argv[i], "--input")==0) {
             strcpy(in_file, argv[i+1]);
         }
