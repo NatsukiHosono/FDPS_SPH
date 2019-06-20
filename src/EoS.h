@@ -237,7 +237,7 @@ namespace EoS{
 
 		void test_data() const{
 			std::ofstream output;
-			output.open("init/test_output.txt", std::ios::out);
+			output.open("src/init/test_output.txt", std::ios::out);
 			output.setf(std::ios::scientific);
 			output.precision(8);
 			if(output.fail() == true){
@@ -269,5 +269,5 @@ static const EoS::IdealGas<PS::F64>  Monoatomic(5./3.);
 static const EoS::IdealGas<PS::F64>  Diatomic  (1.4);
 static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0);
 static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
-static const EoS::ANEOS<PS::F64> AGranite      ("init/granite.rho_u.txt");
+static const EoS::ANEOS<PS::F64> AGranite      ("src/init/granite.rho_u.txt");
 

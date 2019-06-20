@@ -1,0 +1,14 @@
+# input parameters
+# mode = 0                    # tar and imp set from specified files, set impVel
+    tar = "tar.dat"         # file contains tar initial conditions
+    imp = "imp.dat"         # file contains imp initial conditions
+    impVel = 1000           # impact velocity
+
+mode = 1                    # tar on only, creates tar.dat
+    UnitMass = 5.97e+24     # target mass
+    UnitRadi = 6100e+3      # target radius
+    coreFracRadi = 0.54     # core fraction in radius
+    coreFracMass = 0.3      # core fraction in mass
+
+# mode = 2                    # imp on only, creates imp.dat
+    imptarMassRatio = 0.2   # impator-to-target mass ratio
