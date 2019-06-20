@@ -7,10 +7,9 @@
 #endif
 template <class Ptcl> class GI : public Problem<Ptcl>{
     public:
-	static const double END_TIME;
-    static int mode;
+	static double end_time;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
-                        const char* in_file, const char* out_file){
+                        const char* in_file){
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -25,17 +24,17 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		//       Change this into a command-line parameter.
         //system("pwd");
         char initdir[20];
-        strcpy(initdir, "init/");
-        //std::cout << initdir << std::endl;
+        strcpy(initdir, "input/");
         ParameterFile parameter_file(strcat(initdir, in_file));
-        std::cout << "reading from init/" << in_file << std::endl;
+        std::cout << "reading from input/" << in_file << std::endl;
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
-        //mode = parameter_file.getValueOf("mode", 0 );
+        int mode = parameter_file.getValueOf("mode", 0 );
         PS::F64 impVel = parameter_file.getValueOf("impVel",0);
+        end_time = parameter_file.getValueOf("end_time",1.0e+4);
         
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
@@ -50,8 +49,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const double offset = 5.0 * UnitRadi;
 		const PS::F64 dx = 1.0 / 39;
 		const PS::F64 Grav = 6.67e-11;
-		std::cout << impRadi / tarRadi << std::endl;
-		std::cout << impCoreRadi / impRadi << std::endl;
+		//std::cout << impRadi / tarRadi << std::endl;
+		//std::cout << impCoreRadi / impRadi << std::endl;
 		///////////////////
 		//Dummy put to determine # of ptcls
 		///////////////////
@@ -142,7 +141,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
             case 0:
                 std::cout << "creating target from tar.dat" << std::endl;
                 FILE * tarFile;
-                tarFile = fopen("init/tar.dat","r");
+                tarFile = fopen("input/tar.dat","r");
                 FileHeader tarheader;
                 int nptcltar;
                 nptcltar = tarheader.readAscii(tarFile);
@@ -161,7 +160,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 
                 std::cout << "creating impactor from imp.dat" << std::endl;
                 FILE * impFile;
-                impFile = fopen("init/imp.dat","r");
+                impFile = fopen("input/imp.dat","r");
                 FileHeader impheader;
                 int nptclimp;
                 nptclimp = impheader.readAscii(impFile);
@@ -312,7 +311,4 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	}
 };
 
-template <class Ptcl> const double GI<Ptcl>::END_TIME = 1.0e+4;
-
-ParameterFile parameter_file("init/input.txt");
-template <class Ptcl> int GI<Ptcl>::mode = parameter_file.getValueOf("mode", 0 );
+template <class Ptcl> double GI<Ptcl>::end_time;

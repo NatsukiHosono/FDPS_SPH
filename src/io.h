@@ -18,17 +18,17 @@ template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_sy
 	fout.close();
 }
 
-template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time){
+template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time, char* out_dir){
 	if(sysinfo.time > sysinfo.output_time){
 		FileHeader header;
 		header.time = sysinfo.time;
 		header.Nbody = sph_system.getNumberOfParticleLocal();
 		char filename[256];
-        sprintf(filename, "results/%05d", sysinfo.output_id);
+        sprintf(filename, "results/%s/%05d", out_dir, sysinfo.output_id);
 		sph_system.writeParticleAscii(filename, "%s_%05d_%05d.dat", header);
 		if(PS::Comm::getRank() == 0){
-			std::cout << "//================================" << std::endl;
-			std::cout << "output " << filename << "." << std::endl;
+            std::cout << "//================================" << std::endl;
+            std::cout << "output " << filename << "." << std::endl;
 			std::cout << "//================================" << std::endl;
 		}
 		sysinfo.output_time += end_time / PARAM::NUMBER_OF_SNAPSHOTS;
