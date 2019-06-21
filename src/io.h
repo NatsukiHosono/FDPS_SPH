@@ -1,10 +1,10 @@
 #pragma once
 
-template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo){
+template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo, char* out_dir){
 	//Binary
 	char filename[256];
 	std::ofstream fout;
-    sprintf(filename, "results/%B05d_%05d.bin", PS::Comm::getNumberOfProc(), PS::Comm::getRank());
+    sprintf(filename, "results/%s/%05d_%05d.bin", out_dir, PS::Comm::getNumberOfProc(), PS::Comm::getRank());
 	fout.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 	if(!fout){
 		std::cout << "cannot write restart file." << std::endl;

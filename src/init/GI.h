@@ -168,7 +168,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 for(int i=0; i<nptclimp; i++){
                     Ptcl ith;
                     ith.readAscii(impFile);
-                    ith.vel.x = (-1) * impVel;
+                    ith.vel.x += (-1) * impVel;
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
                 }
                 for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
@@ -310,5 +310,3 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		}
 	}
 };
-
-template <class Ptcl> double GI<Ptcl>::end_time;

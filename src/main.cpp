@@ -16,6 +16,8 @@
 #include "io.h"
 #include "integral.h"
 
+template <class Ptcl> double GI<Ptcl>::end_time;
+
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
 	typedef GI<PTCL::RealPtcl> PROBLEM;
@@ -144,7 +146,7 @@ int main(int argc, char* argv[]){
 			std::cout << "//================================" << std::endl;
 		}
 		if(sysinfo.step % 30 == 0){
-			OutputBinary(sph_system, sysinfo);
+			OutputBinary(sph_system, sysinfo, out_dir);
 		}
 	}
 
