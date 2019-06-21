@@ -17,6 +17,7 @@
 #include "integral.h"
 
 template <class Ptcl> double GI<Ptcl>::end_time;
+template <class Ptcl> double GI<Ptcl>::damping;
 
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
@@ -134,6 +135,7 @@ int main(int argc, char* argv[]){
 		#pragma omp parallel for
 		for(int i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			sph_system[i].finalKick(sysinfo.dt);
+            sph_system[i].dampMotion(PROBLEM::damping);
 		}
 		PROBLEM::postTimestepProcess(sph_system, sysinfo);
 		sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);

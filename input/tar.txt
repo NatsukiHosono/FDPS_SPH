@@ -14,3 +14,5 @@ mode = 1                    # tar on only, creates tar.dat
     imptarMassRatio = 0.2   # impator-to-target mass ratio
 
 end_time = 1.0e+5           # number of seconds in the simulation
+
+damping = 0.8

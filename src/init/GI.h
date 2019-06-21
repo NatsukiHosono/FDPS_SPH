@@ -8,6 +8,7 @@
 template <class Ptcl> class GI : public Problem<Ptcl>{
     public:
 	static double end_time;
+    static double damping;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
                         const char* in_file){
 		const double Corr = .98;//Correction Term
@@ -33,8 +34,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
         int mode = parameter_file.getValueOf("mode", 0 );
-        PS::F64 impVel = parameter_file.getValueOf("impVel",0);
+        PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
         end_time = parameter_file.getValueOf("end_time",1.0e+4);
+        damping = parameter_file.getValueOf("damping",1.);
         
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
