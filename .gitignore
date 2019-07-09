@@ -35,5 +35,5 @@
 .DS_Store
 
 # Directories
-build/
-results/
+build/*
+results/default/*
