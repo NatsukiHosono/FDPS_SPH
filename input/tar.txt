@@ -1,4 +1,5 @@
-# input parameters
+# These are input parameters for the simulation of a target body.
+
 # mode = 0                    # tar and imp set from specified files, set impVel
     tar = "tar.dat"         # file contains tar initial conditions
     imp = "imp.dat"         # file contains imp initial conditions
