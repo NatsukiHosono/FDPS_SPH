@@ -1,4 +1,5 @@
 # These are input parameters for the simulation of a target body.
+# Run FDPS_SPH with this file using the "-i tar.txt" option at runtime
 
 # mode = 0                    # tar and imp set from specified files, set impVel
     tar = "tar.dat"         # file contains tar initial conditions
