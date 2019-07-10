@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
 	//Setup Initial
 	//////////////////
     bool newSim = true;
-    char in_file[20], out_dir[20];
+    char in_file[256], out_dir[256];
     strcpy(in_file, "input.txt");
     strcpy(out_dir, "default");
     for (int i=0; i<argc; i++) {
