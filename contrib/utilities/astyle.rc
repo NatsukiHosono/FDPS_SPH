@@ -1,0 +1,15 @@
+# astyle indentation style for FDPS SPH
+# Run astyle on all files with:
+#    astyle --options=contrib/utilities/astyle.rc `find src | egrep '\.(h|cc)$'`
+
+--style=google
+
+# use tabs:
+--indent-preprocessor
+--indent=tab
+--indent-namespaces
+--indent-labels
+
+--max-instatement-indent=80
+--suffix=none
+--quiet
