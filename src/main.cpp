@@ -11,7 +11,7 @@
 #include "kernel.h"
 #include "EoS.h"
 #include "class.h"
-#include "init/GI.h"
+#include "GI.h"
 #include "force.h"
 #include "io.h"
 #include "integral.h"
