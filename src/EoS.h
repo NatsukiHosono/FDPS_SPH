@@ -225,7 +225,8 @@ namespace EoS{
 			}
 			input.close();
 
-			test_data();
+			// uncomment this to test input routine
+			// test_data();
 		}
 
 		inline type Pressure(const type dens, const type eng) const{
