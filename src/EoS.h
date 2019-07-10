@@ -239,7 +239,7 @@ namespace EoS{
 
 		void test_data() const{
 			std::ofstream output;
-			output.open("src/init/test_output.txt", std::ios::out);
+			output.open("test_output.txt", std::ios::out);
 			output.setf(std::ios::scientific);
 			output.precision(8);
 			if(output.fail() == true){
