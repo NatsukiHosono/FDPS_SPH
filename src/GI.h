@@ -1,4 +1,4 @@
-#include "parse.h"
+#include <parse.h>
 
 #define SELF_GRAVITY
 #define FLAG_GI
