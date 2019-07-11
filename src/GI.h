@@ -193,12 +193,15 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// excess of mantle particles
 		int Nexcess;
 		Nexcess = tar.size() - int(Nptcl*(1.0-coreFracMass));
+
 		
-		// erasing excess of particles
+		// erasing excess of mantle particles
 		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
-		  tar.erase(tar.begin()+ rand () % (tar.size() - int(Nptcl*(1.0-coreFracMass)) + 1) +  - int(Nptcl*(1.0-coreFracMass)));
+		  tar.erase(tar.begin()+ rand () % (tar.size() + 1));
 		}
-		std::cout << tar.size() << std::endl ;
+
+		
+		std::cout << "# of mantle particles = " <<  tar.size() << std::endl ;
 
 		
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
@@ -211,7 +214,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.pos.y = tarCoreShrinkFactor * UnitRadi * y;
                             ith.pos.z = tarCoreShrinkFactor * UnitRadi * z;
                             ith.dens = tarCoreMass / (4.0 / 3.0 * math::pi * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr);
-                            ith.mass = tarMass + impMass;
+                            ith.mass = tarMass; // + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
                             // TODO: Modify this line for all particles that need new EoS
@@ -224,12 +227,20 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 		// excess of core particles
 		Nexcess = tar.size() - Nptcl;
+		if (tar.size() < int(Nptcl)){
+		  std::cout << "The number of core particle is not enough. You may want to modify the parameter gridpoint in GI.h " << std::endl;
+		  exit(0);
+		}
+		
 
+		// erasing excess of core particles
 		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
-		  tar.erase(tar.begin()+ rand () % (tar.size() + 1));
+		  tar.erase(tar.begin()+ rand () % (tar.size() - int(Nptcl*(1.0-coreFracMass)) + 1) +  int(Nptcl*(1.0-coreFracMass)));
+		  //tar.erase(tar.begin()+ rand () % (tar.size() + 1));
 		}
 
-		std::cout << tar.size() << std::endl ;
+
+		std::cout << "# of total SPH particles " <<tar.size() << std::endl ;
 		exit(0);
 		
 	       
