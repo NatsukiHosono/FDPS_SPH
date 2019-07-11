@@ -54,93 +54,29 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const PS::F64 Grav = 6.67e-11;
 
 
-
-
-		//std::cout << impRadi / tarRadi << std::endl;
-		//std::cout << impCoreRadi / impRadi << std::endl;
-		///////////////////
-		//Dummy put to determine # of ptcls
-		///////////////////
-		//target
+		int tarNmntl;
+		int tarNcore;
+		int tarNptcl;
+		int impNptcl;
+		
+		
+		int impNcore;
+		int impNmntl;
 		
 
-		int tarNmntl = int(Nptcl * (1.0-coreFracMass));
-	       
-		/*	for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r <= tarRadi){
-						++ estimatedNptcl;
-					}
-					if(r >= tarRadi || r <= tarCoreRadi) continue;
-					++ tarNmntl;
-				}
-			}
-		}
-
-		*/
+		double tarCoreShrinkFactor = 1.0;
+		double impCoreShrinkFactor = 1.0;
 
 
-		int tarNcore = int(Nptcl * (1.0-coreFracMass));
-
+		
+		//tarNptcl = tarNcore + tarNmntl;
+		//impNptcl = impNcore + impNmntl;
+		
+		//if (mode==0){
+		//	Nptcl    = tarNptcl + impNptcl;
+		//}
 
 		/*
-		int tarNcore;
-		double tarCoreShrinkFactor = 1.0;
-		while(tarCoreShrinkFactor *= 0.99){
-			tarNcore = 0;
-			for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-				for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-					for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-						const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-						if(r >= Corr * tarCoreRadi) continue;
-						++ tarNcore;
-					}
-				}
-			}
-			if((double)(tarNcore) / (double)(tarNcore + tarNmntl) > coreFracMass) break;
-		}
-		*/
-
-		
-		//imp
-		int impNmntl = 0;
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = Expand * sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= impRadi || r <= impCoreRadi) continue;
-					++ impNmntl;
-				}
-			}
-		}
-		double impCoreShrinkFactor = 1.0;
-		int impNcore;
-		while(impCoreShrinkFactor *= 0.99){
-			impNcore = 0;
-			for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-				for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-					for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-						const PS::F64 r = Expand * impCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-						if(r >= Corr * impCoreRadi) continue;
-						++ impNcore;
-					}
-				}
-			}
-			if((double)(impNcore) / (double)(impNcore + impNmntl) > coreFracMass) break;
-		}
-		///////////////////
-		//Dummy end
-		///////////////////
-		const int tarNptcl = tarNcore + tarNmntl;
-		const int impNptcl = impNcore + impNmntl;
-		
-		if (mode==0){
-			Nptcl    = tarNptcl + impNptcl;
-		}
-
-
 		std::cout << "Target  :" << tarNptcl << std::endl;
 		std::cout << "    radius           : " << tarRadi << std::endl;
 		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
@@ -160,6 +96,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         std::cout << "    velocity         : " << impVel << std::endl;
 		std::cout << "Total:" << Nptcl << std::endl;
 		std::cout << "Tar-to-Imp mass ratio: " << (double)(impNmntl) / (double)(tarNmntl) << std::endl;
+
+		*/
+		
 		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
 		///////////////////
 		//Real put
@@ -172,29 +111,40 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 FILE * tarFile;
                 tarFile = fopen("input/tar.dat","r");
                 FileHeader tarheader;
-                int nptcltar;
-                nptcltar = tarheader.readAscii(tarFile);
-                std::cout << "num tar ptcl: " << nptcltar << std::endl;
-                for(int i=0; i<nptcltar; i++){
+                tarNptcl = tarheader.readAscii(tarFile);
+		
+                std::cout << "Number of particles of the target: " << tarNptcl << std::endl;
+		
+                for(int i=0; i < tarNptcl; i++){
                     Ptcl ith;
                     ith.readAscii(tarFile);
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                 }
-                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
-                    tar[i].mass /= (PS::F64)(Nptcl);
-                }
+
+		//std::cout << tar[0].mass << std::endl;
+		
+                //for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+                //    tar[i].mass /= (PS::F64)(Nptcl);
+                //}
+		
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     ptcl.push_back(tar[i]);
                 }
-                
+
+
+		std::cout << tar[0].mass << std::endl;
+		exit(0);
+		
+		//TODO:  I don't think EoS, energy etc is not stored in the particles -- right?
+		
                 std::cout << "creating impactor from imp.dat" << std::endl;
                 FILE * impFile;
                 impFile = fopen("input/imp.dat","r");
                 FileHeader impheader;
-                int nptclimp;
-                nptclimp = impheader.readAscii(impFile);
-                std::cout << "num imp ptcl: " << nptclimp << std::endl;
-                for(int i=0; i<nptclimp; i++){
+                int impNptcl;
+                impNptcl = impheader.readAscii(impFile);
+                std::cout << "Number of particles of the impactor: " <<  impNptcl << std::endl;
+                for(int i=0; i<impNptcl; i++){
                     Ptcl ith;
                     ith.readAscii(impFile);
                     ith.vel.x += (-1) * impVel;
@@ -206,9 +156,16 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
                     ptcl.push_back(imp[i]);
                 }
+
+		Nptcl = tarNptcl + impNptcl;
+		
                 break;
             case 2:
                 //Put Tar.
+	        //Assuming there is no impactor
+
+	        tarNmntl = int(Nptcl * (1.0-coreFracMass));
+		tarNcore = int(Nptcl * coreFracMass);
 	      
                 std::cout << "creating target" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
@@ -220,6 +177,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.pos.x = UnitRadi * x;
                             ith.pos.y = UnitRadi * y;
                             ith.pos.z = UnitRadi * z;
+			    // I am a little confused by this following line. Shouldn't SPH compute density?
+			    // Is this just a guess and SPH will actually compute the density from the next step? - Miki
                             ith.dens = (tarMass - tarCoreMass) / (4.0 / 3.0 * math::pi * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi));
                             ith.mass = tarMass + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
