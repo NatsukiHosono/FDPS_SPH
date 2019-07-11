@@ -59,7 +59,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		int tarNptcl;
 		int impNptcl;
 		
-		
 		int impNcore;
 		int impNmntl;
 		
@@ -120,22 +119,14 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ith.readAscii(tarFile);
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                 }
-
-		//std::cout << tar[0].mass << std::endl;
-		
-                //for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
-                //    tar[i].mass /= (PS::F64)(Nptcl);
-                //}
 		
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     ptcl.push_back(tar[i]);
                 }
 
 
-		std::cout << tar[0].mass << std::endl;
-		exit(0);
-		
-		//TODO:  I don't think EoS, energy etc is not stored in the particles -- right?
+		//std::cout << tar[0].mass << std::endl;
+		//exit(0);
 		
                 std::cout << "creating impactor from imp.dat" << std::endl;
                 FILE * impFile;
@@ -162,10 +153,13 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 break;
             case 2:
                 //Put Tar.
-	        //Assuming there is no impactor
+
 
 	        tarNmntl = int(Nptcl * (1.0-coreFracMass));
 		tarNcore = int(Nptcl * coreFracMass);
+
+		//Assuming there is no impactor here
+
 	      
                 std::cout << "creating target" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
@@ -180,7 +174,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 			    // I am a little confused by this following line. Shouldn't SPH compute density?
 			    // Is this just a guess and SPH will actually compute the density from the next step? - Miki
                             ith.dens = (tarMass - tarCoreMass) / (4.0 / 3.0 * math::pi * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi));
-                            ith.mass = tarMass + impMass;
+                            ith.mass = tarMass; // + impMass; 
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
                             // TODO: Modify this line for all particles that need new EoS
@@ -248,6 +242,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 }
                 break;
             case 3:
+	      // Miki did not touch this -- this will probably break.
                 //imp
                 std::cout << "creating impactor" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
