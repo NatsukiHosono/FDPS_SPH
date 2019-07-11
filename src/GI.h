@@ -28,7 +28,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
-        int mode = parameter_file.getValueOf("mode", 1 );
+        int mode = parameter_file.getValueOf("mode", 2 );
         PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
         end_time = parameter_file.getValueOf("end_time",1.0e+4);
         damping = parameter_file.getValueOf("damping",1.);
