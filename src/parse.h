@@ -76,7 +76,7 @@ class ParameterFile{
 		}
 	}
 	template <typename T>
-	T getValueOf(const std::string &key, T default_parameter_value=T()){
+	T getValueOf(const std::string &key, const T &default_parameter_value){
 
 		T parameter_value = default_parameter_value;
 
@@ -92,10 +92,8 @@ class ParameterFile{
 		    }
 		}
 		else{
-			if (default_parameter_value == T()){
-				std::cout << "Parameter <" << key << "> not found and no default value provided. Aborting." << std::endl;
-				throw;
-			}
+			std::cout << "Parameter <" << key << "> not found and no default value provided. Aborting." << std::endl;
+			throw;
 		}
 
 		return parameter_value;
