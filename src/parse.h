@@ -42,7 +42,7 @@ return std::string(input, left, right - left + 1);
 class ParameterFile{
 	std::map<std::string, std::string> param;
 	public:
-	ParameterFile(const char* const file){
+	ParameterFile(const std::string &file){
 		std::ifstream input;
 		input.open(file, std::ios::in);
 		if(input.fail() == true){

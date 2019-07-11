@@ -11,7 +11,7 @@ CFLAGS += -DFAST_COMM_FOR_2ND_EXCHANGE
 #CFLAGS += -DPARTICLE_SIMULATOR_TWO_DIMENSION
 
 CPPOBJS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-CPPHDRS = $(wildcard *.h)
+CPPHDRS = $(wildcard *.h) $(wildcard init/*.h)
 PROGRAM = sph.out
 
 .PHONY:	clean all
