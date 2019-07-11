@@ -10,7 +10,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	static double end_time;
     static double damping;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
-                        const char* in_file){
+                        const std::string &input_file){
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -23,11 +23,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// Use parameters from input file, or defaults if none provided
 		// TODO: Currently the input file has to be in the same directory as the executable
 		//       Change this into a command-line parameter.
-        //system("pwd");
-        char initdir[20];
-        strcpy(initdir, "input/");
-        ParameterFile parameter_file(strcat(initdir, in_file));
-        std::cout << "reading from input/" << in_file << std::endl;
+        std::string input_directory("input/");
+        ParameterFile parameter_file(input_directory + input_file);
+        std::cout << "reading from input/" << input_file << std::endl;
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);

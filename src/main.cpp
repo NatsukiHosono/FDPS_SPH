@@ -37,16 +37,15 @@ int main(int argc, char* argv[]){
 	//Setup Initial
 	//////////////////
     bool newSim = true;
-    char in_file[256], out_dir[256];
-    strcpy(in_file, "input.txt");
-    strcpy(out_dir, "default");
+    std::string input_file("input.txt");
+    std::string output_directory("default");
+
     for (int i=0; i<argc; i++) {
-        //std::cout << i << argv[i] << std::endl;
         if (strcmp(argv[i],"-i")==0 || strcmp(argv[i], "--input")==0) {
-            strcpy(in_file, argv[i+1]);
+        	input_file = std::string(argv[i+1]);
         }
         if (strcmp(argv[i],"-o")==0 || strcmp(argv[i], "--output")==0) {
-            strcpy(out_dir, argv[i+1]);
+        	output_directory = std::string(argv[i+1]);
         }
         if (strcmp(argv[i],"-r")==0 || strcmp(argv[i], "--resume")==0) {
             sysinfo.step = atoi(argv[i+1]);
@@ -55,9 +54,7 @@ int main(int argc, char* argv[]){
     }
     
     if (newSim) {
-        //std::cout << "INPUT: " << in_file << std::endl;
-        //std::cout << "OUTPUT: " << out_dir << std::endl;
-        PROBLEM::setupIC(sph_system, sysinfo, dinfo, in_file);
+        PROBLEM::setupIC(sph_system, sysinfo, dinfo, input_file);
         PROBLEM::setEoS(sph_system);
         PTCL::CalcPressure(sph_system);
     } else {
@@ -69,7 +66,7 @@ int main(int argc, char* argv[]){
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 		sph_system[i].initialize();
 	}
-    OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::end_time, out_dir);
+    OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::end_time, output_directory);
 
 	//Dom. info
 	dinfo.decomposeDomainAll(sph_system);
@@ -100,7 +97,7 @@ int main(int argc, char* argv[]){
 	#endif
 	sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
 	PROBLEM::addExternalForce(sph_system, sysinfo);
-	OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::end_time, out_dir);
+	OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::end_time, output_directory);
 
 	if(PS::Comm::getRank() == 0){
 		std::cout << "//================================" << std::endl;
@@ -139,7 +136,7 @@ int main(int argc, char* argv[]){
 		}
 		PROBLEM::postTimestepProcess(sph_system, sysinfo);
 		sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
-		OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, PROBLEM::end_time, out_dir);
+		OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, PROBLEM::end_time, output_directory);
 		++ sysinfo.step;
 		if(PS::Comm::getRank() == 0){
 			std::cout << "//================================" << std::endl;
@@ -148,7 +145,7 @@ int main(int argc, char* argv[]){
 			std::cout << "//================================" << std::endl;
 		}
 		if(sysinfo.step % 30 == 0){
-			OutputBinary(sph_system, sysinfo, out_dir);
+			OutputBinary(sph_system, sysinfo, output_directory);
 		}
 	}
 

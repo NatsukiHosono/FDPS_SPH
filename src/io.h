@@ -1,6 +1,6 @@
 #pragma once
 
-template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo, char* out_dir){
+template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo, std::string &out_dir){
 	//Binary
 	char filename[256];
 	std::ofstream fout;
@@ -18,7 +18,7 @@ template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_sy
 	fout.close();
 }
 
-template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time, char* out_dir){
+template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time, std::string &out_dir){
 	if(sysinfo.time > sysinfo.output_time){
 		FileHeader header;
 		header.time = sysinfo.time;
