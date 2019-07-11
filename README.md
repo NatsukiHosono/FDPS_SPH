@@ -26,7 +26,7 @@ output of FDPS SPH can be found in the [manual](TODO create link).
 Contributing to FDPS SPH
 ----------------------
 
-FDPS is currently in an early development state. We welcome contributions
+FDPS SPH is currently in an early development state. We welcome contributions
 from everyone, but we ask to open an issue first to discuss your ideas.
 The code structure and user interface can change significantly until
 our first release, so only start using and modifying FDPS SPH if you
