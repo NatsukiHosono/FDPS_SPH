@@ -40,6 +40,8 @@ int main(int argc, char* argv[]){
     std::string input_file("input.txt");
     std::string output_directory("default");
 
+	createOutputDirectory("result");
+
     for (int i=0; i<argc; i++) {
         if (strcmp(argv[i],"-i")==0 || strcmp(argv[i], "--input")==0) {
         	input_file = std::string(argv[i+1]);
