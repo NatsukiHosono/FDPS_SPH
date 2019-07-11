@@ -38,9 +38,7 @@ int main(int argc, char* argv[]){
 	//////////////////
     bool newSim = true;
     std::string input_file("input.txt");
-    std::string output_directory("default");
-
-	createOutputDirectory("result");
+    std::string output_directory("result/");
 
     for (int i=0; i<argc; i++) {
         if (strcmp(argv[i],"-i")==0 || strcmp(argv[i], "--input")==0) {
@@ -48,6 +46,8 @@ int main(int argc, char* argv[]){
         }
         if (strcmp(argv[i],"-o")==0 || strcmp(argv[i], "--output")==0) {
         	output_directory = std::string(argv[i+1]);
+        	if (output_directory.back() != '/')
+        		output_directory += '/';
         }
         if (strcmp(argv[i],"-r")==0 || strcmp(argv[i], "--resume")==0) {
             sysinfo.step = atoi(argv[i+1]);
@@ -55,6 +55,8 @@ int main(int argc, char* argv[]){
         }
     }
     
+	createOutputDirectory(output_directory);
+
     if (newSim) {
         PROBLEM::setupIC(sph_system, sysinfo, dinfo, input_file);
         PROBLEM::setEoS(sph_system);

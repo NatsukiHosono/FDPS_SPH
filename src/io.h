@@ -8,7 +8,7 @@ template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_sy
 	//Binary
 	char filename[256];
 	std::ofstream fout;
-    sprintf(filename, "results/%s/%05d_%05d.bin", out_dir, PS::Comm::getNumberOfProc(), PS::Comm::getRank());
+    sprintf(filename, "%s/%05d_%05d.bin", out_dir.c_str(), PS::Comm::getNumberOfProc(), PS::Comm::getRank());
 	fout.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 	if(!fout){
 		std::cout << "cannot write restart file." << std::endl;
@@ -27,12 +27,14 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 		FileHeader header;
 		header.time = sysinfo.time;
 		header.Nbody = sph_system.getNumberOfParticleLocal();
-		char filename[256];
-        sprintf(filename, "results/%s/%05d", out_dir, sysinfo.output_id);
-		sph_system.writeParticleAscii(filename, "%s_%05d_%05d.dat", header);
+		char filename[20];
+        sprintf(filename, "results.%05d", sysinfo.output_id);
+		std::string full_filename = out_dir + filename;
+
+		sph_system.writeParticleAscii(full_filename.c_str(), "%s_%05d_%05d.dat", header);
 		if(PS::Comm::getRank() == 0){
             std::cout << "//================================" << std::endl;
-            std::cout << "output " << filename << "." << std::endl;
+            std::cout << "output " << full_filename << "." << std::endl;
 			std::cout << "//================================" << std::endl;
 		}
 		sysinfo.output_time += end_time / PARAM::NUMBER_OF_SNAPSHOTS;
