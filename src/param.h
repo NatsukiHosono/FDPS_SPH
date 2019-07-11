@@ -1,11 +1,11 @@
 #pragma once
 
-namespace PARAM{
-	#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
+namespace PARAM {
+#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 	const short int Dim = 2;
-	#else
+#else
 	const short int Dim = 3;
-	#endif
+#endif
 	const PS::F64 SMTH = 1.2;
 	const PS::F64 C_CFL = 0.3;
 	const PS::U64 NUMBER_OF_SNAPSHOTS = 200;

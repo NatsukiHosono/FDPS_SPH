@@ -1,74 +1,74 @@
 #pragma once
 
-enum TYPE{
+enum TYPE {
 	HYDRO,
 	FREEZE,
 };
 
-struct system_t{
+struct system_t {
 	PS::F64 dt, time, output_time;
 	PS::S64 step, output_id;
-	system_t() : step(0), time(0.0), output_id(0), output_time(0.0){
+	system_t() : step(0), time(0.0), output_id(0), output_time(0.0) {
 	}
 };
 
-class FileHeader{
-public:
+class FileHeader {
+  public:
 	int Nbody;
 	double time;
-	int readAscii(FILE* fp){
+	int readAscii(FILE* fp) {
 		fscanf(fp, "%lf\n", &time);
 		fscanf(fp, "%d\n", &Nbody);
 		return Nbody;
 	}
-	void writeAscii(FILE* fp) const{
+	void writeAscii(FILE* fp) const {
 		fprintf(fp, "%e\n", time);
 		fprintf(fp, "%d\n", Nbody);
 	}
 };
 
-namespace STD{
-	namespace RESULT{
+namespace STD {
+	namespace RESULT {
 		//Density summation
-		class Dens{
-			public:
+		class Dens {
+		  public:
 			PS::F64 dens;
 			PS::F64 smth;
-			void clear(){
+			void clear() {
 				dens = smth = 0;
 			}
 		};
 		//for Balsara switch
-		class Drvt{
-			public:
+		class Drvt {
+		  public:
 			PS::F64 div_v;
 			PS::F64vec rot_v;
 			PS::F64 grad_smth;
-			void clear(){
+			void clear() {
 				div_v = 0.0;
 				grad_smth = 0.0;
 				rot_v = 0.0;
 			}
 		};
 		//Hydro force
-		class Hydro{
-			public:
+		class Hydro {
+		  public:
 			PS::F64vec acc;
 			PS::F64 eng_dot;
 			PS::F64 dt;
-			void clear(){
+			void clear() {
 				acc = 0;
 				eng_dot = 0;
 				dt = 1.0e+30;
 			}
 		};
 		//Self gravity
-		class Grav{
-			public:
+		class Grav {
+		  public:
 			PS::F64vec acc;
 			PS::F64    pot;
 			PS::F64    dt;
-			void clear(){
+			void clear() {
 				acc = 0.0;
 				pot = 0.0;
 				dt = 1.0e+30;
@@ -76,8 +76,8 @@ namespace STD{
 		};
 	}
 
-	class RealPtcl{
-		public:
+	class RealPtcl {
+	  public:
 		PS::F64 mass;
 		PS::F64vec pos, vel, acc;
 		PS::F64 dens;//DENSity
@@ -103,144 +103,144 @@ namespace STD{
 
 		TYPE type;
 		//Constructor
-		RealPtcl(){
+		RealPtcl() {
 			type = HYDRO;
 			AVa = 1.0;
 			Bal = 1.0;
 		}
 		//Copy functions
-		void copyFromForce(const RESULT::Dens& dens){
+		void copyFromForce(const RESULT::Dens& dens) {
 			this->dens = dens.dens;
 			this->smth = dens.smth;
 		}
-		void copyFromForce(const RESULT::Drvt& drvt){
+		void copyFromForce(const RESULT::Drvt& drvt) {
 			this->div_v = drvt.div_v;
 			this->rot_v = drvt.rot_v;
-			if(PARAM::FLAG_B95 == true){
+			if(PARAM::FLAG_B95 == true) {
 				this->Bal = std::abs(drvt.div_v) / (std::abs(drvt.div_v) + sqrt(drvt.rot_v * drvt.rot_v) + 1.0e-4 * this->snds / this->smth); //Balsala switch
-			}else{
+			} else {
 				this->Bal = 1.0;
 			}
 			this->grad_smth = drvt.grad_smth;
 		}
-		void copyFromForce(const RESULT::Hydro& force){
+		void copyFromForce(const RESULT::Hydro& force) {
 			this->acc     = force.acc;
 			this->eng_dot = force.eng_dot;
 			this->dt      = force.dt;
 		}
-		void copyFromForce(const RESULT::Grav& force){
+		void copyFromForce(const RESULT::Grav& force) {
 			this->grav = force.acc;
 			this->pot  = force.pot;
 			//not copy dt
 		}
 		//Give necessary values to FDPS
-		PS::F64 getCharge() const{
+		PS::F64 getCharge() const {
 			return this->mass;
 		}
-		PS::F64vec getPos() const{
+		PS::F64vec getPos() const {
 			return this->pos;
 		}
-		PS::F64 getRSearch() const{
+		PS::F64 getRSearch() const {
 			return kernel_t::supportRadius() * this->smth;
 		}
-		void setPos(const PS::F64vec& pos){
+		void setPos(const PS::F64vec& pos) {
 			this->pos = pos;
 		}
-		void writeAscii(FILE* fp) const{
-			#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
-			fprintf(fp, "%ld\t%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  0.0  ,  vel.x,  vel.y,  0.0  ,  dens,  eng,  pres, pot);
-			#else
+		void writeAscii(FILE* fp) const {
+#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
+			fprintf(fp, "%ld\t%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  0.0,  vel.x,  vel.y,  0.0,  dens,  eng,  pres, pot);
+#else
 			fprintf(fp, "%ld\t%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  pos.z,  vel.x,  vel.y,  vel.z,  dens,  eng,  pres, pot);
-			#endif
+#endif
 		}
-		void readAscii(FILE* fp){
-			#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
+		void readAscii(FILE* fp) {
+#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 			double dummy1, dummy2;
 			fscanf (fp, "%ld\t%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &dummy1, &vel.x, &vel.y, &dummy2, &dens, &eng, &pres, &pot);
-			#else
+#else
 			fscanf (fp, "%ld\t%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &pos.z, &vel.x, &vel.y, &vel.z, &dens, &eng, &pres, &pot);
-			#endif
+#endif
 		}
-		void setPressure(const EoS::EoS_t<PS::F64>* const _EoS){
+		void setPressure(const EoS::EoS_t<PS::F64>* const _EoS) {
 			EoS = _EoS;
 		}
-		void initialize(){
+		void initialize() {
 			smth = PARAM::SMTH * pow(mass / dens, 1.0/(PS::F64)(PARAM::Dim));
 			grad_smth = 1.0;
 		}
-		void initialKick(const PS::F64 dt_glb){
+		void initialKick(const PS::F64 dt_glb) {
 			//if(type == FREEZE) return;
 			vel_half = vel + 0.5 * dt_glb * (acc + grav);
 			eng_half = eng + 0.5 * dt_glb * eng_dot;
 		}
-		void fullDrift(const PS::F64 dt_glb){
+		void fullDrift(const PS::F64 dt_glb) {
 			//if(type == FREEZE) return;
 			pos += dt_glb * vel_half;
-			if(PARAM::FLAG_R00 == true){
+			if(PARAM::FLAG_R00 == true) {
 				AVa += ((2.0 - AVa) * std::max(- div_v, 0.0) - (AVa - 0.1) / (smth / snds)) * dt_glb;
 			}
 		}
-		void predict(const PS::F64 dt_glb){
+		void predict(const PS::F64 dt_glb) {
 			//if(type == FREEZE) return;
 			vel += dt_glb * (acc + grav);
 			eng += dt_glb * eng_dot;
 		}
-		void finalKick(const PS::F64 dt_glb){
+		void finalKick(const PS::F64 dt_glb) {
 			//if(type == FREEZE) return;
 			vel = vel_half + 0.5 * dt_glb * (acc + grav);
 			eng = eng_half + 0.5 * dt_glb * eng_dot;
 		}
-        void dampMotion(double damping) {
-            vel *= damping;
-        }
+		void dampMotion(double damping) {
+			vel *= damping;
+		}
 	};
 
-	namespace EPI{
-		class Dens{
-			public:
+	namespace EPI {
+		class Dens {
+		  public:
 			PS::F64vec pos;
 			PS::F64    mass;
 			PS::F64    smth;
 			PS::S64    id;
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				this->pos  = rp.pos;
 				this->mass = rp.mass;
 				this->smth = rp.smth;
 				this->id   = rp.id;
 			}
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			PS::F64 getRSearch() const{
+			PS::F64 getRSearch() const {
 				return kernel_t::supportRadius() * this->smth;
 			}
-			void setPos(const PS::F64vec& pos){
+			void setPos(const PS::F64vec& pos) {
 				this->pos = pos;
 			}
 		};
 
-		class Drvt{
-			public:
+		class Drvt {
+		  public:
 			PS::F64vec pos;
 			PS::F64vec vel;
 			PS::F64    smth;
 			PS::F64    dens;
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				pos  = rp.pos;
 				vel  = rp.vel;
 				dens = rp.dens;
 				smth = rp.smth;
 			}
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			PS::F64 getRSearch() const{
+			PS::F64 getRSearch() const {
 				return kernel_t::supportRadius() * this->smth;
 			}
 		};
 
-		class Hydro{
-			public:
+		class Hydro {
+		  public:
 			PS::F64vec pos;
 			PS::F64vec vel;
 			PS::F64    smth;
@@ -251,7 +251,7 @@ namespace STD{
 			PS::F64    Bal;
 			PS::F64    AVa;
 			PS::S64    id;///DEBUG
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				this->pos       = rp.pos;
 				this->vel       = rp.vel;
 				this->smth      = rp.smth;
@@ -263,26 +263,26 @@ namespace STD{
 				this->AVa       = rp.AVa;
 				this->id        = rp.id;///DEBUG
 			}
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			PS::F64 getRSearch() const{
+			PS::F64 getRSearch() const {
 				return kernel_t::supportRadius() * this->smth;
 			}
 		};
-		class Grav{
-			public:
+		class Grav {
+		  public:
 			PS::F64vec pos;
 			PS::F64    eps2;
 			PS::S64    id;
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			PS::F64 getEps2(void) const{
+			PS::F64 getEps2(void) const {
 				//return (1.0e-4 * 6400.0e+3) * (1.0e-4 * 6400.0e+3);//GI Unit
 				return eps2;
 			}
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				pos = rp.pos;
 				id  = rp.id;
 				//eps2 = 1.0e-2 * rp.smth * rp.smth;
@@ -291,52 +291,52 @@ namespace STD{
 		};
 	}
 
-	namespace EPJ{
-		class Dens{
-		public:
+	namespace EPJ {
+		class Dens {
+		  public:
 			PS::F64    mass;
 			PS::F64vec pos;
 			PS::F64    smth;
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				this->mass = rp.mass;
 				this->pos  = rp.pos;
 				this->smth = rp.smth;
 			}
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			void setPos(const PS::F64vec& pos){
+			void setPos(const PS::F64vec& pos) {
 				this->pos = pos;
 			}
-			PS::F64 getRSearch() const{
+			PS::F64 getRSearch() const {
 				return kernel_t::supportRadius() * this->smth;
 			}
 		};
-		class Drvt{
-			public:
+		class Drvt {
+		  public:
 			PS::F64    mass;
 			PS::F64vec pos;
 			PS::F64vec vel;
 			PS::F64    smth;
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				this->mass = rp.mass;
 				this->pos  = rp.pos;
 				this->vel  = rp.vel;
 				this->smth = rp.smth;
 			}
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			void setPos(const PS::F64vec& pos){
+			void setPos(const PS::F64vec& pos) {
 				this->pos = pos;
 			}
-			PS::F64 getRSearch() const{
+			PS::F64 getRSearch() const {
 				return kernel_t::supportRadius() * this->smth;
 			}
 		};
 
-		class Hydro{
-			public:
+		class Hydro {
+		  public:
 			PS::F64vec pos;
 			PS::F64vec vel;
 			PS::F64    dens;
@@ -348,7 +348,7 @@ namespace STD{
 			PS::F64    Bal;
 			PS::F64    AVa;
 			PS::S64    id;///DEBUG
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				this->pos   = rp.pos;
 				this->vel   = rp.vel;
 				this->dens  = rp.dens;
@@ -361,29 +361,29 @@ namespace STD{
 				this->AVa   = rp.AVa;
 				this->id    = rp.id;///DEBUG
 			}
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			PS::F64 getRSearch() const{
+			PS::F64 getRSearch() const {
 				return kernel_t::supportRadius() * this->smth;
 			}
-			void setPos(const PS::F64vec& pos){
+			void setPos(const PS::F64vec& pos) {
 				this->pos = pos;
 			}
 		};
 
-		class Grav{
-			public:
+		class Grav {
+		  public:
 			PS::F64vec pos;
 			PS::F64    mass;
 			PS::S64    id;
-			PS::F64vec getPos() const{
+			PS::F64vec getPos() const {
 				return this->pos;
 			}
-			PS::F64 getCharge(void) const{
+			PS::F64 getCharge(void) const {
 				return this->mass;
 			}
-			void copyFromFP(const RealPtcl& rp){
+			void copyFromFP(const RealPtcl& rp) {
 				this->mass = rp.mass;
 				this->pos  = rp.pos;
 				this->id   = rp.id;
@@ -392,20 +392,20 @@ namespace STD{
 	}
 }
 
-template <class Ptcl> class Problem{
-	Problem(){
+template <class Ptcl> class Problem {
+	Problem() {
 	}
-	public:
-	static void setupIC(PS::ParticleSystem<Ptcl>&, system_t&, PS::DomainInfo&){
+  public:
+	static void setupIC(PS::ParticleSystem<Ptcl>&, system_t&, PS::DomainInfo&) {
 	}
-	static void setEoS(PS::ParticleSystem<Ptcl>&){
+	static void setEoS(PS::ParticleSystem<Ptcl>&) {
 	}
-	static void setDomain(PS::DomainInfo&){
+	static void setDomain(PS::DomainInfo&) {
 	}
-	static void addExternalForce(PS::ParticleSystem<Ptcl>&, system_t&){
+	static void addExternalForce(PS::ParticleSystem<Ptcl>&, system_t&) {
 		std::cout << "No Ext. Force" << std::endl;
 	}
-	static void postTimestepProcess(PS::ParticleSystem<Ptcl>&, system_t&){
+	static void postTimestepProcess(PS::ParticleSystem<Ptcl>&, system_t&) {
 	}
 };
 

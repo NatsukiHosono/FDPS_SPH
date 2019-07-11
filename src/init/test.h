@@ -49,10 +49,10 @@ void SetupIC(PS::ParticleSystem<RealPtcl>& sph_system, PS::F64* end_time, PS::Do
 }
 */
 
-template <class Ptcl> class GI : public Problem<Ptcl>{
-	public:
+template <class Ptcl> class GI : public Problem<Ptcl> {
+  public:
 	static const double END_TIME;
-	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
+	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo) {
 
 		/////////
 		//place ptcls
@@ -64,9 +64,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const PS::F64 Grav = 1.0;
 		const PS::F64 dx = 1.0 / 8.0;
 		PS::S32 id = 0;
-		for(PS::F64 x = -Radi ; x <= Radi ; x += dx){
-			for(PS::F64 y = -Radi ; y <= Radi ; y += dx){
-				for(PS::F64 z = -Radi ; z <= Radi ; z += dx){
+		for(PS::F64 x = -Radi ; x <= Radi ; x += dx) {
+			for(PS::F64 y = -Radi ; y <= Radi ; y += dx) {
+				for(PS::F64 z = -Radi ; z <= Radi ; z += dx) {
 					const PS::F64 r = sqrt(x*x + y*y + z*z);
 					if(r > Radi) continue;
 					Ptcl ith;
@@ -83,17 +83,17 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 				}
 			}
 		}
-		for(PS::U32 i = 0 ; i < ptcl.size() ; ++ i){
+		for(PS::U32 i = 0 ; i < ptcl.size() ; ++ i) {
 			ptcl[i].mass = ptcl[i].mass / (PS::F64)(ptcl.size());
 		}
 
-		if(PS::Comm::getRank() == 0){
+		if(PS::Comm::getRank() == 0) {
 			const PS::S32 numPtclLocal = ptcl.size();
 			sph_system.setNumberOfParticleLocal(numPtclLocal);
-			for(PS::U32 i = 0 ; i < ptcl.size() ; ++ i){
+			for(PS::U32 i = 0 ; i < ptcl.size() ; ++ i) {
 				sph_system[i] = ptcl[i];
 			}
-		}else{
+		} else {
 			sph_system.setNumberOfParticleLocal(0);
 		}
 		//Fin.
@@ -101,13 +101,13 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 	}
 
-	static void setEoS(PS::ParticleSystem<Ptcl>& sph_system){
-		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+	static void setEoS(PS::ParticleSystem<Ptcl>& sph_system) {
+		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i) {
 			sph_system[i].setPressure(&Monoatomic);
 		}
 	}
 
-	static void addExternalForce(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo){
+	static void addExternalForce(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo) {
 	}
 };
 

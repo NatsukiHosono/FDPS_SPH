@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if test ! -d src ; then
+  echo "*** This script must be run from the top-level directory of FDPS SPH."
+  exit
+fi
+
+if test ! -f contrib/utilities/astyle.rc ; then
+  echo "*** No style file doc/astyle.rc found."
+  exit
+fi
+
+if test -z "`which astyle`" ; then
+  echo "*** No astyle program found."
+  exit
+fi
+
+if test "`astyle --version 2>&1`" != "Artistic Style Version 3.1" ; then
+  echo "*** Found a version of astyle different than the required version 3.1."
+  exit
+fi
+
+
+echo "--- Indenting all FDPS SPH files"
+
+find src \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/utilities/astyle.rc
+
+# remove execute permission on source files:
+find src \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 chmod -x
