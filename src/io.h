@@ -1,5 +1,9 @@
 #pragma once
 
+#include <sys/stat.h>
+#include <dirent.h>
+#include <cassert>
+
 template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo){
 	//Binary
 	char filename[256];
@@ -71,3 +75,14 @@ template <class ThisPtcl> void InputBinary(PS::ParticleSystem<ThisPtcl>& sph_sys
 	std::cout << "read binary" << std::endl;
 }
 
+void createOutputDirectory(const std::string &directory_name){
+	// check if the output directory exists, if not create it.
+	if (DIR *output_directory = opendir(directory_name.c_str())){
+		int error = closedir(output_directory);
+		assert(error == 0);
+	}
+	else{
+		int error = mkdir(directory_name.c_str(),S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+		assert(error == 0);
+	}
+}

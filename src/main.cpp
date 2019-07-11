@@ -43,6 +43,8 @@ int main(int argc, char* argv[]){
 		PROBLEM::setEoS(sph_system);
 	}
 
+	createOutputDirectory("result");
+
 	#pragma omp parallel for
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 		sph_system[i].initialize();
