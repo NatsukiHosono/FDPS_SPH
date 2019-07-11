@@ -49,7 +49,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 		const double offset = 5.0 * UnitRadi;
 		// the following line predicts the number of grid points in one direction
-		const int  gridpoint = int(2.0/pow(4.18*1.1/Nptcl,0.333));
+		const int  gridpoint = int(2.0/pow(4.18*0.85/Nptcl,0.333));
 		const PS::F64 dx = 2.0/gridpoint;  //gridpoint;
 		const PS::F64 Grav = 6.67e-11;
 
@@ -185,11 +185,16 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     }
                 }
 
+		std::cout << "The estimated # of mantle particles =" << tar.size() << ", whereas the ideal mantle particle number is " << int(Nptcl*(1.0-coreFracMass)) << std::endl;
 		if (tar.size() < int(Nptcl*(1.0-coreFracMass))){
-		  std::cout << "The estimated number of grid points is too small. You may want to modify the parameter gridpoint in GI.h " << std::endl;
+		  std::cout << "The number of mantle particle is not enough. You may want to modify the parameter gridpoint in GI.h " << std::endl;
 		  exit(0);
 		}
 
+		std::cout <<  tarCoreShrinkFactor << std::endl;
+
+		std::cout << "Now removing the extra mantle particles" << std::endl;
+		
 		// excess of mantle particles
 		int Nexcess;
 		Nexcess = tar.size() - int(Nptcl*(1.0-coreFracMass));
@@ -199,7 +204,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
 		  tar.erase(tar.begin()+ rand () % (tar.size() + 1));
 		}
-
 		
 		std::cout << "# of mantle particles = " <<  tar.size() << std::endl ;
 
@@ -207,12 +211,18 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
                         for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-                            const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-                            if(r >= Corr * tarCoreRadi) continue;
+			  //const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
+			    const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
+                            //if(r >= Corr * tarCoreRadi) continue;
+			    if(r >= tarCoreRadi) continue;
                             Ptcl ith;
-                            ith.pos.x = tarCoreShrinkFactor * UnitRadi * x;
-                            ith.pos.y = tarCoreShrinkFactor * UnitRadi * y;
-                            ith.pos.z = tarCoreShrinkFactor * UnitRadi * z;
+                            //ith.pos.x = tarCoreShrinkFactor * UnitRadi * x;
+                            //ith.pos.y = tarCoreShrinkFactor * UnitRadi * y;
+                            //ith.pos.z = tarCoreShrinkFactor * UnitRadi * z;
+                            ith.pos.x = UnitRadi * x;
+                            ith.pos.y = UnitRadi * y;
+                            ith.pos.z = UnitRadi * z;
+			    
                             ith.dens = tarCoreMass / (4.0 / 3.0 * math::pi * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr);
                             ith.mass = tarMass; // + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
@@ -225,14 +235,16 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     }
 		}
 
+		std::cout << tar.size() << std::endl;
+
 		// excess of core particles
 		Nexcess = tar.size() - Nptcl;
-		if (tar.size() < int(Nptcl)){
-		  std::cout << "The number of core particle is not enough. You may want to modify the parameter gridpoint in GI.h " << std::endl;
+		if (tar.size() < Nptcl){
+		  std::cout << "The number of core particle is not enough. You may want to increase the core fraction. " << std::endl;
 		  exit(0);
 		}
 		
-
+		std::cout << "Now removing the extra core particles" << std::endl;
 		// erasing excess of core particles
 		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
 		  tar.erase(tar.begin()+ rand () % (tar.size() - int(Nptcl*(1.0-coreFracMass)) + 1) +  int(Nptcl*(1.0-coreFracMass)));
