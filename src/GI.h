@@ -8,7 +8,7 @@
 template <class Ptcl> class GI : public Problem<Ptcl>{
     public:
 	static double end_time;
-    static double damping;
+        static double damping;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
                         const std::string &input_file){
 		const double Corr = .98;//Correction Term
@@ -26,6 +26,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         std::string input_directory("input/");
         ParameterFile parameter_file(input_directory + input_file);
         std::cout << "reading from input/" << input_file << std::endl;
+	PS::F64 Nptcl  = parameter_file.getValueOf("Nptcl", 100000);
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
@@ -47,24 +48,44 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const PS::F64 impCoreRadi = impRadi * coreFracRadi;
 
 		const double offset = 5.0 * UnitRadi;
-		const PS::F64 dx = 1.0 / 39;
+		// the following line predicts the number of grid points in one direction
+		const int  gridpoint = int(2.0/pow(4.18*1.1/Nptcl,0.333));
+		const PS::F64 dx = 2.0/gridpoint;  //gridpoint;
 		const PS::F64 Grav = 6.67e-11;
+
+
+
+
 		//std::cout << impRadi / tarRadi << std::endl;
 		//std::cout << impCoreRadi / impRadi << std::endl;
 		///////////////////
 		//Dummy put to determine # of ptcls
 		///////////////////
 		//target
-		int tarNmntl = 0;
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+		
+
+		int tarNmntl = int(Nptcl * (1.0-coreFracMass));
+	       
+		/*	for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
 			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
 				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
 					const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
+					if(r <= tarRadi){
+						++ estimatedNptcl;
+					}
 					if(r >= tarRadi || r <= tarCoreRadi) continue;
 					++ tarNmntl;
 				}
 			}
 		}
+
+		*/
+
+
+		int tarNcore = int(Nptcl * (1.0-coreFracMass));
+
+
+		/*
 		int tarNcore;
 		double tarCoreShrinkFactor = 1.0;
 		while(tarCoreShrinkFactor *= 0.99){
@@ -80,6 +101,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 			}
 			if((double)(tarNcore) / (double)(tarNcore + tarNmntl) > coreFracMass) break;
 		}
+		*/
+
+		
 		//imp
 		int impNmntl = 0;
 		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
@@ -111,7 +135,12 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		///////////////////
 		const int tarNptcl = tarNcore + tarNmntl;
 		const int impNptcl = impNcore + impNmntl;
-		const int Nptcl    = tarNptcl + impNptcl;
+		
+		if (mode==0){
+			Nptcl    = tarNptcl + impNptcl;
+		}
+
+
 		std::cout << "Target  :" << tarNptcl << std::endl;
 		std::cout << "    radius           : " << tarRadi << std::endl;
 		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
@@ -180,6 +209,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 break;
             case 2:
                 //Put Tar.
+	      
                 std::cout << "creating target" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
@@ -201,6 +231,23 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                         }
                     }
                 }
+
+		if (tar.size() < int(Nptcl*(1.0-coreFracMass))){
+		  std::cout << "The estimated number of grid points is too small. You may want to modify the parameter gridpoint in GI.h " << std::endl;
+		  exit(0);
+		}
+
+		// excess of mantle particles
+		int Nexcess;
+		Nexcess = tar.size() - int(Nptcl*(1.0-coreFracMass));
+		
+		// erasing excess of particles
+		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
+		  tar.erase(tar.begin()+ rand () % (tar.size() - int(Nptcl*(1.0-coreFracMass)) + 1) +  - int(Nptcl*(1.0-coreFracMass)));
+		}
+		std::cout << tar.size() << std::endl ;
+
+		
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
                         for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
@@ -220,7 +267,20 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                         }
                     }
-                }
+		}
+
+		// excess of core particles
+		Nexcess = tar.size() - Nptcl;
+
+		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
+		  tar.erase(tar.begin()+ rand () % (tar.size() + 1));
+		}
+
+		std::cout << tar.size() << std::endl ;
+		exit(0);
+		
+	       
+
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     tar[i].mass /= (PS::F64)(Nptcl);
                 }
