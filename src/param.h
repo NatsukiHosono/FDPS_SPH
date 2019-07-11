@@ -18,4 +18,3 @@ namespace PARAM{
 	//Strength of AV
 	const PS::F64 AV_STRENGTH = 1.0;
 };
-

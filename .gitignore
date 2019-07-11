@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+.DS_Store
+
+# Directories
+FDPS/
+build/
+results/

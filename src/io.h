@@ -1,10 +1,10 @@
 #pragma once
 
-template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo){
+template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, const system_t& sysinfo, std::string &out_dir){
 	//Binary
 	char filename[256];
 	std::ofstream fout;
-	sprintf(filename, "result/%05d_%05d.bin", PS::Comm::getNumberOfProc(), PS::Comm::getRank());
+    sprintf(filename, "results/%s/%05d_%05d.bin", out_dir, PS::Comm::getNumberOfProc(), PS::Comm::getRank());
 	fout.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 	if(!fout){
 		std::cout << "cannot write restart file." << std::endl;
@@ -18,17 +18,17 @@ template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_sy
 	fout.close();
 }
 
-template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time){
+template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time, std::string &out_dir){
 	if(sysinfo.time > sysinfo.output_time){
 		FileHeader header;
 		header.time = sysinfo.time;
 		header.Nbody = sph_system.getNumberOfParticleLocal();
 		char filename[256];
-		sprintf(filename, "result/%05d", sysinfo.output_id);
+        sprintf(filename, "results/%s/%05d", out_dir, sysinfo.output_id);
 		sph_system.writeParticleAscii(filename, "%s_%05d_%05d.dat", header);
 		if(PS::Comm::getRank() == 0){
-			std::cout << "//================================" << std::endl;
-			std::cout << "output " << filename << "." << std::endl;
+            std::cout << "//================================" << std::endl;
+            std::cout << "output " << filename << "." << std::endl;
 			std::cout << "//================================" << std::endl;
 		}
 		sysinfo.output_time += end_time / PARAM::NUMBER_OF_SNAPSHOTS;
@@ -39,7 +39,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo){
 	FileHeader header;
 	char filename[256];
-	sprintf(filename, "result/%05d", sysinfo.step);
+    sprintf(filename, "results/%05d", sysinfo.step);
 	sph_system.readParticleAscii(filename, "%s_%05d_%05d.dat", header);
 	sysinfo.time = header.time;
 	std::cout << header.time << std::endl;
