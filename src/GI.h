@@ -49,22 +49,69 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 		const double offset = 5.0 * UnitRadi;
 		// the following line predicts the number of grid points in one direction
-		const int  gridpoint = int(2.0/pow(4.18*0.85/Nptcl,0.333));
-		const PS::F64 dx = 2.0/gridpoint;  //gridpoint;
+		const int  gridpoint = int(2.0/pow(4.18*1.1/Nptcl,0.333));
+		//const PS::F64 dx = 2.0/gridpoint;  //gridpoint;
+		double dx =  2.0/gridpoint;
+
+		
 		const PS::F64 Grav = 6.67e-11;
 
+		//std::cout << gridpoint*gridpoint*gridpoint << std::endl;
 
-		int tarNmntl;
-		int tarNcore;
+
+		int tarNmntl=0;
+		int tarNcore=0;
 		int tarNptcl;
 		int impNptcl;
 		
-		int impNcore;
-		int impNmntl;
 		
 
-		double tarCoreShrinkFactor = 1.0;
+		double tarCoreShrinkFactor = 0.70;
 		double impCoreShrinkFactor = 1.0;
+
+		double dx_core = dx * tarCoreShrinkFactor;
+
+	       
+
+
+		///////////////////
+		//Dummy put to determine # of ptcls
+		///////////////////
+		//target
+		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+					const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
+					if(r >= tarRadi || r <= tarCoreRadi) continue;
+					++ tarNmntl;
+				}
+			}
+		}
+		
+		std::cout << tarNmntl << std::endl;
+
+
+		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx_core){
+		  for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx_core){
+		    for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx_core){
+		      const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
+		      if(r >= tarCoreRadi) continue;
+		      ++ tarNcore;
+		    }
+		  }
+		}
+
+
+		std::cout << tarNcore << std::endl;
+		
+		
+		//if((double)(tarNcore) / (double)(tarNcore + tarNmntl) > coreFracMass) break;
+		
+		////////
+		// end of Dummy
+		////////
+
+
 
 
 		
@@ -97,8 +144,12 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::cout << "Tar-to-Imp mass ratio: " << (double)(impNmntl) / (double)(tarNmntl) << std::endl;
 
 		*/
-		
+
 		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
+
+
+
+		
 		///////////////////
 		//Real put
 		///////////////////
@@ -151,15 +202,54 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		Nptcl = tarNptcl + impNptcl;
 		
                 break;
-            case 2:
+		case 2:
+		  {
                 //Put Tar.
 
+	      if (tarNmntl <  int(Nptcl * (1.0-coreFracMass))){
+		std::cout << "too few mantle particles. Increase the grid size" << std::endl;
+		exit(0);
+	      }
 
-	        tarNmntl = int(Nptcl * (1.0-coreFracMass));
-		tarNcore = int(Nptcl * coreFracMass);
 
-		//Assuming there is no impactor here
+	      if (tarNcore <  int(Nptcl *coreFracMass)){
+		std::cout << "too few core particles. Decrease the core shrink factor" << std::endl;
+		exit(0);
+	      }
+	      
+	      std::vector<int> removal_list;
+	      int num=0;
+	      int interval = int(tarNmntl / (tarNmntl -  int(Nptcl * (1.0-coreFracMass))));
+	      int index = 0;
+	      int index_removal = 0;
 
+	      for (int i=0; i < tarNmntl; i = i + interval){
+		removal_list.push_back(i);
+		if (removal_list.size() == tarNmntl -  int(Nptcl * (1.0-coreFracMass))) break;	
+	      }
+
+	      std::cout << removal_list.size() << std::endl;
+
+	      
+	      // if the list is shorter than it should be 
+	      while (removal_list.size() < tarNmntl -  int(Nptcl * (1.0-coreFracMass))){
+		num = rand ()  % int(tarNmntl) + 1;
+		if (std::count(removal_list.begin(),removal_list.end(),num) == 0) removal_list.push_back(num);
+	      }
+
+	      std::sort(removal_list.begin(), removal_list.end());
+
+	      std::cout << removal_list.size() << std::endl;	 
+
+	      if (removal_list.size() != tarNmntl -  int(Nptcl * (1.0-coreFracMass))){
+		std::cout << "The number of mantle particle is not the same as the planned number" << std::endl;
+		exit(0);
+	      }
+
+	  
+	      
+		
+	      // creating mantle particles
 	      
                 std::cout << "creating target" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
@@ -180,37 +270,73 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&AGranite);
                             ith.tag = 0;
+			    
+			    if ((index - removal_list[index_removal]==0) && (index_removal < removal_list.size())){			     
+			      index_removal +=   1;
+			      
+			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
+			      // fail save 
+			      std::cout << "stop!" <<   removal_list[index_removal] << 'a' << index_removal  << std::endl;
+			      exit(0);
+			    }else{			      
                             if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+			    }
+			    index += 1;
                         }
                     }
                 }
-
-		std::cout << "The estimated # of mantle particles =" << tar.size() << ", whereas the ideal mantle particle number is " << int(Nptcl*(1.0-coreFracMass)) << std::endl;
-		if (tar.size() < int(Nptcl*(1.0-coreFracMass))){
-		  std::cout << "The number of mantle particle is not enough. You may want to modify the parameter gridpoint in GI.h " << std::endl;
-		  exit(0);
-		}
-
-		std::cout <<  tarCoreShrinkFactor << std::endl;
-
-		std::cout << "Now removing the extra mantle particles" << std::endl;
-		
-		// excess of mantle particles
-		int Nexcess;
-		Nexcess = tar.size() - int(Nptcl*(1.0-coreFracMass));
-
-		
-		// erasing excess of mantle particles
-		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
-		  tar.erase(tar.begin()+ rand () % (tar.size() + 1));
-		}
 		
 		std::cout << "# of mantle particles = " <<  tar.size() << std::endl ;
 
+
+
 		
-                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+		// now we are removing particles for the core
+
+		// initialize the removal list
+		removal_list.erase(removal_list.begin(),removal_list.end());
+
+			       			      
+		//num=0;
+	      interval = int(tarNcore / (tarNcore -  int(Nptcl * coreFracMass)));
+
+
+		
+	      for (int i=0; i < tarNcore; i = i + interval){
+		removal_list.push_back(tar.size()+i);
+		//std::cout << tar.size()+i << std::endl;
+		  if (removal_list.size() == tarNcore -  int(Nptcl * coreFracMass)) break;	
+		}
+
+
+
+	      
+	      while (removal_list.size() < tarNcore -  int(Nptcl * coreFracMass)){
+		num = rand ()  % int(tarNcore +1) + tarNmntl;
+		if (std::count(removal_list.begin(),removal_list.end(),num) == 0) removal_list.push_back(num);
+	      }
+
+	      std::sort(removal_list.begin(), removal_list.end());
+	      std::cout << removal_list.size() << std::endl;	 
+
+	      if (removal_list.size() != tarNcore -  int(Nptcl * coreFracMass)){
+		std::cout << "The number of core particle is not the same as the planned number" << std::endl;
+		exit(0);
+	      }
+
+	      for (int i=0; i < removal_list.size(); ++i){
+		//	std::cout << removal_list[i] << std::endl;
+	      }
+		
+	      index=tar.size();
+	      index_removal = 0;
+
+	      std::cout << tarNcore - removal_list.size() << ' ' << tar.size()<< std::endl;
+	      
+		
+                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx_core){
+                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx_core){
+                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx_core){
 			  //const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
 			    const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
                             //if(r >= Corr * tarCoreRadi) continue;
@@ -230,31 +356,30 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&Iron);
                             ith.tag = 1;
+
+
+			    if ((index - removal_list[index_removal]==0) && (index_removal   < removal_list.size())){			     
+			      index_removal +=   1;
+			      std::cout << index << "test" << removal_list[index_removal] <<std::endl;
+			      
+			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
+			      // fail save 
+			      std::cout << "stop!" <<   removal_list[index_removal] << 'a' << index_removal  << std::endl;
+			      exit(0);
+			    }else{			      
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+			    }
+			    index += 1;
+			    
+
+	      
                             if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                         }
                     }
 		}
 
-		std::cout << tar.size() << std::endl;
-
-		// excess of core particles
-		Nexcess = tar.size() - Nptcl;
-		if (tar.size() < Nptcl){
-		  std::cout << "The number of core particle is not enough. You may want to increase the core fraction. " << std::endl;
-		  exit(0);
-		}
-		
-		std::cout << "Now removing the extra core particles" << std::endl;
-		// erasing excess of core particles
-		for(PS::U32 i = 0 ; i < Nexcess ; ++ i){
-		  tar.erase(tar.begin()+ rand () % (tar.size() - int(Nptcl*(1.0-coreFracMass)) + 1) +  int(Nptcl*(1.0-coreFracMass)));
-		  //tar.erase(tar.begin()+ rand () % (tar.size() + 1));
-		}
-
-
-		std::cout << "# of total SPH particles " <<tar.size() << std::endl ;
+		std::cout << "# of total particles = " <<  tar.size() << std::endl ;
 		exit(0);
-		
 	       
 
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
@@ -264,6 +389,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ptcl.push_back(tar[i]);
                 }
                 break;
+		  }
             case 3:
 	      // Miki did not touch this -- this will probably break.
                 //imp

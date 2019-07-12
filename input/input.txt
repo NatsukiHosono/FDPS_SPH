@@ -1,0 +1,3 @@
+mode = 2
+Nptcl = 30000
+impVel=1000
