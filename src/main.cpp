@@ -11,17 +11,19 @@
 #include "kernel.h"
 #include "EoS.h"
 #include "class.h"
-#include "GI.h"
+//#include "GI.h"
+#include "shocktube.h"
 #include "force.h"
 #include "io.h"
 #include "integral.h"
 
-template <class Ptcl> double GI<Ptcl>::end_time;
-template <class Ptcl> double GI<Ptcl>::damping;
+//template <class Ptcl> double GI<Ptcl>::end_time;
+//template <class Ptcl> double GI<Ptcl>::damping;
 
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
-	typedef GI<PTCL::RealPtcl> PROBLEM;
+	//typedef GI<PTCL::RealPtcl> PROBLEM;
+	typedef ShockTube<PTCL::RealPtcl> PROBLEM;
 	//////////////////
 	//Create vars.
 	//////////////////

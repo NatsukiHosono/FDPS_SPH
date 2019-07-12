@@ -30,7 +30,7 @@ struct WendlandC6{
 		return dr * r_value / (sqrt(dr * dr) * H  + 1.0e-6 * h);
 	}
 	static PS::F64 supportRadius(){
-		return 2.5;
+		return 3.5;
 	}
 };
 
