@@ -95,7 +95,6 @@ class ParameterFile{
 			std::cout << "Parameter <" << key << "> not found and no default value provided. Aborting." << std::endl;
 			throw;
 		}
-
 		return parameter_value;
 	  }
 };
