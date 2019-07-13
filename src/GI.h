@@ -266,20 +266,23 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.dens = (tarMass - tarCoreMass) / (4.0 / 3.0 * math::pi * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi));
                             ith.mass = tarMass; // + impMass; 
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-                            ith.id   = id++;
                             // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&AGranite);
                             ith.tag = 0;
+                            ith.id   = id++;
 			    
 			    if ((index - removal_list[index_removal]==0) && (index_removal < removal_list.size())){			     
 			      index_removal +=   1;
-			      
+			     id = id -1;	
+		      
 			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
 			      // fail save 
 			      std::cout << "stop!" <<   removal_list[index_removal] << 'a' << index_removal  << std::endl;
 			      exit(0);
 			    }else{			      
-                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()){ 
+ 	                    tar.push_back(ith);
+	}
 			    }
 			    index += 1;
                         }
@@ -332,7 +335,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	      index_removal = 0;
 
 	      std::cout << tarNcore - removal_list.size() << ' ' << tar.size()<< std::endl;
-	      
+	     
 		
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx_core){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx_core){
@@ -352,28 +355,33 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.dens = tarCoreMass / (4.0 / 3.0 * math::pi * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr);
                             ith.mass = tarMass; // + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-                            ith.id   = id++;
                             // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&Iron);
                             ith.tag = 1;
+                            ith.id   = id++;
 
 
 			    if ((index - removal_list[index_removal]==0) && (index_removal   < removal_list.size())){			     
-			      index_removal +=   1;
 			      std::cout << index << "test" << removal_list[index_removal] <<std::endl;
-			      
+			      index_removal +=   1;
+				id = id -1;			      
+
 			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
 			      // fail save 
 			      std::cout << "stop!" <<   removal_list[index_removal] << 'a' << index_removal  << std::endl;
 			      exit(0);
-			    }else{			      
-                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+			    }else{		
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()){ 
+                             tar.push_back(ith);
+				}
+				std::cout << ith.id / NptclIn1Node << " " << PS::Comm::getRank() << " a " << std::endl;
 			    }
+
+				std::cout << tar.size() << std::endl;	      
 			    index += 1;
 			    
 
 	      
-                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                         }
                     }
 		}
