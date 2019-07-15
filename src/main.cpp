@@ -18,7 +18,6 @@
 
 template <class Ptcl> double GI<Ptcl>::end_time;
 template <class Ptcl> double GI<Ptcl>::damping;
-//template <class Ptcl> std::string GI<Ptcl>::output_directory;
 
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
@@ -63,6 +62,7 @@ int main(int argc, char* argv[]){
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
         PROBLEM::setEoS(sph_system);
     }
+
 	#pragma omp parallel for
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 		sph_system[i].initialize();

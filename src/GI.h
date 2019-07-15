@@ -9,7 +9,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
     public:
 	static double end_time;
     static double damping;
-    static std::string output_directory;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
                         ParameterFile &parameter_file){
 		const double Corr = .98;//Correction Term
