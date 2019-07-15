@@ -2,4 +2,4 @@
 cd build
 make 
 cd ..
-./sph.out
+./sph.out -i input/input.txt

@@ -29,7 +29,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
 		int mode = parameter_file.getValueOf("mode", 2 );
-		PS::F64 impVel = parameter_file.getValueOf("impVel",1000.);
+		PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
 		end_time = parameter_file.getValueOf("end_time",1.0e+4);
 		damping = parameter_file.getValueOf("damping",1.);
 		PS::F64 Nptcl  = parameter_file.getValueOf("Nptcl", 100000);
@@ -116,7 +116,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		///////////////////
 		const int tarNptcl = tarNcore + tarNmntl;
 		const int impNptcl = impNcore + impNmntl;
-		//const int Nptcl    = tarNptcl + impNptcl;
+		const int Nptcl    = tarNptcl + impNptcl;
 		std::cout << "Target  :" << tarNptcl << std::endl;
 		std::cout << "    radius           : " << tarRadi << std::endl;
 		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
@@ -144,7 +144,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         
         switch (mode){
             case 1:
-	      {
                 std::cout << "creating target from tar.dat" << std::endl;
                 FILE * tarFile;
                 tarFile = fopen("input/tar.dat","r");
@@ -177,63 +176,15 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ith.vel.x += (-1) * impVel;
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
                 }
-		// I do not think we need this
-                //for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-                //    imp[i].mass /= (PS::F64)(Nptcl);
-                //}
+                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+                    imp[i].mass /= (PS::F64)(Nptcl);
+                }
                 for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
                     ptcl.push_back(imp[i]);
                 }
-
-		Nptcl = tarNptcl + impNptcl;
-		
                 break;
-	      }
             case 2:
-	      {
                 //Put Tar.
-
-	      if (tarNmntl <  int(Nptcl * (1.0-coreFracMass))){
-		std::cout << "Too few mantle particles. Increase the grid size" << std::endl;
-		exit(0);
-	      }
-
-
-	      if (tarNcore <  int(Nptcl *coreFracMass)){
-		std::cout << "Too few core particles. Decrease the core shrink factor" << std::endl;
-		exit(0);
-	      }
-
-
-	      //removing particles to reach the exact Nptcl
-	      std::vector<int> removal_list;
-	      int num=0;
-	      int interval = int(tarNmntl / (tarNmntl -  int(Nptcl * (1.0-coreFracMass))));
-	      int index = 0;
-	      int index_removal = 0;
-
-	      for (int i=0; i < tarNmntl; i = i + interval){
-		removal_list.push_back(i);
-		if (removal_list.size() == tarNmntl -  int(Nptcl * (1.0-coreFracMass))) break;	
-	      }
-
-
-	      // if the removal list is shorter than the target number
-	      while (removal_list.size() < tarNmntl -  int(Nptcl * (1.0-coreFracMass))){
-		num = rand ()  % int(tarNmntl) + 1;
-		if (std::count(removal_list.begin(),removal_list.end(),num) == 0) removal_list.push_back(num);
-	      }
-
-	      std::sort(removal_list.begin(), removal_list.end());
-
-	      if (removal_list.size() != tarNmntl -  int(Nptcl * (1.0-coreFracMass))){
-		std::cout << "The number of mantle particle is not the same as the planned number" << std::endl;
-		exit(0);
-	      }
-
-
-	      
-	      
                 std::cout << "creating target" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
@@ -251,50 +202,10 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&AGranite);
                             ith.tag = 0;
-
-			    if ((index - removal_list[index_removal]==0) && (index_removal < removal_list.size())){			     
-			      index_removal += 1;
-			      id += -1;	
-		      
-			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
-			      // fail save 
-			      std::cout << "Particle removal routine is not working."  << std::endl;
-			      exit(0);
-			    }else{			      
-			      if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
-			    }
-			    index += 1;
+                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                         }
                     }
                 }
-
-		std::cout << "# of mantle particles = " <<  tar.size() << std::endl;
-
-		// making the core condition
-		// initialize the removal list
-		removal_list.erase(removal_list.begin(),removal_list.end());
-		interval = int(tarNcore / (tarNcore -  int(Nptcl * coreFracMass)));
-
-		for (int i=0; i < tarNcore; i = i + interval){
-		  removal_list.push_back(tar.size() + i);
-		  if (removal_list.size() == tarNcore -  int(Nptcl * coreFracMass)) break;	
-		}
-
-		while (removal_list.size() < tarNcore -  int(Nptcl * coreFracMass)){
-		  num = rand ()  % int(tarNcore + 1) + tarNmntl;
-		  if (std::count(removal_list.begin(),removal_list.end(),num) == 0) removal_list.push_back(num);
-		}
-	       
-	      std::sort(removal_list.begin(), removal_list.end());
-
-	      if (removal_list.size() != tarNcore -  int(Nptcl * coreFracMass)){
-		std::cout << "The number of core particle is not the same as the planned number" << std::endl;
-		exit(0);
-	      }
-
-	      index=tar.size();
-	      index_removal = 0;
-		
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
                         for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
@@ -311,25 +222,10 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&Iron);
                             ith.tag = 1;
-
-			    if ((index - removal_list[index_removal]==0) && (index_removal   < removal_list.size())){			     
-			      index_removal += 1;
-			      id +=  -1;			      
-
-			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
-			      // fail save 
-			      std::cout << "particle removal algorithm is not working"  << std::endl;
-			      exit(0);
-			    }else{		
                             if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
-			    }	      
-			    index += 1;			    
                         }
                     }
                 }
-
-		std::cout << "# of total particles = " <<  tar.size() << std::endl;
-		
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     tar[i].mass /= (PS::F64)(Nptcl);
                 }
@@ -337,9 +233,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ptcl.push_back(tar[i]);
                 }
                 break;
-	      }
             case 3:
-	      {
                 //imp
                 std::cout << "creating impactor" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
@@ -389,7 +283,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ptcl.push_back(imp[i]);
                 }
                 break;
-	}
         }
 
 		const PS::S32 numPtclLocal = ptcl.size();

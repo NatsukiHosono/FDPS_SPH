@@ -1,3 +1,6 @@
 mode = 2
 Nptcl = 30000
-impVel=1000
+impVel = 1000
+UnitMass = 5.97e+24
+UnitRadi = 6100e3
+ 
