@@ -22,8 +22,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		/////////
 
 		// Use parameters from input file, or defaults if none provided
-//        ParameterFile parameter_file(input_file);
-        //std::cout << "Reading parameters from " << input_file << std::endl;
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
@@ -33,11 +31,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
         end_time = parameter_file.getValueOf("end_time",1.0e+4);
         damping = parameter_file.getValueOf("damping",1.);
-	//output_directory = parameter_file.getValueOf("output_directory",std::string("results/"));
-       // if (output_directory.back() != '/')
-            //output_directory += '/';
-
-		const PS::F64 Expand = 1.1;
+		
+        const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
 		const PS::F64 tarCoreMass = tarMass * coreFracMass;
