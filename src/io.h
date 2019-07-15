@@ -22,7 +22,7 @@ template <class ThisPtcl> void OutputBinary(PS::ParticleSystem<ThisPtcl>& sph_sy
 	fout.close();
 }
 
-template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 end_time, std::string &out_dir){
+template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, const PS::F64 output_interval, std::string &out_dir){
 	if(sysinfo.time > sysinfo.output_time){
 		FileHeader header;
 		header.time = sysinfo.time;
@@ -37,7 +37,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
             std::cout << "output " << full_filename << "." << std::endl;
 			std::cout << "//================================" << std::endl;
 		}
-		sysinfo.output_time += end_time / PARAM::NUMBER_OF_SNAPSHOTS;
+        sysinfo.output_time += output_interval;
 		++ sysinfo.output_id;
 	}
 }

@@ -17,4 +17,6 @@ mode = 2                    # tar on only, creates tar.dat
 
 end_time = 1.0e+5           # number of seconds in the simulation
 
-damping = 0.8
+damping = 1
+
+output_interval = 10
