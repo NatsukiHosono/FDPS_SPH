@@ -10,7 +10,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	static double end_time;
     static double damping;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
-                        const std::string &input_file){
+                        ParameterFile &parameter_file){
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -21,19 +21,19 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		/////////
 
 		// Use parameters from input file, or defaults if none provided
-        ParameterFile parameter_file(input_file);
-        std::cout << "Reading parameters from " << input_file << std::endl;
+
 		PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
 		PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
 		PS::F64 coreFracRadi = parameter_file.getValueOf("coreFracRadi", 3500.0e+3 / 6400.0e+3);
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
+
 		int mode = parameter_file.getValueOf("mode", 2 );
-		PS::F64 impVel = parameter_file.getValueOf("impVel",1000.);
+		PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
 		end_time = parameter_file.getValueOf("end_time",1.0e+4);
 		damping = parameter_file.getValueOf("damping",1.);
 		PS::F64 Nptcl  = parameter_file.getValueOf("Nptcl", 100000);
-		
+
         
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;

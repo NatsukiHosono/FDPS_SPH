@@ -3,7 +3,10 @@ MESSAGE(STATUS "====================================================")
 MESSAGE(STATUS "============ Configuring FDPS_SPH ==================")
 MESSAGE(STATUS "====================================================")
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 PROJECT(FDPS_SPH)
 
