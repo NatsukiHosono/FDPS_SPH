@@ -30,8 +30,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
         end_time = parameter_file.getValueOf("end_time",1.0e+4);
         damping = parameter_file.getValueOf("damping",1.);
-		
-        const PS::F64 Expand = 1.1;
+        
+		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
 		const PS::F64 tarCoreMass = tarMass * coreFracMass;
