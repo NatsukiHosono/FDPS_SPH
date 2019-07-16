@@ -78,7 +78,7 @@ template <class ThisPtcl> void InputBinary(PS::ParticleSystem<ThisPtcl>& sph_sys
 }
 
 void createOutputDirectory(const std::string &directory_name){
-	// check if the output directory exists, if not create it.
+    // check if the output directory exists, if not create it.
 	if (DIR *output_directory = opendir(directory_name.c_str())){
 		int error = closedir(output_directory);
 		assert(error == 0);
