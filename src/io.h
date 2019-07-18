@@ -37,7 +37,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
             std::cout << "output " << full_filename << "." << std::endl;
 			std::cout << "//================================" << std::endl;
 		}
-        sysinfo.output_time += output_interval;
+		sysinfo.output_time += output_interval;
 		++ sysinfo.output_id;
 	}
 }
