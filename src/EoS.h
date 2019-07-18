@@ -163,11 +163,14 @@ namespace EoS{
 		 * TODO fill in format description, check that my implementation is correct
 		 */
 		ANEOS(const std::string &filename){
+
+			std::cout << "Reading ANEOS parameters from " << filename << std::endl;
+
 			std::ifstream input;
 			input.open(filename, std::ios::in);
-			if(input.fail() == true){
-				std::cout << "Cannot open file..." << filename << std::endl;
-				return;
+			if(!input.is_open()){
+				std::cout << "Cannot open ANEOS file " << filename << std::endl;
+				throw;
 			}
 
 			const unsigned int n_expected_fields = 5;
