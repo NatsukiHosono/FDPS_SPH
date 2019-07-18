@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
         PROBLEM::setEoS(sph_system);
     }
-    PS::F64 output_interval = parameter_file.getValueOf("output_interval",100.);
+    PS::F64 output_interval = parameter_file.getValueOf("output_interval",50.);
 
 	#pragma omp parallel for
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
