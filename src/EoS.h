@@ -269,9 +269,14 @@ namespace EoS{
 	};
 }
 
+// These are hard-coded equations of state of certain materials. They
+// are useful for benchmarking purposes, or if you need exactly these EoS.
 static const EoS::IdealGas<PS::F64>  Monoatomic(5./3.);
 static const EoS::IdealGas<PS::F64>  Diatomic  (1.4);
 static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0);
 static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
-static const EoS::ANEOS<PS::F64> AGranite      ("eos/granite.rho_u.txt");
+
+// This vector can hold any number of ANEOS equations of state.
+// The actual equations of state are later read from files by the specific problem setup.
+static std::vector<EoS::ANEOS<PS::F64>> ANEOS_EoS;
 
