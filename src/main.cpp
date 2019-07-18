@@ -48,9 +48,10 @@ int main(int argc, char* argv[]){
             newSim = false;
         }
     }
-    ParameterFile parameter_file(input_file);
     std::cout << "Reading parameters from " << input_file << std::endl;
-    std::string output_directory = parameter_file.getValueOf("output_directory",std::string("results/"));
+    ParameterFile parameter_file(input_file);
+
+    std::string output_directory = parameter_file.getValueOf<std::string>("output_directory",std::string("results/"));
     if (output_directory.back() != '/')
         output_directory.back() += '/';
     createOutputDirectory(output_directory);

@@ -46,7 +46,7 @@ class ParameterFile{
 		std::ifstream input;
 		input.open(file, std::ios::in);
 		if(input.fail() == true){
-			std::cout << "Cannot open file, assuming default values ..." << std::endl;
+			std::cout << "Cannot open input file, assuming default values ..." << std::endl;
 			return;
 		}
 		std::string line;
@@ -90,10 +90,6 @@ class ParameterFile{
 		      std::cout << "Convert error: cannot convert string '" << param[key] << "' to value" << std::endl;
 		      throw;
 		    }
-		}
-		else{
-			std::cout << "Parameter <" << key << "> not found and no default value provided. Aborting." << std::endl;
-			throw;
 		}
 
 		return parameter_value;
