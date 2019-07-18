@@ -31,6 +31,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         end_time = parameter_file.getValueOf("end_time",1.0e+4);
         damping = parameter_file.getValueOf("damping",1.);
         
+        ANEOS_EoS.push_back(EoS::ANEOS<PS::F64>("eos/granite.rho_u.txt"));
+
 		const PS::F64 Expand = 1.1;
 		const PS::F64 tarMass = UnitMass;
 		const PS::F64 tarRadi = UnitRadi;
@@ -190,7 +192,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
                             // TODO: Modify this line for all particles that need new EoS
-                            ith.setPressure(&AGranite);
+                            ith.setPressure(&ANEOS_EoS[0]);
                             ith.tag = 0;
                             if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                         }
@@ -240,7 +242,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
                             // TODO: Modify this line for all particles that need new EoS
-                            ith.setPressure(&AGranite);
+                            ith.setPressure(&ANEOS_EoS[0]);
                             ith.tag = 2;
                             if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
                         }
@@ -289,7 +291,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			// TODO: Modify the lines below for all particles that need new EoS
 			if(sph_system[i].tag % 2 == 0){
-				sph_system[i].setPressure(&AGranite);
+				sph_system[i].setPressure(&ANEOS_EoS[0]);
 			}else{
 				sph_system[i].setPressure(&Iron);
 			}
