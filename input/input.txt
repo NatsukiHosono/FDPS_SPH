@@ -8,4 +8,4 @@ coreFracMass = 0.3
 imptarMassRatio = 0.1
 end_time= 1e4
 damping = 1
-output_directory = results/test 
+output_directory = test/ 

@@ -28,7 +28,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		PS::F64 coreFracMass = parameter_file.getValueOf("coreFracMass", 0.3);
 		PS::F64 imptarMassRatio = parameter_file.getValueOf("imptarMassRatio", 0.1);
 
-		int mode = parameter_file.getValueOf("mode", 2 );
+		const unsigned int mode = parameter_file.getValueOf("mode", 2 );
 		PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
 		end_time = parameter_file.getValueOf("end_time",1.0e+4);
 		damping = parameter_file.getValueOf("damping",1.);
@@ -51,7 +51,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		// the following line predicts the number of grid points in one direction
 		const int  gridpoint = int(2.0/pow(4.18*1.1/Nptcl,0.333));
 		const PS::F64 dx =  2.0/gridpoint;
-		//const PS::F64 dx = 1.0 / 39;
 		
 		const PS::F64 Grav = 6.67e-11;
 		//std::cout << impRadi / tarRadi << std::endl;
@@ -116,7 +115,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		///////////////////
 		const int tarNptcl = tarNcore + tarNmntl;
 		const int impNptcl = impNcore + impNmntl;
-		//const int Nptcl    = tarNptcl + impNptcl;
 		std::cout << "Target  :" << tarNptcl << std::endl;
 		std::cout << "    radius           : " << tarRadi << std::endl;
 		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
@@ -272,7 +270,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 		// making the core condition
 		// initialize the removal list
-		removal_list.erase(removal_list.begin(),removal_list.end());
+		removal_list.clear();
 		interval = int(tarNcore / (tarNcore -  int(Nptcl * coreFracMass)));
 
 		for (int i=0; i < tarNcore; i = i + interval){
