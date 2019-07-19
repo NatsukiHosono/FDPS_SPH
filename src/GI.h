@@ -110,9 +110,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ith.readAscii(tarFile);		    
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                 }
-                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
-                    tar[i].mass /= (PS::F64)(Nptcl);
-                }
+
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     ptcl.push_back(tar[i]);
                 }
