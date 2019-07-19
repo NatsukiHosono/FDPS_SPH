@@ -1,10 +1,31 @@
 #include <parse.h>
+#include <unordered_set>
 
 #define SELF_GRAVITY
 #define FLAG_GI
 #ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 #error
 #endif
+
+std::unordered_set <unsigned int>  create_removal_list (const unsigned int lowest_index, const unsigned int highest_index,const unsigned int number_of_removed_items){
+      std::unordered_set<unsigned int> removal_list;
+
+      if (number_of_removed_items == 0)
+	return removal_list;
+
+      // If the removal list is shorter than the target number
+      // (i.e. the highest index is not divisable by the number of
+      // removed items), remove random items until the size fits
+      
+      while (removal_list.size() < number_of_removed_items){
+	const unsigned int num = rand ()  % static_cast<unsigned int>(highest_index - lowest_index) + lowest_index;
+	// This works even if num is already in the list, because the unordered_set filters out duplicates
+	removal_list.insert(num);
+      }
+      return  removal_list;
+}
+
+
 template <class Ptcl> class GI : public Problem<Ptcl>{
     public:
 	static double end_time;
@@ -48,13 +69,18 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		
 
 		const double offset = 5.0 * UnitRadi;
-		// the following line predicts the number of grid points in one direction
+		/* the following line predicts the number of grid points in one direction
+		  The volume of a recutangular box whose radius is L^3
+		  The volume of a sphere whose radius is L/2 is 4 \pi/3 (L/2)^3
+		  dx is defined as the grid size in one direction
+		  Nptcl = (volume of a sphere)/(dx)^3 * L^3, where L = 2.0
+	          dx = (4.18/Nptcl)^{1/3}
+		  The number of grid point is 2.0/dx
+		  we multiply 1.1 so that the enough particles are created to generate a sphere */
 		const int  gridpoint = int(2.0/pow(4.18*1.1/Nptcl,0.333));
-		const PS::F64 dx =  2.0/gridpoint;
-		
+		const PS::F64 dx =  2.0/gridpoint;	
 		const PS::F64 Grav = 6.67e-11;
-		//std::cout << impRadi / tarRadi << std::endl;
-		//std::cout << impCoreRadi / impRadi << std::endl;
+
 		///////////////////
 		//Dummy put to determine # of ptcls
 		///////////////////
@@ -115,25 +141,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		///////////////////
 		const int tarNptcl = tarNcore + tarNmntl;
 		const int impNptcl = impNcore + impNmntl;
-		std::cout << "Target  :" << tarNptcl << std::endl;
-		std::cout << "    radius           : " << tarRadi << std::endl;
-		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
-		std::cout << "    # of core ptcls  : " << tarNcore << std::endl;
-		std::cout << "    # of mantle ptcls: " << tarNmntl << std::endl;
-		std::cout << "    core density     : " << tarCoreMass / (4.0 * math::pi / 3.0 * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr) << std::endl;
-		std::cout << "    mantle density   : " << (tarMass - tarCoreMass) / (4.0 * math::pi / 3.0 * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi)) << std::endl;
-		std::cout << "    mean density     : " << tarMass / (4.0 * math::pi / 3.0 * tarRadi * tarRadi * tarRadi) << std::endl;
-		std::cout << "Impactor:" << impNptcl << std::endl;
-		std::cout << "    radius           : " << impRadi << std::endl;
-		std::cout << "    total-to-core    : " << (double)(impNcore) / (double)(impNptcl) << std::endl;
-		std::cout << "    # of core ptcls  : " << impNcore << std::endl;
-		std::cout << "    # of mantle ptcls: " << impNmntl << std::endl;
-		std::cout << "    core density     : " << impCoreMass / (4.0 * math::pi / 3.0 * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr) << std::endl;
-		std::cout << "    mantle density   : " << (impMass - impCoreMass) / (4.0 * math::pi / 3.0 * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi)) << std::endl;
-		std::cout << "    mean density     : " << impMass / (4.0 * math::pi / 3.0 * impRadi * impRadi * impRadi) << std::endl;
-        std::cout << "    velocity         : " << impVel << std::endl;
-		std::cout << "Total:" << Nptcl << std::endl;
-		std::cout << "Tar-to-Imp mass ratio: " << (double)(impNmntl) / (double)(tarNmntl) << std::endl;
 		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
 		///////////////////
 		//Real put
@@ -175,10 +182,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ith.vel.x += (-1) * impVel;
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
                 }
-		// I do not think we need this
-                //for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-                //    imp[i].mass /= (PS::F64)(Nptcl);
-                //}
+
                 for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
                     ptcl.push_back(imp[i]);
                 }
@@ -189,49 +193,26 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	      }
             case 2:
 	      {
-                //Put Tar.
-
-	      if (tarNmntl <  int(Nptcl * (1.0-coreFracMass))){
-		std::cout << "Too few mantle particles. Increase the grid size" << std::endl;
+		// checking if there are enough mantle particles
+	      if (tarNmntl <  static_cast<int>(Nptcl * (1.0-coreFracMass))){
+		std::cout << "Too few mantle particles. Increase the grid size. The easiet fix is to increase the gridpoint in GI.h " << std::endl;
 		exit(0);
 	      }
 
-
-	      if (tarNcore <  int(Nptcl *coreFracMass)){
-		std::cout << "Too few core particles. Decrease the core shrink factor" << std::endl;
+	      // cheking if there are enough core particles
+	      if (tarNcore <  static_cast<int>(Nptcl *coreFracMass)){
+		std::cout << "Too few core particles. Increase the grid size and/or change the core shrink factor." << std::endl;
 		exit(0);
 	      }
 
 
 	      //removing particles to reach the exact Nptcl
-	      std::vector<int> removal_list;
-	      int num=0;
-	      int interval = int(tarNmntl / (tarNmntl -  int(Nptcl * (1.0-coreFracMass))));
+
 	      int index = 0;
-	      int index_removal = 0;
 
-	      for (int i=0; i < tarNmntl; i = i + interval){
-		removal_list.push_back(i);
-		if (removal_list.size() == tarNmntl -  int(Nptcl * (1.0-coreFracMass))) break;	
-	      }
+	      std::unordered_set<unsigned int> removal_list;
+	      removal_list = create_removal_list (0, tarNmntl, tarNmntl - static_cast<int>(Nptcl * (1.0-coreFracMass)));
 
-
-	      // if the removal list is shorter than the target number
-	      while (removal_list.size() < tarNmntl -  int(Nptcl * (1.0-coreFracMass))){
-		num = rand ()  % int(tarNmntl) + 1;
-		if (std::count(removal_list.begin(),removal_list.end(),num) == 0) removal_list.push_back(num);
-	      }
-
-	      std::sort(removal_list.begin(), removal_list.end());
-
-	      if (removal_list.size() != tarNmntl -  int(Nptcl * (1.0-coreFracMass))){
-		std::cout << "The number of mantle particle is not the same as the planned number" << std::endl;
-		exit(0);
-	      }
-
-
-	      
-	      
                 std::cout << "creating target" << std::endl;
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
@@ -250,15 +231,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.setPressure(&AGranite);
                             ith.tag = 0;
 
-			    if ((index - removal_list[index_removal]==0) && (index_removal < removal_list.size())){			     
-			      index_removal += 1;
-			      id += -1;	
-		      
-			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
-			      // fail save 
-			      std::cout << "Particle removal routine is not working."  << std::endl;
-			      exit(0);
-			    }else{			      
+			    if (removal_list.count(index)){
+			      id += -1;
+			    }else{
 			      if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
 			    }
 			    index += 1;
@@ -269,29 +244,12 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::cout << "# of mantle particles = " <<  tar.size() << std::endl;
 
 		// making the core condition
-		// initialize the removal list
 		removal_list.clear();
-		interval = int(tarNcore / (tarNcore -  int(Nptcl * coreFracMass)));
+		removal_list = create_removal_list (tarNmntl, tarNmntl + tarNcore, tarNcore - static_cast<int>(Nptcl * coreFracMass));
 
-		for (int i=0; i < tarNcore; i = i + interval){
-		  removal_list.push_back(tar.size() + i);
-		  if (removal_list.size() == tarNcore -  int(Nptcl * coreFracMass)) break;	
-		}
-
-		while (removal_list.size() < tarNcore -  int(Nptcl * coreFracMass)){
-		  num = rand ()  % int(tarNcore + 1) + tarNmntl;
-		  if (std::count(removal_list.begin(),removal_list.end(),num) == 0) removal_list.push_back(num);
-		}
+		
+		index=tar.size();
 	       
-	      std::sort(removal_list.begin(), removal_list.end());
-
-	      if (removal_list.size() != tarNcore -  int(Nptcl * coreFracMass)){
-		std::cout << "The number of core particle is not the same as the planned number" << std::endl;
-		exit(0);
-	      }
-
-	      index=tar.size();
-	      index_removal = 0;
 		
                 for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
                     for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
@@ -310,23 +268,18 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.setPressure(&Iron);
                             ith.tag = 1;
 
-			    if ((index - removal_list[index_removal]==0) && (index_removal   < removal_list.size())){			     
-			      index_removal += 1;
-			      id +=  -1;			      
-
-			    }else if((index - removal_list[index_removal]>0) && (index_removal < removal_list.size())){
-			      // fail save 
-			      std::cout << "particle removal algorithm is not working"  << std::endl;
-			      exit(0);
-			    }else{		
-                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
-			    }	      
-			    index += 1;			    
+			    if (removal_list.count(index)){
+			      id += -1;
+			    }else{
+			      if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+			    }
+			    index += 1;
                         }
                     }
                 }
 
 		std::cout << "# of total particles = " <<  tar.size() << std::endl;
+		//exit(0);
 		
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     tar[i].mass /= (PS::F64)(Nptcl);
@@ -387,8 +340,33 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ptcl.push_back(imp[i]);
                 }
                 break;
-	}
+	      }
         }
+
+	        std::cout << "Target  :" << tarNptcl << std::endl;
+		std::cout << "    radius           : " << tarRadi << std::endl;
+		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
+		std::cout << "    # of core ptcls  : " << tarNcore << std::endl;
+		std::cout << "    # of mantle ptcls: " << tarNmntl << std::endl;
+		std::cout << "    core density     : " << tarCoreMass / (4.0 * math::pi / 3.0 * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr * Corr) << std::endl;
+		std::cout << "    mantle density   : " << (tarMass - tarCoreMass) / (4.0 * math::pi / 3.0 * (tarRadi * tarRadi * tarRadi - tarCoreRadi * tarCoreRadi * tarCoreRadi)) << std::endl;
+		std::cout << "    mean density     : " << tarMass / (4.0 * math::pi / 3.0 * tarRadi * tarRadi * tarRadi) << std::endl;
+
+		if (mode==1){
+		  std::cout << "Impactor:" << impNptcl << std::endl;
+		  std::cout << "    radius           : " << impRadi << std::endl;
+		  std::cout << "    total-to-core    : " << (double)(impNcore) / (double)(impNptcl) << std::endl;
+		  std::cout << "    # of core ptcls  : " << impNcore << std::endl;
+		  std::cout << "    # of mantle ptcls: " << impNmntl << std::endl;
+		  std::cout << "    core density     : " << impCoreMass / (4.0 * math::pi / 3.0 * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr) << std::endl;
+		  std::cout << "    mantle density   : " << (impMass - impCoreMass) / (4.0 * math::pi / 3.0 * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi)) << std::endl;
+		  std::cout << "    mean density     : " << impMass / (4.0 * math::pi / 3.0 * impRadi * impRadi * impRadi) << std::endl;
+		  std::cout << "    velocity         : " << impVel << std::endl;
+		  std::cout << "Tar-to-Imp mass ratio: " << (double)(impNmntl) / (double)(tarNmntl) << std::endl;
+		}
+		
+		std::cout << "Total:" << Nptcl << std::endl;
+	
 
 		const PS::S32 numPtclLocal = ptcl.size();
 		sph_system.setNumberOfParticleLocal(numPtclLocal);
@@ -419,4 +397,10 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 			sph_system[i].acc += - sph_system[i].vel * 0.05 / sph_system[i].dt;
 		}
 	}
+
+
+
+
+
+	
 };
