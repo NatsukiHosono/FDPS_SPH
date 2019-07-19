@@ -17,4 +17,6 @@ mode = 3                    # imp on only, creates imp.dat
     imptarMassRatio = 0.2   # impator-to-target mass ratio
 
 end_time = 1.0e+5           # number of seconds in the simulation
+damping = 1
+output_interval = 100
 output_directory = results/imp
