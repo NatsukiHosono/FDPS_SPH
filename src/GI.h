@@ -79,95 +79,25 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const PS::F64 dx =  2.0/gridpoint;	
 		const PS::F64 Grav = 6.67e-11;
 
-		///////////////////
-		//Dummy put to determine # of ptcls
-		///////////////////
 		//target
-		int tarNptcl;
+		int tarNptcl = 0;
 		int tarNmntl = 0;
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= tarRadi || r <= tarCoreRadi) continue;
-					++ tarNmntl;
-				}
-			}
-		}
-		int tarNcore;
-		double tarCoreShrinkFactor = 1.0;
-		while(tarCoreShrinkFactor *= 0.99){
-			tarNcore = 0;
-			for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-				for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-					for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-						const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-						if(r >= Corr * tarCoreRadi) continue;
-						++ tarNcore;
-					}
-				}
-			}
-			if((double)(tarNcore) / (double)(tarNcore + tarNmntl) > coreFracMass) break;
-		}
-
+		int tarNcore = 0;
+	       
 
 		//impactor
+		double tarCoreShrinkFactor = 1.0;
 		int impNmntl = 0;
 		int impNcore = 0;
 		int impNptcl = 0;
 
-		// I suggest removing the following -- because we are not using them.
-		// with mode=2, we can create a target and impactor separately and name one "target" and the other "impactor"
-		// I don't think mode = 3 is needed either
-
-
-
-	       
-		/*
-		//imp
-		int impNmntl = 0;
-		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-					const PS::F64 r = Expand * sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= impRadi || r <= impCoreRadi) continue;
-					++ impNmntl;
-				}
-			}
-		}
-		double impCoreShrinkFactor = 1.0;
-		int impNcore;
-		while(impCoreShrinkFactor *= 0.99){
-			impNcore = 0;
-			for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-				for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-					for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-						const PS::F64 r = Expand * impCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-						if(r >= Corr * impCoreRadi) continue;
-						++ impNcore;
-					}
-				}
-			}
-			if((double)(impNcore) / (double)(impNcore + impNmntl) > coreFracMass) break;
-		}
-
-		*/
-
-		
-		///////////////////
-		//Dummy end
-		///////////////////
-
 		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
 		
-		///////////////////
-		//Real put
-		///////////////////
 		PS::S32 id = 0;
         
         switch (mode){
             case 1:
-	      {
+	      {		
                 std::cout << "creating target from tar.dat" << std::endl;
                 FILE * tarFile;
                 tarFile = fopen("input/tar.dat","r");
@@ -177,7 +107,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 std::cout << "num tar ptcl: " << nptcltar << std::endl;
                 for(int i=0; i<nptcltar; i++){
                     Ptcl ith;
-                    ith.readAscii(tarFile);
+                    ith.readAscii(tarFile);		    
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
                 }
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
@@ -186,6 +116,16 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
                     ptcl.push_back(tar[i]);
                 }
+
+                for(PS::U32 i = 0 ; i < tar.size() ; ++ i){
+		  if (tar[i].tag==0){
+		      tarNmntl += 1;
+		  }else{
+		    tarNcore += 1;
+		  }
+                }
+
+		tarNptcl = tarNmntl + tarNcore;
                 
                 std::cout << "creating impactor from imp.dat" << std::endl;
                 FILE * impFile;
@@ -205,12 +145,57 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     ptcl.push_back(imp[i]);
                 }
 
+		for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
+		  if (imp[i].tag==0){
+		      impNmntl += 1;
+		  }else{
+		    impNcore += 1;
+		  }
+                }
+
+		impNptcl = impNmntl + impNcore;
+
 		Nptcl = tarNptcl + impNptcl;
 		
                 break;
 	      }
             case 2:
 	      {
+		///////////////////
+		//Dummy put to determine # of ptcls
+		///////////////////
+		
+
+		for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+		  for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+		    for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+		      const PS::F64 r = sqrt(x*x + y*y + z*z) * UnitRadi;
+		      if(r >= tarRadi || r <= tarCoreRadi) continue;
+		      ++ tarNmntl;
+		    }
+		  }
+		}
+
+		while(tarCoreShrinkFactor *= 0.99){
+		  tarNcore = 0;
+		  for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
+		    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
+		      for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
+			const PS::F64 r = tarCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
+			if(r >= Corr * tarCoreRadi) continue;
+			++ tarNcore;
+		      }
+		    }
+		  }
+		  if((double)(tarNcore) / (double)(tarNcore + tarNmntl) > coreFracMass) break;
+		}
+
+		///////////////////
+		//Dummy end
+		///////////////////
+
+
+		
 		// checking if there are enough mantle particles
 	      if (tarNmntl <  static_cast<int>(Nptcl * (1.0-coreFracMass))){
 		std::cout << "Too few mantle particles. Increase the grid size. The easiest fix is to increase the gridpoint in GI.h " << std::endl;
