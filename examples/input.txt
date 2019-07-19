@@ -1,6 +1,12 @@
-# input parameters
-UnitMass = 5.97e+24 # target mass
-UnitRadi = 6100e+3 # target radius
-coreFracRadi = 0.54 # core fraction in radius
-coreFracMass = 0.3 # core fraction in mass
-imptarMassRatio = 0.2 # impator-to-target mass ratio
+mode = 2
+total_number_of_particles = 30000
+impVel = 1000
+UnitMass = 5.97e+24
+UnitRadi = 6100e3
+coreFracRadi =  0.54
+coreFracMass = 0.3
+imptarMassRatio = 0.1
+end_time= 1e4
+damping = 1
+output_directory = test/
+output_interval = 10.0 
