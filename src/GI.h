@@ -49,6 +49,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 		const unsigned int mode = parameter_file.getValueOf("mode", 2 );
 		PS::F64 impVel = parameter_file.getValueOf("impVel",0.);
+		PS::F64 impAngle = parameter_file.getValueOf("impact_angle",0.) /180.0 * math::pi; //converting from degree to radian
+
+		
 		end_time = parameter_file.getValueOf("end_time",1.0e+4);
 		damping = parameter_file.getValueOf("damping",1.);
 		PS::F64 Nptcl  = parameter_file.getValueOf("total_number_of_particles", 100000);
@@ -135,7 +138,15 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 for(int i=0; i<nptclimp; i++){
                     Ptcl ith;
                     ith.readAscii(impFile);
-                    ith.vel.x += (-1) * impVel;
+
+		    // This needs to be updated -- the code should determine the impactor and target sizes
+
+                    ith.vel.x += (-1) * cos(impAngle) * impVel;
+		    ith.vel.y += (-1) * sin(impAngle) * impVel;
+		    ith.pos.x +=  (impRadi + tarRadi) * cos(impAngle) * 1.2 ; 
+		    ith.pos.y +=  (impRadi + tarRadi) * sin(impAngle) * 1.2 ;
+
+		    
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
                 }
 
@@ -227,7 +238,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.mass = tarMass + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
-                            // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&AGranite);
                             ith.tag = 0;
 
@@ -241,7 +251,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                     }
                 }
 
-		std::cout << "# of mantle particles = " <<  id << std::endl;
+		std::cout << "# of mantle particles = " <<  id  << std::endl;
 
 		// making the core condition
 		removal_list.clear();
@@ -263,7 +273,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.mass = tarMass + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
-                            // TODO: Modify this line for all particles that need new EoS
                             ith.setPressure(&Iron);
                             ith.tag = 1;
 
@@ -291,63 +300,11 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 }
                 break;
 	      }
-
-	      /*
-            case 3:
-	      {
-                //imp
-                std::cout << "creating impactor" << std::endl;
-                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-                            const PS::F64 r = Expand * sqrt(x*x + y*y + z*z) * UnitRadi;
-                            if(r >= impRadi || r <= impCoreRadi) continue;
-                            Ptcl ith;
-                            ith.pos.x = Expand * UnitRadi * x + offset;
-                            ith.pos.y = Expand * UnitRadi * y;
-                            ith.pos.z = Expand * UnitRadi * z;
-                            ith.dens = (impMass - impCoreMass) / (4.0 / 3.0 * math::pi * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi));
-                            ith.mass = tarMass + impMass;
-                            ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-                            ith.id   = id++;
-                            // TODO: Modify this line for all particles that need new EoS
-                            ith.setPressure(&AGranite);
-                            ith.tag = 2;
-                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
-                        }
-                    }
-                }
-                for(PS::F64 x = -1.0 ; x <= 1.0 ; x += dx){
-                    for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
-                        for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
-                            const PS::F64 r = Expand * impCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-                            if(r >= impCoreRadi) continue;
-                            Ptcl ith;
-                            ith.pos.x = Expand * impCoreShrinkFactor * UnitRadi * x + offset;
-                            ith.pos.y = Expand * impCoreShrinkFactor * UnitRadi * y;
-                            ith.pos.z = Expand * impCoreShrinkFactor * UnitRadi * z;
-                            ith.dens = impCoreMass / (4.0 / 3.0 * math::pi * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr);
-                            ith.mass = tarMass + impMass;
-                            ith.eng  = 0.1 * Grav * tarMass / tarRadi;
-                            ith.id   = id++;
-                            // TODO: Modify this line for all particles that need new EoS
-                            ith.setPressure(&Iron);
-                            ith.tag = 3;
-                            if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
-                        }
-                    }
-                }
-                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-                    imp[i].mass /= (PS::F64)(Nptcl);
-                }
-                for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-                    ptcl.push_back(imp[i]);
-                }
-                break;
-	      }
-
-	      */
         }
+
+	
+
+
 	
 	        tarNptcl = tarNcore + tarNmntl;
 		impNptcl = impNcore + impNmntl;

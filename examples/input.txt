@@ -1,6 +1,6 @@
-mode = 2
-total_number_of_particles = 30000
-impVel = 1000
+mode = 1
+total_number_of_particles = 60000
+impVel = 5000.0
 UnitMass = 5.97e+24
 UnitRadi = 6100e3
 coreFracRadi =  0.54
@@ -8,5 +8,6 @@ coreFracMass = 0.3
 imptarMassRatio = 0.1
 end_time= 1e4
 damping = 1
-output_directory = test/
+output_directory = test2/
 output_interval = 10.0 
+impact_angle = 45
