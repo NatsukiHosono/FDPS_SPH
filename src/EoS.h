@@ -93,7 +93,7 @@ namespace EoS{
 		 * A member variable that contains all the EoS data from ANEOS. The lines
 		 * represent density, the columns energy. The data values for each entry
 		 * are
-		 * Density (kg/m3) Temperature (K) Energy (J/kg) Pressure (Pa) Sound speed (m/s) Entropy (J/kg/K).
+		 * Density (kg/m3) Internal energy (J/kg) Temperature (K) Pressure (Pa) Sound speed (m/s) Entropy (J/kg/K).
 		 */
 		std::vector<std::vector<std::array<type, 6> > > eos_data;
 

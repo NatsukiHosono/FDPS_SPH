@@ -1,4 +1,10 @@
 # input parameters
+mode = 2
+output_interval = 10
+damping = 1
+end_time = 1e5
+output_directory = results/
+impVel = 1000
 UnitMass = 5.97e+24 # target mass
 UnitRadi = 6100e+3 # target radius
 coreFracRadi = 0.54 # core fraction in radius
