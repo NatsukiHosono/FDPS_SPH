@@ -232,7 +232,7 @@ namespace EoS{
 		}
 
 		inline type Pressure(const type dens, const type eng) const{
-			return get_interpolated_value(dens,eng,3);
+			return std::max(get_interpolated_value(dens,eng,3), 0.0);
 		}
 
 		inline type SoundSpeed(const type dens, const type eng) const{
