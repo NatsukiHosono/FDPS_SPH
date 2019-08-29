@@ -15,7 +15,6 @@ std::unordered_set <unsigned int>  create_removal_list (const unsigned int lowes
       
       while (removal_list.size() < number_of_removed_items){
 	const unsigned int num = rand ()  % static_cast<unsigned int>(highest_index - lowest_index) + lowest_index;
-	//std::cout << num << std::endl;
 	
 	// This works even if num is already in the list, because the unordered_set filters out duplicates
 	removal_list.insert(num);
@@ -77,7 +76,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		  Nptcl = (volume of a sphere)/(dx)^3 * L^3, where L = 2.0
 	          dx = (4.0/3.0 * math::pi/Nptcl)^{1/3}
 		  The number of grid point is 2.0/dx
-		  we multiply 1.1 so that the enough particles are created to generate a sphere */
+		  we multiply by 1.1 so that enough particles are created to generate a sphere */
 		const int  gridpoint = int(2.0/pow(4.0/3.0 * math::pi * 1.1/Nptcl,0.333));
 		const PS::F64 dx =  2.0/gridpoint;	
 		const PS::F64 Grav = 6.67e-11;
@@ -100,6 +99,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
         
         switch (mode){
             case 1:
+	    // This mode will enable to create a target and an imapctor from input/tar.dat and input/imp.dat
 	      {		
                 std::cout << "creating target from tar.dat" << std::endl;
                 FILE * tarFile;
@@ -152,14 +152,11 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
                 for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
                     ptcl.push_back(imp[i]);
-                }
-
-		for(PS::U32 i = 0 ; i < imp.size() ; ++ i){
-		  if (imp[i].tag==0){
+		    if (imp[i].tag==0){
 		      impNmntl += 1;
-		  }else{
-		    impNcore += 1;
-		  }
+		    }else{
+		      impNcore += 1;
+		  }		    
                 }
 
 		impNptcl = impNmntl + impNcore;
@@ -169,6 +166,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 break;
 	      }
             case 2:
+	    // This mode will create an initial condition
 	      {
 		///////////////////
 		//Dummy put to determine # of ptcls
@@ -243,8 +241,8 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 
 			    if (removal_list.count(index)){
 			      id += -1;
-			    }else{
-			      if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+			    }else if (ith.id / NptclIn1Node == PS::Comm::getRank()){
+			      tar.push_back(ith);
 			    }
 			    index += 1;
                         }
@@ -363,5 +361,5 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			sph_system[i].acc += - sph_system[i].vel * 0.05 / sph_system[i].dt;
 		}
-	}	
+	}
 };
