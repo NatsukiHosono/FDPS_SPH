@@ -138,14 +138,10 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                 for(int i=0; i<nptclimp; i++){
                     Ptcl ith;
                     ith.readAscii(impFile);
-
-		    // This needs to be updated -- the code should determine the impactor and target sizes
-
                     ith.vel.x += (-1) * cos(impAngle) * impVel;
 		    ith.vel.y += (-1) * sin(impAngle) * impVel;
-		    ith.pos.x +=  (impRadi + tarRadi) * cos(impAngle) * 1.2 ; 
-		    ith.pos.y +=  (impRadi + tarRadi) * sin(impAngle) * 1.2 ;
-
+		    ith.pos.x +=  (impRadi + tarRadi) * cos(impAngle); 
+		    ith.pos.y +=  (impRadi + tarRadi) * sin(impAngle);
 		    
                     if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
                 }
