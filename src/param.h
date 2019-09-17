@@ -17,5 +17,7 @@ namespace PARAM{
 	const bool FLAG_R00 = false;
 	//Strength of AV
 	const PS::F64 AV_STRENGTH = 1.0;
+	//DISPH power
+	const PS::F64 DISPH_POWER = 1.0;
 };
 
