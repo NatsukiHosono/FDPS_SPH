@@ -1,5 +1,5 @@
 # 120 120 :Grid numbers for density and internal energy 
-# Density (km/m3), Internal energy (kJ/kg), Temperature (K), Sound speed (m/s), Entropy (J/K/kg) 
+# Density (km/m3), Internal energy (kJ/kg), Temperature (K), Pressure (Pa), Sound speed (m/s), Entropy (J/K/kg) 
  1.00000000E-06  1.17199486E+03  1.00000000E+00 1.97173850E-102  1.00000000E-12 -5.22510116E+03 
  1.00000000E-06  1.32109228E+03  1.12885259E+00 4.76643814E-102  1.00000000E-12 -5.18684884E+03 
  1.00000000E-06  1.48915740E+03  1.27409738E+00 7.91667048E-102  1.00000000E-12 -5.14373018E+03 
