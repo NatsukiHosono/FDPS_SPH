@@ -135,9 +135,9 @@ for m in range(0,nr, int(nr/6)):
 
 h = open(outputfilename,'w')
 h.write("%i %i %s \n" % (nr, nu , ':Grid numbers for density and internal energy'))
-h.write('Density (km/m3), Internal energy (kJ/kg), Temperature (K), Sound speed (m/s), Entropy (J/K/kg) \n')
+h.write('Density (km/m3), Internal energy (kJ/kg), Pressure (Pa), Temperature (K), Sound speed (m/s), Entropy (J/K/kg) \n')
 
 
 for m in range(0,nr):
     for n in range(0,nu):
-        h.write("%15.8E %15.8E %15.8E %15.8E %15.8E \n" % (density[m], new_energy[n], new_temperature[m][n],  new_soundspeed[m][n], new_entropy[m][n]))
+        h.write("%15.8E %15.8E %15.8E %15.8E %15.8E %15.8E \n" % (density[m], new_energy[n], new_pressure[m][n], new_temperature[m][n],  new_soundspeed[m][n], new_entropy[m][n]))
