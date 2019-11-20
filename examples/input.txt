@@ -11,3 +11,4 @@ damping = 1
 output_directory = test2/
 output_interval = 10.0 
 impact_angle = 45
+

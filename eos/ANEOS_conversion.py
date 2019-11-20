@@ -5,7 +5,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, interp2d
 from scipy import interpolate
 
 #----- A user has to change these three parameters  ----------------
@@ -90,7 +90,9 @@ new_entropy=np.zeros(shape=(nr,nu))
 for m in range(0,nu):
 
     # internal energy
-    f_temperature = interpolate.interp1d(energy[m,:], temperature, kind='linear', fill_value='extrapolate')
+    f_energy = interpolate.interp2d(density, entropy, new_energy, kind='linear', fill_value='extrapolate')
+    energy = f_energy(density, entropy)
+    # f_temperature = interpolate.interp1d(energy[m,:], temperature, kind='linear', fill_value='extrapolate')
     new_temperature[m][:]=f_temperature(new_energy)
 
     # pressure
