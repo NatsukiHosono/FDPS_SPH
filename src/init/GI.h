@@ -1,4 +1,4 @@
-#include <parse.h>
+#include "../parse.h"
 
 #define SELF_GRAVITY
 #define FLAG_GI
@@ -9,7 +9,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	public:
 	static const double END_TIME;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
-		const bool createTarget = true;//set false if you make an impactor.
+		const bool createTarget = false;//set false if you make an impactor.
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -41,7 +41,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const PS::F64 impCoreMass = impMass * coreFracMass;
 		const PS::F64 impCoreRadi = impRadi * coreFracRadi;
 
-		const double offset = 5.0 * UnitRadi;
 		const PS::F64 dx = 1.0 / 39;
 		const PS::F64 Grav = 6.67e-11;
 		std::cout << impRadi / tarRadi << std::endl;
@@ -107,6 +106,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const int tarNptcl = tarNcore + tarNmntl;
 		const int impNptcl = impNcore + impNmntl;
 		const int Nptcl    = tarNptcl + impNptcl;
+		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
 		std::cout << "Target  :" << tarNptcl << std::endl;
 		std::cout << "    radius           : " << tarRadi << std::endl;
 		std::cout << "    total-to-core    : " << (double)(tarNcore) / (double)(tarNptcl) << std::endl;
@@ -125,7 +125,6 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::cout << "    mean density     : " << impMass / (4.0 * math::pi / 3.0 * impRadi * impRadi * impRadi) << std::endl;
 		std::cout << "Total:" << Nptcl << std::endl;
 		std::cout << "Tar-to-Imp mass ratio: " << (double)(impNmntl) / (double)(tarNmntl) << std::endl;
-		const int NptclIn1Node = Nptcl / PS::Comm::getNumberOfProc();
 		///////////////////
 		//Real put
 		///////////////////
@@ -176,7 +175,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					const PS::F64 r = Expand * sqrt(x*x + y*y + z*z) * UnitRadi;
 					if(r >= impRadi || r <= impCoreRadi) continue;
 					Ptcl ith;
-					ith.pos.x = Expand * UnitRadi * x + offset;
+					ith.pos.x = Expand * UnitRadi * x;
 					ith.pos.y = Expand * UnitRadi * y;
 					ith.pos.z = Expand * UnitRadi * z;
 					ith.dens = (impMass - impCoreMass) / (4.0 / 3.0 * math::pi * (impRadi * impRadi * impRadi - impCoreRadi * impCoreRadi * impCoreRadi));
@@ -193,9 +192,9 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 			for(PS::F64 y = -1.0 ; y <= 1.0 ; y += dx){
 				for(PS::F64 z = -1.0 ; z <= 1.0 ; z += dx){
 					const PS::F64 r = Expand * impCoreShrinkFactor * sqrt(x*x + y*y + z*z) * UnitRadi;
-					if(r >= impCoreRadi) continue;
+					if(r >= Corr * impCoreRadi) continue;
 					Ptcl ith;
-					ith.pos.x = Expand * impCoreShrinkFactor * UnitRadi * x + offset;
+					ith.pos.x = Expand * impCoreShrinkFactor * UnitRadi * x;
 					ith.pos.y = Expand * impCoreShrinkFactor * UnitRadi * y;
 					ith.pos.z = Expand * impCoreShrinkFactor * UnitRadi * z;
 					ith.dens = impCoreMass / (4.0 / 3.0 * math::pi * impCoreRadi * impCoreRadi * impCoreRadi * Corr * Corr * Corr);
@@ -204,6 +203,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.id   = id++;
 					ith.setPressure(&Iron);
 					ith.tag = 3;
+					std::cout << ith.id << ", " << ith.id / NptclIn1Node << std::endl;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
 				}
 			}
