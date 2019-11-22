@@ -1,8 +1,8 @@
-mode = 1
+mode = 2
 total_number_of_particles = 60000
 impVel = 5000.0
 UnitMass = 5.97e+24
-UnitRadi = 6100e3
+UnitRadi = 7000e3
 coreFracRadi =  0.54
 coreFracMass = 0.3
 imptarMassRatio = 0.1

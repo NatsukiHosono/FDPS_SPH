@@ -202,6 +202,10 @@ namespace EoS{
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data);
 		}
 
+        inline type InternalEnergy(const type dens, const type entropy) const{
+            return BilinearInterpolation::interpolate(dens, entropy, densities, entropies, 2, eos_data);
+        }
+
 		void test_data() const{
 			std::ofstream output;
 			output.open("test_output.txt", std::ios::out);
