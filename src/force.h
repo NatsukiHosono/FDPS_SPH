@@ -12,7 +12,7 @@ namespace STD{
 					dens[i].dens += jth.mass * kernel.W(dr, ith.smth);
 				}
 				#ifdef FLAG_GI
-				dens[i].dens = std::max(5.0, dens[i].dens);
+				dens[i].dens = std::max(100.0, dens[i].dens);
 				#endif
 				dens[i].smth = PARAM::SMTH * pow(ith.mass / dens[i].dens, 1.0/(PS::F64)(PARAM::Dim));
 			}
@@ -91,7 +91,7 @@ namespace STD{
 					const TPtclJ& jth = ep_j[j];
 					const PS::F64vec dr = ith.pos - jth.pos;
 					const PS::F64 dr2 = dr * dr;
-					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + ith.getEps2());
+					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1.0e-6);
 					const PS::F64 m_dr3_inv = jth.mass * math::pow3(dr_inv);
 					grav[i].acc -= G * m_dr3_inv * dr;
 					grav[i].pot -= G * jth.mass * dr_inv;
@@ -117,7 +117,7 @@ namespace DI{
 					dens[i].dens_smth += jth.mass * kernel.W(dr, ith.smth);
 					dens[i].pres_smth += jth.pV * kernel.W(dr, ith.smth);
 				}
-				dens[i].dens_smth = std::max(5.0, dens[i].dens_smth);
+				dens[i].dens_smth = std::max(100.0, dens[i].dens_smth);
 				dens[i].smth = PARAM::SMTH * pow(ith.mass / dens[i].dens_smth, 1.0/(PS::F64)(PARAM::Dim));
 			}
 		}
@@ -194,7 +194,7 @@ namespace DI{
 					const TPtclJ& jth = ep_j[j];
 					const PS::F64vec dr = ith.pos - jth.pos;
 					const PS::F64 dr2 = dr * dr;
-					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + ith.getEps2());
+					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1.0e-6);
 					const PS::F64 m_dr3_inv = jth.mass * math::pow3(dr_inv);
 					grav[i].acc -= G * m_dr3_inv * dr;
 					grav[i].pot -= G * jth.mass * dr_inv;

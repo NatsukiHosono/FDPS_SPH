@@ -9,7 +9,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	public:
 	static constexpr double END_TIME = 1.0e+4;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
-		const bool createTarget = true;//set false if you make an impactor.
+		const bool createTarget = false;//set false if you make an impactor.
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -41,7 +41,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		const PS::F64 impCoreMass = impMass * coreFracMass;
 		const PS::F64 impCoreRadi = impRadi * coreFracRadi;
 
-		const PS::F64 dx = 1.0 / 39;
+		const PS::F64 dx = 1.0 / 11;
 		const PS::F64 Grav = 6.67e-11;
 		std::cout << impRadi / tarRadi << std::endl;
 		std::cout << impCoreRadi / impRadi << std::endl;
@@ -399,6 +399,26 @@ template <class Ptcl> class GI_imp : public Problem<Ptcl>{
 			sph_system[i].eng  = std::max(sph_system[i].eng , 1.0e+4);
 			sph_system[i].dens = std::max(sph_system[i].dens, 100.0);
 		}
+		if(sys.step % 100 == 0 || 1){
+			//Shift Origin
+			PS::F64vec com_loc = 0;//center of mass
+			PS::F64vec mom_loc = 0;//moment
+			PS::F64 mass_loc = 0;//
+			PS::F64 eng_loc = 0;//
+			for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+				com_loc += sph_system[i].pos * sph_system[i].mass;
+				mom_loc += sph_system[i].vel * sph_system[i].mass;
+				mass_loc += sph_system[i].mass;
+				eng_loc += sph_system[i].mass * (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
+			}
+			PS::F64vec com = PS::Comm::getSum(com_loc);
+			PS::F64vec mom = PS::Comm::getSum(mom_loc);
+			PS::F64 mass = PS::Comm::getSum(mass_loc);
+			PS::F64 eng = PS::Comm::getSum(eng_loc);
+			std::cout << "Mom: " << mom << std::endl;
+			std::cout << "Eng: " << eng << std::endl;
+		}
+		#if 0
 		//Shift Origin
 		PS::F64vec com_loc = 0;//center of mass of target core
 		PS::F64vec mom_loc = 0;//moment of target core
@@ -418,6 +438,7 @@ template <class Ptcl> class GI_imp : public Problem<Ptcl>{
 			sph_system[i].pos -= com;
 			sph_system[i].vel -= mom;
 		}
+		#endif
 		#if 1
 		std::size_t Nptcl = sph_system.getNumberOfParticleLocal();
 		for(PS::S32 i = 0 ; i < Nptcl ; ++ i){
