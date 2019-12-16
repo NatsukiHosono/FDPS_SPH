@@ -1,4 +1,7 @@
 #pragma once
+
+#include "EoS.h"
+
 namespace STD{
 	class CalcDensity{
 		kernel_t kernel;
@@ -26,6 +29,14 @@ namespace STD{
 			sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
 		}
 	}
+
+    void CalcInternalEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
+        #pragma omp parallel for
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+            sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng);
+            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
+        }
+    }
 
 	class CalcDerivative{
 		kernel_t kernel;

@@ -108,6 +108,9 @@ int main(int argc, char* argv[]){
 		std::cout << "//================================" << std::endl;
 	}
 
+    const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
+    const double initial_entropy = parameter_file.getValueOf("entropy", 100); // initial constant entropy value
+
 	while(sysinfo.time < PROBLEM::end_time){
 		#pragma omp parallel for
 		for(int i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
@@ -124,6 +127,10 @@ int main(int argc, char* argv[]){
 		for(short int loop = 0 ; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP ; ++ loop){
 			dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
 		}
+        //    Calculate initial internal energy for mode 1 initial target/impactor creation
+        if(mode == 2) {
+            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
+        }
 		PTCL::CalcPressure(sph_system);
 		drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
 		hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);

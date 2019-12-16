@@ -18,6 +18,7 @@ namespace EoS{
 		}
 		virtual type Pressure  (const type dens, const type eng) const = 0;
 		virtual type SoundSpeed(const type dens, const type eng) const = 0;
+		virtual type InternalEnergy(const type dens, const type entropy) const = 0;
 	};
 	//////////////////
 	//EoSs
@@ -33,6 +34,10 @@ namespace EoS{
 		inline type SoundSpeed(const type dens, const type eng) const{
 			return sqrt(hcr * (hcr - 1.0) * eng);
 		}
+
+        inline type InternalEnergy(const type dens, const type entropy) const{
+            return 0;
+        }
 		inline type HeatCapacityRatio() const{
 			return hcr;
 		}
@@ -88,6 +93,10 @@ namespace EoS{
 		inline type SoundSpeed(const type dens, const type eng) const{
 			return sqrt(std::max(Pressure(dens, eng) / (dens * dens) * dPdu(dens, eng) + dPdrho(dens, eng), 0.0) + 1.0e-16);
 		}
+
+        inline type InternalEnergy(const type dens, const type entropy) const{
+            return 0;
+        }
 	};
 
 	template <typename type> class ANEOS : public EoS_t<type>{
