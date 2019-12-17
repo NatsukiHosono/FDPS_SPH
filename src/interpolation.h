@@ -47,7 +47,9 @@ public:
 
         // If we are not at the boundaries of the data table
         if ((neighbors.first < var1_vector.size() - 1) &&
-            (neighbors.second < var2_vector.size() - 1)) {
+            (neighbors.second < var2_vector.size() - 1) &&
+            (neighbors.first > 0) &&
+            (neighbors.second > 0)) {
             // compute the interpolation weights of this val1 and val2
             const auto xi = (val1 - var1_vector[neighbors.first - 1]) /
                             (var1_vector[neighbors.first] - var1_vector[neighbors.first - 1]);
