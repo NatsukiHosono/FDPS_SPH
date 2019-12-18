@@ -44,6 +44,14 @@ namespace STD{
         }
     }
 
+    void CalcEntropyAndInternalEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
+		#pragma omp parallel for
+		for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+			sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
+			sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
+		}
+	}
+
 	class CalcDerivative{
 		kernel_t kernel;
 		public:
