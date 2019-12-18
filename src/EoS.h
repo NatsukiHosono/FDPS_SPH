@@ -18,7 +18,8 @@ namespace EoS{
 		}
 		virtual type Pressure  (const type dens, const type eng) const = 0;
 		virtual type SoundSpeed(const type dens, const type eng) const = 0;
-		virtual type InternalEnergy(const type dens, const type entropy) const = 0;
+		virtual type InternalEnergy(const type dens, const type ent) const = 0;
+        virtual type Entropy(const type dens, const type eng) const = 0;
 	};
 	//////////////////
 	//EoSs
@@ -28,16 +29,23 @@ namespace EoS{
 		public:
 		IdealGas(const type _hcr) : hcr(_hcr){
 		}
+
 		inline type Pressure(const type dens, const type eng) const{
 			return (hcr - 1.0) * dens * eng;
 		}
+
 		inline type SoundSpeed(const type dens, const type eng) const{
 			return sqrt(hcr * (hcr - 1.0) * eng);
 		}
 
-        inline type InternalEnergy(const type dens, const type entropy) const{
+        inline type InternalEnergy(const type dens, const type ent) const{
             return 0;
         }
+
+        inline type Entropy(const type dens, const type eng) const{
+            return 0;
+        }
+
 		inline type HeatCapacityRatio() const{
 			return hcr;
 		}
@@ -94,7 +102,11 @@ namespace EoS{
 			return sqrt(std::max(Pressure(dens, eng) / (dens * dens) * dPdu(dens, eng) + dPdrho(dens, eng), 0.0) + 1.0e-16);
 		}
 
-        inline type InternalEnergy(const type dens, const type entropy) const{
+        inline type InternalEnergy(const type dens, const type ent) const{
+            return 0;
+        }
+
+        inline type Entropy(const type dens, const type eng) const{
             return 0;
         }
 	};
@@ -211,8 +223,12 @@ namespace EoS{
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data);
 		}
 
-        inline type InternalEnergy(const type dens, const type entropy) const{
-            return BilinearInterpolation::interpolate(dens, entropy, densities, entropies, 2, eos_data);
+        inline type InternalEnergy(const type dens, const type ent) const{
+            return BilinearInterpolation::interpolate(dens, ent, densities, entropies, 2, eos_data);
+        }
+
+        inline type Entropy(const type dens, const type eng) const{
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
         }
 
 		void test_data() const{
