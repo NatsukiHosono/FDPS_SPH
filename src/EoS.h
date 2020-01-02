@@ -121,6 +121,10 @@ namespace EoS{
 		std::vector<double> energies;
         std::vector<double> entropies;
 
+        std::vector<double> full_densities;
+        std::vector<double> full_energies;
+        std::vector<double> full_entropies;
+
 		public:
 		/**
 		 * Construct the EoS by reading its data from a file. The file format looks
@@ -137,6 +141,9 @@ namespace EoS{
                         std::vector<double> &var1_vector,
                         std::vector<double> &var2_vector,
                         std::vector<double> &var3_vector,
+                        std::vector<double> &var1_vector_full,
+                        std::vector<double> &var2_vector_full,
+                        std::vector<double> &var3_vector_full,
                         const std::string &file_path,
                         const int val1_property_index,
                         const int val2_property_index,
@@ -201,6 +208,13 @@ namespace EoS{
                                 if (line_index == 0 && field_index == val3_property_index)
                                     var3_vector.push_back(tmp);
 
+                                if (field_index == val1_property_index)
+                                    var1_vector_full.push_back(tmp);
+                                if (field_index == val2_property_index)
+                                    var2_vector_full.push_back(tmp);
+                                if (field_index == val3_property_index)
+                                    var3_vector_full.push_back(tmp);
+
                                 ++field_index;
                             }
                             ++column_index;
@@ -212,23 +226,23 @@ namespace EoS{
             };
 
             eos_data = readANEOSfile::readfile(densities, energies,
-                    entropies, filename, 0, 1, 5);
+                    entropies, full_densities, full_energies, full_entropies, filename, 0, 1, 5);
 		}
 
 		inline type Pressure(const type dens, const type eng) const{
-			return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
+			return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data, false);
 		}
 
 		inline type SoundSpeed(const type dens, const type eng) const{
-            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data);
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data, false);
 		}
 
         inline type InternalEnergy(const type dens, const type ent) const{
-            return BilinearInterpolation::interpolate(dens, ent, densities, entropies, 2, eos_data);
+            return BilinearInterpolation::interpolate(dens, ent, densities, entropies, 2, eos_data, false);
         }
 
         inline type Entropy(const type dens, const type eng) const{
-            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
+            return BilinearInterpolation::interpolate(dens, eng, full_densities, full_energies, 5, eos_data, true);
         }
 
 		void test_data() const{
