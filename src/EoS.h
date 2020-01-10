@@ -230,19 +230,19 @@ namespace EoS{
 		}
 
 		inline type Pressure(const type dens, const type eng) const{
-			return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data, false);
+			return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
 		}
 
 		inline type SoundSpeed(const type dens, const type eng) const{
-            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data, false);
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data);
 		}
 
         inline type InternalEnergy(const type dens, const type ent) const{
-            return BilinearInterpolation::interpolate(dens, ent, densities, entropies, 2, eos_data, false);
+            return EnergyInterpolation::interpolate(dens, ent, full_densities, full_entropies, full_energies, 1, eos_data, 120);
         }
 
         inline type Entropy(const type dens, const type eng) const{
-            return BilinearInterpolation::interpolate(dens, eng, full_densities, full_energies, 5, eos_data, true);
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
         }
 
 		void test_data() const{
