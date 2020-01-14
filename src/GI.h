@@ -1,4 +1,4 @@
-#include <parse.h>
+#include "parse.h"
 #include <unordered_set>
 
 #define SELF_GRAVITY
@@ -367,7 +367,7 @@ public:
     static constexpr PS::F64 M = 6.0e+24;
     static constexpr double Grav = 6.67e-11;
     static constexpr double L_EM = 3.5e+34;
-    static constexpr double damping = 0;
+    static constexpr double damping = 1.0;
 
     static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo,
             ParameterFile &parameter_file){
@@ -381,7 +381,7 @@ public:
             fin >> N;
             while (!fin.eof()){
                 Ptcl ith;
-                fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot;
+                fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent;
                 tar.push_back(ith);
             }
             tar.pop_back();
@@ -394,7 +394,7 @@ public:
             fin >> N;
             while (!fin.eof()){
                 Ptcl ith;
-                fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot;
+                fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent;
                 imp.push_back(ith);
             }
             imp.pop_back();
@@ -407,6 +407,8 @@ public:
                 ++ cnt;
             }
             for(int i = 0 ; i < imp.size() ; ++ i){
+				//ad-hoc modification
+                imp[i].tag += 2;
                 sph_system[cnt] = imp[i];
                 ++ cnt;
             }

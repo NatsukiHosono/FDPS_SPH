@@ -16,6 +16,11 @@
 #include "io.h"
 #include "integral.h"
 
+
+template <class Ptcl> double GI<Ptcl>::end_time;
+template <class Ptcl> double GI<Ptcl>::damping;
+
+
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
 	typedef GI_imp<PTCL::RealPtcl> PROBLEM;
@@ -107,6 +112,7 @@ int main(int argc, char* argv[]){
 
     const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
     const double initial_entropy = parameter_file.getValueOf("entropy", 100); // initial constant entropy value
+	//std::cout << "L115: " << initial_entropy << std::endl;
 
 	while(sysinfo.time < PROBLEM::end_time){
 		#pragma omp parallel for
