@@ -16,12 +16,9 @@
 #include "io.h"
 #include "integral.h"
 
-template <class Ptcl> double GI<Ptcl>::end_time;
-template <class Ptcl> double GI<Ptcl>::damping;
-
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
-	typedef GI<PTCL::RealPtcl> PROBLEM;
+	typedef GI_imp<PTCL::RealPtcl> PROBLEM;
 	//////////////////
 	//Create vars.
 	//////////////////

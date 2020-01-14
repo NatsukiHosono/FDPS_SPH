@@ -1,4 +1,4 @@
-mode = 2
+mode = 1
 total_number_of_particles = 60000
 impVel = 5000.0
 UnitMass = 5.97e+24
