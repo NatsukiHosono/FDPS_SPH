@@ -129,8 +129,8 @@ int main(int argc, char* argv[]){
 		}
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         if(mode == 2) {
-//            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
-            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
+            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
+//            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
 //            PTCL::CalcEntropy(sph_system);
         }
 		PTCL::CalcPressure(sph_system);
