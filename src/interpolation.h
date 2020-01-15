@@ -213,7 +213,7 @@ private:
             }
         }
         if (min_distance < 0) {
-            if (min_distance_index < 0) {
+            if (min_distance_index <= 0) {
                 return std::make_pair(min_distance_index, min_distance_index + 1);
             } else if (min_distance_index + 1 == grid_length) {
                 return std::make_pair(min_distance_index - 2, min_distance_index - 1);
