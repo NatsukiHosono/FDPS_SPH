@@ -149,7 +149,7 @@ namespace STD{
 		}
 		void writeAscii(FILE* fp) const{
 			#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
-			fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  0.0  ,  vel.x,  vel.y,  0.0  ,  dens,  eng,  pres, pot);
+			fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  0.0  ,  vel.x,  vel.y,  0.0  ,  dens,  eng,  pres, pot, ent);
 			#else
 			fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  pos.z,  vel.x,  vel.y,  vel.z,  dens,  eng,  pres, pot, ent);
 			#endif
@@ -157,10 +157,10 @@ namespace STD{
 		void readAscii(FILE* fp){
 			#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 			double dummy1, dummy2;
-			fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &dummy1, &vel.x, &vel.y, &dummy2, &dens, &eng, &pres, &pot);
+			fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &dummy1, &vel.x, &vel.y, &dummy2, &dens, &eng, &pres, &pot, &ent);
 			#else
 			fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &pos.z, &vel.x, &vel.y, &vel.z, &dens, &eng, &pres, &pot, &ent);
-			#endif
+            #endif
 		}
 		void setPressure(const EoS::EoS_t<PS::F64>* const _EoS){
 			EoS = _EoS;

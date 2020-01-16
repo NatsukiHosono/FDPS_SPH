@@ -44,6 +44,13 @@ namespace STD{
         }
     }
 
+    void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
+        #pragma omp parallel for
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+            sph_system[i].ent = entropy;
+        }
+    }
+
     void CalcEntropyAndInternalEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
 		#pragma omp parallel for
 		for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){

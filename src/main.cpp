@@ -23,7 +23,7 @@ template <class Ptcl> double GI<Ptcl>::damping;
 
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
-	typedef GI_imp<PTCL::RealPtcl> PROBLEM;
+	typedef GI<PTCL::RealPtcl> PROBLEM;  // note: this must be changed to GI_imp for impact simulations...come up with a fix soon
 	//////////////////
 	//Create vars.
 	//////////////////
@@ -112,7 +112,6 @@ int main(int argc, char* argv[]){
 
     const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
     const double initial_entropy = parameter_file.getValueOf("entropy", 100); // initial constant entropy value
-	//std::cout << "L115: " << initial_entropy << std::endl;
 
 	while(sysinfo.time < PROBLEM::end_time){
 		#pragma omp parallel for
@@ -132,8 +131,9 @@ int main(int argc, char* argv[]){
 		}
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         if(mode == 2) {
-            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
-//            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
+//            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
+            PTCL::SetConstantEntropy(sph_system, initial_entropy);
+            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
 //            PTCL::CalcEntropy(sph_system);
         }
 		PTCL::CalcPressure(sph_system);

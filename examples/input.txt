@@ -1,5 +1,5 @@
-mode = 1
-total_number_of_particles = 60000
+mode = 2
+total_number_of_particles = 12000
 impVel = 5000.0
 UnitMass = 5.97e+24
 UnitRadi = 7000e3
