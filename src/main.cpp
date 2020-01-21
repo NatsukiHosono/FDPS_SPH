@@ -22,17 +22,8 @@ template <class Ptcl> double GI<Ptcl>::damping;
 
 
 int main(int argc, char* argv[]){
-    std::string input_file("input.txt");
-    ParameterFile parameter_file(input_file);
-    std::cout << "Reading parameters from " << input_file << std::endl;
-    const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
-
-    namespace PTCL = STD;
-    if (mode == 2) {
-        typedef GI<PTCL::RealPtcl> PROBLEM;  // note: this must be changed to GI_imp for impact simulations (mode 1)...come up with a fix soon
-    } else {
-        typedef GI_imp<PTCL::RealPtcl> PROBLEM;
-    }
+	namespace PTCL = STD;
+	typedef GI<PTCL::RealPtcl> PROBLEM;  // note: this must be changed to GI_imp for impact simulations...come up with a fix soon
 	//////////////////
 	//Create vars.
 	//////////////////
@@ -48,6 +39,7 @@ int main(int argc, char* argv[]){
 	//Setup Initial
 	//////////////////
     bool newSim = true;
+    std::string input_file("input.txt");
 
     for (int i=0; i<argc; i++) {
         if (strcmp(argv[i],"-i")==0 || strcmp(argv[i], "--input")==0) {
@@ -58,6 +50,8 @@ int main(int argc, char* argv[]){
             newSim = false;
         }
     }
+    ParameterFile parameter_file(input_file);
+    std::cout << "Reading parameters from " << input_file << std::endl;
     std::string output_directory = parameter_file.getValueOf("output_directory",std::string("results/"));
     if (output_directory.back() != '/')
         output_directory.back() += '/';
@@ -116,6 +110,7 @@ int main(int argc, char* argv[]){
 		std::cout << "//================================" << std::endl;
 	}
 
+    const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
     const double initial_entropy = parameter_file.getValueOf("entropy", 100.0); // initial constant entropy value
 
 	while(sysinfo.time < PROBLEM::end_time){
