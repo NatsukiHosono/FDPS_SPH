@@ -64,6 +64,7 @@ namespace EoS{
 			const type mu  = eta - 1.0;
 			return a * dens * eng + (b * dens * eng / (eng / u0 / eta / eta + 1.0) + A * mu * exp(- alpha * (1.0 / eta - 1.0))) * exp(- beta * (1.0 / eta - 1.0) * (1.0 / eta - 1.0));
 		}
+
 		inline type dPdrho(const type rho, const type u) const{
 			const type drho = 0.0001;
 			return (Pressure(rho + drho, u) - Pressure(rho - drho, u)) / (2.0 * drho);

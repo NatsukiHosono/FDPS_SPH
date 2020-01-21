@@ -9,7 +9,7 @@ imptarMassRatio = 0.1
 end_time= 1e4
 damping = 1
 output_directory = test2/
-output_interval = 10.0 
+output_interval = 100.0
 impact_angle = 45
-entropy = 300
+entropy = -1.16297275e1
 

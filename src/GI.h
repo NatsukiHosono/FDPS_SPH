@@ -103,7 +103,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	      {		
                 std::cout << "creating target from tar.dat" << std::endl;
                 FILE * tarFile;
-                tarFile = fopen("input/tar.dat","r");
+                tarFile = fopen("input/tar.txt","r");
                 FileHeader tarheader;
                 int nptcltar;
                 nptcltar = tarheader.readAscii(tarFile);
