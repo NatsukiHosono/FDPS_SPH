@@ -23,7 +23,7 @@ template <class Ptcl> double GI<Ptcl>::damping;
 
 int main(int argc, char* argv[]){
 	namespace PTCL = STD;
-	typedef GI<PTCL::RealPtcl> PROBLEM;  // note: this must be changed to GI_imp for impact simulations...come up with a fix soon
+	typedef GI<PTCL::RealPtcl> PROBLEM;  // note: this must be changed to GI_imp for impact simulations...come up with a fix soon for mode dependence
 	//////////////////
 	//Create vars.
 	//////////////////
