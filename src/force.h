@@ -37,6 +37,7 @@ namespace STD{
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
             // check to see if I can interpolate and reproduce entropy
+            // add temperature to output files
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
 
         }
