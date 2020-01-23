@@ -230,6 +230,7 @@ namespace EoS{
                     entropies, full_densities, full_energies, full_entropies, filename, 0, 1, 5);
 		}
 
+		// use energy interpolation class to calculate temperature based on density and energy
 		inline type Pressure(const type dens, const type eng) const{
 			return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
 		}

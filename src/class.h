@@ -77,6 +77,7 @@ namespace STD{
 	}
 
 	class RealPtcl{
+	    // implement temperature
 		public:
 		PS::F64 mass;
 		PS::F64vec pos, vel, acc;

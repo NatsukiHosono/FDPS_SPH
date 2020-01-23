@@ -111,7 +111,7 @@ int main(int argc, char* argv[]){
 	}
 
     const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
-    const double initial_entropy = parameter_file.getValueOf("entropy", 100.0); // initial constant entropy value
+    const double initial_entropy = parameter_file.getValueOf("entropy", 3.12432609E+03 ); // initial constant entropy value
 
 	while(sysinfo.time < PROBLEM::end_time){
 		#pragma omp parallel for

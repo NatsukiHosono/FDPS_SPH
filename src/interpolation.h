@@ -5,6 +5,7 @@
 #include <iostream>
 #include "array"
 
+// function to print vector contents
 template<typename T>
 void print(std::vector<T> const &v)
 {
@@ -14,6 +15,7 @@ void print(std::vector<T> const &v)
     std::cout << '\n';
 }
 
+// subsamples a vector "v" given a lower index bound "m" and upper index bound "n"
 template<typename T>
 std::vector<T> slice(std::vector<T> const &v, int m, int n)
 {
@@ -114,6 +116,8 @@ public:
     };
 };
 
+// a class to handle the specific needs of energy interpolation based on energy and entropy
+// this class assumes that density is gridded and related to energy.  entropy is not gridded and therefore not directly related
 class EnergyInterpolation {
 private:
     static std::pair<unsigned int, unsigned int> get_neighbors_restricted_indices(
@@ -137,38 +141,43 @@ private:
         return distance;
     }
 
+    // function that returns the bounds of the repeated densities that compose the nearest neighbors
+    // specify "upper" or "lower" bounds for the "upper" or "lower" neighbors
+    // these indices will be used to further restrict the entropy/energy vectors for nearest-neighbor searches
     static std::pair<unsigned int, unsigned int> get_neighbors_restricted_indices(
-            const std::vector<double> &array,
+            const std::vector<double> &v,
             double value,
             unsigned int grid_length,
             const std::string& bound
     ) {
         unsigned int b1 = 0; // lower bound index
         unsigned int b2 = 0; // upper bound index
-        int array_size = array.size();
+        int v_size = v.size();
 
         if (bound == "upper") {
-            for (unsigned int a = 0; a < array.size(); a = a + 1) {
-                double v = array[a];
-                if (v >= value) {
+            for (unsigned int a = 0; a < v.size(); a = a + 1) {
+                double val = v[a];
+                if (val >= value) {
                     b1 = a;
                     b2 = a + grid_length;
-                    if (b2 > array.size() - 1) {
-                        b2 = array.size() - 1;
+                    if (b2 > v.size() - 1) {
+                        b2 = v.size() - 1;
                     }
                     break;
                 }
             }
         }
         else {
-            std::vector<double> reversed_vector(array.size()); // declare a new array which will be the reversed original array given in the function
-            std::reverse_copy(std::begin(array), std::end(array), std::begin(reversed_vector)); // reverse the array
+            std::vector<double> reversed_vector(v.size()); // declare a new vector which will be the reversed original vector given in the function
+            std::reverse_copy(std::begin(v), std::end(v), std::begin(reversed_vector)); // reverse the vector
 
             for (unsigned int a = 0; a < reversed_vector.size(); a = a + 1) {
                 double v = reversed_vector[a];
                 if (v <= value) {
-                    b2 = array_size - (a - 1) - grid_length - 1;
-                    b1 = array_size - (a - 1) - (2 * grid_length);
+//                    b2 = v_size - (a - 1) - grid_length - 1;
+//                    b1 = v_size - (a - 1) - (2 * grid_length);
+                    b1 = (v_size - 1) - a - (grid_length - 1);
+                    b2 = b1 + grid_length;
                     if (b1 < 0) {
                         b1 = 0;
                     }
@@ -188,20 +197,22 @@ private:
         return std::make_pair(b1, b2);
     };
 
+    // function that returns the 4 nearest entropy neighbors
+    // these neighbors are within the upper and lower density bounds
     static std::pair<int, int> get_entropy_neighbors(
             std::pair<unsigned int, unsigned int> &restricted_indices,
-            const std::vector<double> &array,
+            const std::vector<double> &v,
             double &given_entropy,
             unsigned int &grid_length
     ) {
-        std::vector<double> entropy_array_restricted = slice(array, restricted_indices.first, restricted_indices.second);
+        std::vector<double> entropy_v_restricted = slice(v, restricted_indices.first, restricted_indices.second);
 
         bool initial_calc = true;
         double min_distance = 0;
         unsigned int min_distance_index = 0;
 
-        for (unsigned int a = 0; a < entropy_array_restricted.size(); a = a + 1) {
-            double v = entropy_array_restricted[a];
+        for (unsigned int a = 0; a < entropy_v_restricted.size(); a = a + 1) {
+            double v = entropy_v_restricted[a];
             double distance = calc_distance(given_entropy, v);
             if (initial_calc) {
                 min_distance = distance;
@@ -238,35 +249,21 @@ private:
     };
 
     static double interpolate_energy(
-            double &p1,
-            double &p2,
-            double &s11,
-            double &s12,
-            double &s21,
-            double &s22,
-            double &u11,
-            double &u12,
-            double &u21,
-            double &u22,
-            double &density,
-            double &entropy
+            double &p1, // lower density neighbor value
+            double &p2, // upper density neighbor value
+            double &s11, // lower density neighbor lower entropy neighbor value
+            double &s12, // lower density neighbor upper entropy neighbor value
+            double &s21, // upper density neighbor lower entropy neighbor value
+            double &s22, // upper density neighbor upper entropy neighbor value
+            double &u11, // lower density neighbor lower energy neighbor value
+            double &u12, // lower density neighbor upper energy neighbor value
+            double &u21, // upper density neighbor lower energy neighbor value
+            double &u22, // upper density neighbor upper energy neighbor value
+            double &density, // the density value being interpolated
+            double &entropy // the entropy value being interpolated
     ) {
 
-//        std::cout << "***********" << std::endl;
-//        std::cout << p1 << std::endl;
-//        std::cout << p2 << std::endl;
-//        std::cout << s11 << std::endl;
-//        std::cout << s12 << std::endl;
-//        std::cout << s21 << std::endl;
-//        std::cout << s22 << std::endl;
-//        std::cout << u11 << std::endl;
-//        std::cout << u12 << std::endl;
-//        std::cout << u21 << std::endl;
-//        std::cout << u22 << std::endl;
-//        std::cout << density << std::endl;
-//        std::cout << entropy << std::endl;
-//        std::cout << "***********" << std::endl;
-
+        // perform a series of 3 linear interpolations in order to arrive at the final interpolated energy value
         double u1 = linear_interpolate(s11, s12, entropy, u11, u12);
         double u2 = linear_interpolate(s21, s22, entropy, u21, u22);
         double u = linear_interpolate(p1, p2, density, u1, u2);
@@ -274,6 +271,7 @@ private:
         return u;
     };
 
+    // a class for performing simple linear interpolations
     static double linear_interpolate(
             double &x1,
             double &x2,
@@ -287,6 +285,7 @@ private:
 
 public:
 
+    // the public interpolation function for forming the energy interpolation
     static double interpolate(
             double val1,
             double val2,
@@ -297,7 +296,6 @@ public:
             const std::vector<std::vector<std::array<double, 6>>> &eos_data,
             unsigned int grid_length
     ) {
-        // if we *are* resBilinearInterpolation::get_entropy_neighborsn just get neighbors within the restricted vector
 
         std::pair<unsigned int, unsigned int> neighbors_lower;
         std::pair<unsigned int, unsigned int> neighbors_upper;
@@ -335,37 +333,6 @@ public:
                 val2
         );
 
-//        std::cout << interpolated_value << std::endl;
-
-//        std::cout << "*** lower ***" << std::endl;
-//        std::cout << neighbors_lower.first << std::endl;
-//        std::cout << neighbors_lower.second << std::endl;
-//        std::cout << "*** upper ***" << std::endl;
-//        std::cout << neighbors_upper.first << std::endl;
-//        std::cout << neighbors_upper.second << std::endl;
-//        std::cout << "*** end ***" << std::endl;
-
-//        std::cout << "*** lower ***" << std::endl;
-//        std::cout << var2_vector_restricted_lower[neighbors_lower.first] << std::endl;
-//        std::cout << var2_vector_restricted_lower[neighbors_lower.second] << std::endl;
-//        std::cout << "*** upper ***" << std::endl;
-//        std::cout << var2_vector_restricted_upper[neighbors_upper.first] << std::endl;
-//        std::cout << var2_vector_restricted_upper[neighbors_upper.second] << std::endl;
-//        std::cout << "*** end ***" << std::endl;
-//
-//        std::cout << "*** lower ***" << std::endl;
-//        std::cout << energy_vector_restricted_lower[neighbors_lower.first] << std::endl;
-//        std::cout << energy_vector_restricted_lower[neighbors_lower.second] << std::endl;
-//        std::cout << "*** upper ***" << std::endl;
-//        std::cout << energy_vector_restricted_upper[neighbors_upper.first] << std::endl;
-//        std::cout << energy_vector_restricted_upper[neighbors_upper.second] << std::endl;
-//        std::cout << "*** end ***" << std::endl;
-
-
-//        std::cout << var1_vector_lower_neighbor << std::endl;
-//        std::cout << var1_vector_upper_neighbor << std::endl;
-
-//        std::cout << interpolated_value << std::endl;
         return interpolated_value;
     };
 };

@@ -33,7 +33,12 @@ namespace STD{
     void CalcInternalEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
         #pragma omp parallel for
         for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+            // switch to tillotson for iron using id tag
+            // if 0, then mantle, if 1, then core
+            // need to use the iron table for interpolating against iron
+            // check to see if I can interpolate and reproduce entropy
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
+
         }
     }
 
