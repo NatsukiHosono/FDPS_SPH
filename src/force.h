@@ -39,6 +39,9 @@ namespace STD{
             // check to see if I can interpolate and reproduce entropy
             // add temperature to output files
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
+            std::cout << "*********" << std::endl;
+            std::cout << sph_system[i].dens << std::endl;
+            std::cout << sph_system[i].eng << std::endl;
 
         }
     }
@@ -63,6 +66,13 @@ namespace STD{
 			sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
 			sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
 		}
+	}
+
+	void ReturnEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system) {
+        #pragma omp parallel for
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i) {
+            std::cout << sph_system[i].eng << std::endl;
+        }
 	}
 
 	class CalcDerivative{

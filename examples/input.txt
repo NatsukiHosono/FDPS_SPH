@@ -11,5 +11,5 @@ damping = 1
 output_directory = test2/
 output_interval = 100.0
 impact_angle = 45
-entropy = 3000
+entropy = 3000.0
 

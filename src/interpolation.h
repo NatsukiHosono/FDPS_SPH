@@ -172,8 +172,8 @@ private:
             std::reverse_copy(std::begin(v), std::end(v), std::begin(reversed_vector)); // reverse the vector
 
             for (unsigned int a = 0; a < reversed_vector.size(); a = a + 1) {
-                double v = reversed_vector[a];
-                if (v <= value) {
+                double val = reversed_vector[a];
+                if (val <= value) {
 //                    b2 = v_size - (a - 1) - grid_length - 1;
 //                    b1 = v_size - (a - 1) - (2 * grid_length);
                     b1 = (v_size - 1) - a - (grid_length - 1);
@@ -279,7 +279,7 @@ private:
             double &q1,
             double &q2
     ) {
-        double f = (((x2 - x) / (x2 - x1)) * q1) + (((x2 - x) / (x2 - x1)) * q2);
+        double f = (((x2 - x) / (x2 - x1)) * q1) + (((x - x1) / (x2 - x1)) * q2);
         return f;
     };
 
@@ -332,6 +332,8 @@ public:
                 val1,
                 val2
         );
+
+        std::cout << interpolated_value << std::endl;
 
         return interpolated_value;
     };
