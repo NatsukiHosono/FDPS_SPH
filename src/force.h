@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EoS.h"
+#include <typeinfo>
 
 namespace STD{
 	class CalcDensity{
@@ -38,11 +39,14 @@ namespace STD{
             // need to use the iron table for interpolating against iron
             // check to see if I can interpolate and reproduce entropy
             // add temperature to output files
-            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
             std::cout << "*********" << std::endl;
+
+            std::cout << i << std::endl;
+            std:: cout << sph_system[i].eng << std::endl;
+            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
             std::cout << sph_system[i].dens << std::endl;
             std::cout << sph_system[i].eng << std::endl;
-
+            std::cout << "__________" << std::endl;
         }
     }
 

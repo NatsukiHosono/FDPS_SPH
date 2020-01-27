@@ -333,7 +333,13 @@ public:
                 val2
         );
 
+        std::cout << "AAAAAAAAAAAAAAAAAAAA" << std::endl;
+        std::cout << val1 << std::endl;
+        std::cout << val2 << std::endl;
+        std::cout << grid_length << std::endl;
         std::cout << interpolated_value << std::endl;
+        std::cout << "BBBBBBBBBBBBBBBBBBBB" << std::endl;
+
 
         return interpolated_value;
     };
