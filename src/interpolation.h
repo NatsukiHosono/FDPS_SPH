@@ -194,6 +194,7 @@ private:
             b2 = grid_length;
         }
 
+
         return std::make_pair(b1, b2);
     };
 
@@ -212,8 +213,8 @@ private:
         unsigned int min_distance_index = 0;
 
         for (unsigned int a = 0; a < entropy_v_restricted.size(); a = a + 1) {
-            double v = entropy_v_restricted[a];
-            double distance = calc_distance(given_entropy, v);
+            double val = entropy_v_restricted[a];
+            double distance = calc_distance(given_entropy, val);
             if (initial_calc) {
                 min_distance = distance;
                 min_distance_index = a;
@@ -280,6 +281,7 @@ private:
             double &q2
     ) {
         double f = (((x2 - x) / (x2 - x1)) * q1) + (((x - x1) / (x2 - x1)) * q2);
+
         return f;
     };
 
@@ -305,9 +307,9 @@ public:
         neighbors_upper = get_entropy_neighbors(restricted_index_pair_upper_bound, var2_vector, val2, grid_length); // upper entropy neighbors
 
 
-        static double var1_vector_lower_neighbor = slice(
+        double var1_vector_lower_neighbor = slice(
                 var1_vector, restricted_index_pair_lower_bound.first, restricted_index_pair_lower_bound.second)[0];
-        static double var1_vector_upper_neighbor = slice(
+        double var1_vector_upper_neighbor = slice(
                 var1_vector, restricted_index_pair_upper_bound.first, restricted_index_pair_upper_bound.second)[0];
         std::vector<double> var2_vector_restricted_lower = slice(var2_vector,
                 restricted_index_pair_lower_bound.first, restricted_index_pair_lower_bound.second);
@@ -317,6 +319,8 @@ public:
                 restricted_index_pair_lower_bound.first, restricted_index_pair_lower_bound.second);
         std::vector<double> energy_vector_restricted_upper = slice(energy_vector,
                 restricted_index_pair_upper_bound.first, restricted_index_pair_upper_bound.second);
+
+
 
         const double interpolated_value = interpolate_energy(
                 var1_vector_lower_neighbor,
@@ -332,14 +336,6 @@ public:
                 val1,
                 val2
         );
-
-        std::cout << "AAAAAAAAAAAAAAAAAAAA" << std::endl;
-        std::cout << val1 << std::endl;
-        std::cout << val2 << std::endl;
-        std::cout << grid_length << std::endl;
-        std::cout << interpolated_value << std::endl;
-        std::cout << "BBBBBBBBBBBBBBBBBBBB" << std::endl;
-
 
         return interpolated_value;
     };
