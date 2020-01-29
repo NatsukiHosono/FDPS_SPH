@@ -129,14 +129,6 @@ int main(int argc, char* argv[]){
 		for(short int loop = 0 ; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP ; ++ loop){
 			dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
 		}
-        //    Calculate initial internal energy for mode 1 initial target/impactor creation
-        if(mode == 2) {
-//            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
-            PTCL::SetConstantEntropy(sph_system, initial_entropy);
-            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
-//            PTCL::ReturnEnergy(sph_system);
-//            PTCL::CalcEntropy(sph_system);
-        }
 		PTCL::CalcPressure(sph_system);
 		drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
 		hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
@@ -149,6 +141,14 @@ int main(int argc, char* argv[]){
 			sph_system[i].finalKick(sysinfo.dt);
             sph_system[i].dampMotion(PROBLEM::damping);
 		}
+        //    Calculate initial internal energy for mode 1 initial target/impactor creation
+        if(mode == 2) {
+//            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
+            PTCL::SetConstantEntropy(sph_system, initial_entropy);
+            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
+//            PTCL::ReturnEnergy(sph_system);
+//            PTCL::CalcEntropy(sph_system);
+        }
 		PROBLEM::postTimestepProcess(sph_system, sysinfo);
 		sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
 		OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_interval, output_directory);
