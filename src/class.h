@@ -81,12 +81,13 @@ namespace STD{
 		public:
 		PS::F64 mass;
 		PS::F64vec pos, vel, acc;
-		PS::F64 dens;//DENSity
-		PS::F64 eng; //ENerGy
-        PS::F64 ent;  // ENTropy
-		PS::F64 pres;//PRESsure
-		PS::F64 smth;//SMooTHing length
-		PS::F64 snds; //SouND Speed
+		PS::F64 dens; // DENSity
+		PS::F64 eng; // ENerGy
+        PS::F64 ent; // ENTropy
+		PS::F64 pres; // PRESsure
+        PS::F64 temp; // TEMPerature
+		PS::F64 smth; // SMooTHing length
+		PS::F64 snds; // SouND Speed
 		PS::F64 div_v;
 		PS::F64vec rot_v;
 		PS::F64 Bal; //Balsala switch
@@ -152,7 +153,7 @@ namespace STD{
 			#ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 			fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  0.0  ,  vel.x,  vel.y,  0.0  ,  dens,  eng,  pres, pot, ent);
 			#else
-			fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  pos.z,  vel.x,  vel.y,  vel.z,  dens,  eng,  pres, pot, ent);
+			fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  pos.z,  vel.x,  vel.y,  vel.z,  dens,  eng,  pres, pot, ent, temp);
 			#endif
 		}
 		void readAscii(FILE* fp){
@@ -160,7 +161,7 @@ namespace STD{
 			double dummy1, dummy2;
 			fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &dummy1, &vel.x, &vel.y, &dummy2, &dens, &eng, &pres, &pot, &ent);
 			#else
-			fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &pos.z, &vel.x, &vel.y, &vel.z, &dens, &eng, &pres, &pot, &ent);
+			fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &pos.z, &vel.x, &vel.y, &vel.z, &dens, &eng, &pres, &pot, &ent, &temp);
             #endif
 		}
 		void setPressure(const EoS::EoS_t<PS::F64>* const _EoS){

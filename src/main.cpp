@@ -145,7 +145,8 @@ int main(int argc, char* argv[]){
         if(mode == 2) {
 //            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
             PTCL::SetConstantEntropy(sph_system, initial_entropy);
-            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
+            PTCL::CalcAll(sph_system, initial_entropy);
+//            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
 //            PTCL::ReturnEnergy(sph_system);
 //            PTCL::CalcEntropy(sph_system);
         }

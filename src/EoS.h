@@ -20,6 +20,7 @@ namespace EoS{
 		virtual type SoundSpeed(const type dens, const type eng) const = 0;
 		virtual type InternalEnergy(const type dens, const type ent) const = 0;
         virtual type Entropy(const type dens, const type eng) const = 0;
+        virtual type Temperature(const type dens, const type eng) const = 0;
 	};
 	//////////////////
 	//EoSs
@@ -43,6 +44,10 @@ namespace EoS{
         }
 
         inline type Entropy(const type dens, const type eng) const{
+            return 0;
+        }
+
+        inline type Temperature(const type dens, const type eng) const{
             return 0;
         }
 
@@ -110,6 +115,10 @@ namespace EoS{
         inline type Entropy(const type dens, const type eng) const{
             return 0;
         }
+
+        inline type Temperature(const type dens, const type eng) const{
+            return 0;
+        }
 	};
 
 	template <typename type> class ANEOS : public EoS_t<type>{
@@ -121,10 +130,12 @@ namespace EoS{
 		std::vector<double> densities;
 		std::vector<double> energies;
         std::vector<double> entropies;
+        std::vector<double> temperatures;
 
         std::vector<double> full_densities;
         std::vector<double> full_energies;
         std::vector<double> full_entropies;
+        std::vector<double> full_temperatures;
 
 		public:
 		/**
@@ -139,16 +150,19 @@ namespace EoS{
             class readANEOSfile {
             public:
                 static std::vector<std::vector<std::array<double, 6>>> readfile(
-                        std::vector<double> &var1_vector,
-                        std::vector<double> &var2_vector,
-                        std::vector<double> &var3_vector,
-                        std::vector<double> &var1_vector_full,
-                        std::vector<double> &var2_vector_full,
-                        std::vector<double> &var3_vector_full,
+                        std::vector<double> &var1_vector, // density
+                        std::vector<double> &var2_vector, // entropy
+                        std::vector<double> &var3_vector, // energy
+                        std::vector<double> &var4_vector, // temperature
+                        std::vector<double> &var1_vector_full, // density
+                        std::vector<double> &var2_vector_full, // entropy
+                        std::vector<double> &var3_vector_full, // energy
+                        std::vector<double> &var4_vector_full, // temperature
                         const std::string &file_path,
-                        const int val1_property_index,
-                        const int val2_property_index,
-                        const int val3_property_index
+                        const int val1_property_index, // density index
+                        const int val2_property_index, // entropy index
+                        const int val3_property_index, // energy index
+                        const int val4_property_index // temperature index
                 ) {
 
                     std::vector<std::vector<std::array<double, 6>>> eos_data;
@@ -208,6 +222,8 @@ namespace EoS{
                                     var2_vector.push_back(tmp);
                                 if (line_index == 0 && field_index == val3_property_index)
                                     var3_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val4_property_index)
+                                    var4_vector.push_back(tmp);
 
                                 if (field_index == val1_property_index)
                                     var1_vector_full.push_back(tmp);
@@ -215,6 +231,8 @@ namespace EoS{
                                     var2_vector_full.push_back(tmp);
                                 if (field_index == val3_property_index)
                                     var3_vector_full.push_back(tmp);
+                                if (field_index == val4_property_index)
+                                    var4_vector_full.push_back(tmp);
 
                                 ++field_index;
                             }
@@ -227,7 +245,8 @@ namespace EoS{
             };
 
             eos_data = readANEOSfile::readfile(densities, energies,
-                    entropies, full_densities, full_energies, full_entropies, filename, 0, 1, 5);
+                    entropies, temperatures, full_densities, full_energies, full_entropies, full_temperatures,
+                    filename, 0, 1, 5, 2);
 		}
 
 		// use energy interpolation class to calculate temperature based on density and energy
@@ -240,12 +259,17 @@ namespace EoS{
 		}
 
         inline type InternalEnergy(const type dens, const type ent) const{
-            return EnergyInterpolation::interpolate(dens, ent, full_densities, full_entropies, full_energies, 1, eos_data, 120);
+            return RestrictedBilinearInterpolation::interpolate(dens, ent, full_densities, full_entropies, full_energies, 1, eos_data, 120);
         }
 
         inline type Entropy(const type dens, const type eng) const{
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
         }
+
+        inline type Temperature(const type dens, const type eng) const{
+            return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies, full_temperatures, 2, eos_data, 120);
+        }
+
 
 		void test_data() const{
 			std::ofstream output;
