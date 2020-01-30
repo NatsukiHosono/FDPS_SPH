@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EoS.h"
-#include <typeinfo>
 
 namespace STD{
 	class CalcDensity{
@@ -33,7 +32,7 @@ namespace STD{
 
     void CalcInternalEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
         #pragma omp parallel for
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal(); ++ i){
             // switch to tillotson for iron using id tag (it already is doing this?)
             // need to use the iron table for interpolating against iron
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
@@ -42,21 +41,21 @@ namespace STD{
 
     void CalcEntropy(PS::ParticleSystem<STD::RealPtcl>& sph_system){
         #pragma omp parallel for
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal(); ++ i){
             sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
         }
     }
 
     void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
         #pragma omp parallel for
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal(); ++ i){
             sph_system[i].ent = entropy;
         }
     }
 
     void CalcEntropyAndInternalEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
 		#pragma omp parallel for
-		for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+		for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal(); ++ i){
 			sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy);
 			sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
 		}
@@ -64,7 +63,7 @@ namespace STD{
 
     void CalcAll(PS::ParticleSystem<STD::RealPtcl>& sph_system, const double &entropy){
         #pragma omp parallel for
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal(); ++ i){
             // switch to tillotson for iron using id tag
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
@@ -76,7 +75,7 @@ namespace STD{
 
 	void ReturnEnergy(PS::ParticleSystem<STD::RealPtcl>& sph_system) {
         #pragma omp parallel for
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i) {
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal(); ++ i) {
             std::cout << sph_system[i].eng << std::endl;
         }
 	}
