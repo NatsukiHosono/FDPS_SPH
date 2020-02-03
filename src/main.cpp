@@ -112,6 +112,8 @@ int main(int argc, char* argv[]){
 
     const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
     const double initial_entropy = parameter_file.getValueOf("entropy", 3.12432609E+03 ); // initial constant entropy value
+    const unsigned int aneos_grid_size = parameter_file.getValueOf("aneos_grid_size", 120); // get grid size of ANEOS input file
+    const unsigned int tillotson_grid_size = parameter_file.getValueOf("tillotson_grid_size", 120); // get grid size of Tillotson input file
 
 	while(sysinfo.time < PROBLEM::end_time){
 		#pragma omp parallel for
@@ -145,7 +147,7 @@ int main(int argc, char* argv[]){
         if(mode == 2) {
 //            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
             PTCL::SetConstantEntropy(sph_system, initial_entropy);
-            PTCL::CalcAll(sph_system, initial_entropy);
+            PTCL::CalcAll(sph_system, initial_entropy, aneos_grid_size, tillotson_grid_size);
 //            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
 //            PTCL::ReturnEnergy(sph_system);
 //            PTCL::CalcEntropy(sph_system);

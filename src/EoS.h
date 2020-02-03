@@ -18,7 +18,7 @@ namespace EoS{
 		}
 		virtual type Pressure  (const type dens, const type eng) const = 0;
 		virtual type SoundSpeed(const type dens, const type eng) const = 0;
-		virtual type InternalEnergy(const type dens, const type ent) const = 0;
+		virtual type InternalEnergy(const type dens, const type ent, const type grid_size) const = 0;
         virtual type Entropy(const type dens, const type eng) const = 0;
         virtual type Temperature(const type dens, const type eng) const = 0;
 	};
@@ -39,7 +39,7 @@ namespace EoS{
 			return sqrt(hcr * (hcr - 1.0) * eng);
 		}
 
-        inline type InternalEnergy(const type dens, const type ent) const{
+        inline type InternalEnergy(const type dens, const type ent, const type grid_size) const{
             return 0;
         }
 
@@ -58,6 +58,24 @@ namespace EoS{
 
     //Tillotson equation "is applicable to the prediction of the shock and release of materials undergoing hypervelocity impacts."
 	template <typename type> class Tillotson : public EoS_t<type>{
+
+
+        /**
+         * Linear vectors of the values of the corresponding fields in eos_data. Stored
+         * for making finding correct lines in eos_data simpler.
+         */
+        std::vector<double> densities;
+        std::vector<double> energies;
+        std::vector<double> entropies;
+        std::vector<double> temperatures;
+
+        std::vector<double> full_densities;
+        std::vector<double> full_energies;
+        std::vector<double> full_entropies;
+        std::vector<double> full_temperatures;
+
+        std::vector<std::vector<std::array<type, 6> > > eos_data;
+
 		type rho0, a, b, A, B, u0, alpha, beta, uiv, ucv;
 		inline type P_co(const type dens, const type eng) const{
 			const type eta = dens / rho0;
@@ -79,7 +97,112 @@ namespace EoS{
 			return (Pressure(rho, u + du) - Pressure(rho, u - du)) / (2.0 * du);
 		}
 		public:
-		Tillotson(const type a_rho0, const type a_u0, const type a_uiv, const type a_ucv, const type a_A, const type a_B, const type a_a, const type a_b, const type a_alpha, const type a_beta){
+		Tillotson(const type a_rho0, const type a_u0, const type a_uiv, const type a_ucv, const type a_A, const type a_B, const type a_a, const type a_b, const type a_alpha, const type a_beta, const std::string &filename){
+
+
+            class readTillotsonfile {
+            public:
+                static std::vector<std::vector<std::array<double, 6>>> readfile(
+                        std::vector<double> &var1_vector, // density
+                        std::vector<double> &var2_vector, // entropy
+                        std::vector<double> &var3_vector, // energy
+                        std::vector<double> &var4_vector, // temperature
+                        std::vector<double> &var1_vector_full, // density
+                        std::vector<double> &var2_vector_full, // entropy
+                        std::vector<double> &var3_vector_full, // energy
+                        std::vector<double> &var4_vector_full, // temperature
+                        const std::string &file_path,
+                        const int val1_property_index, // density index
+                        const int val2_property_index, // entropy index
+                        const int val3_property_index, // energy index
+                        const int val4_property_index // temperature index
+                ) {
+
+                    std::vector<std::vector<std::array<double, 6>>> eos_data;
+
+                    const unsigned int n_expected_fields = 5;
+                    unsigned int n_expected_lines = 0;
+                    unsigned int n_expected_columns = 0;
+                    unsigned int n_lines = 0;
+                    unsigned int column_index = 0;
+
+                    std::string();
+                    std::ifstream input;
+                    input.open(file_path, std::ios::in);
+
+                    if (input.is_open()) {
+                        std::string line;
+                        while (std::getline(input, line)) {
+                            // read the table size, which has to be of the format # n_rows n_cols
+                            if (n_lines == 0 && n_expected_lines == 0 && n_expected_columns == 0) {
+                                std::string tmp;
+                                std::istringstream stream(line);
+
+                                stream >> tmp;
+                                stream >> n_expected_lines;
+                                stream >> n_expected_columns;
+
+                                ++n_lines;
+                                column_index = 0;
+                                eos_data.emplace_back();
+                            }
+
+                            // skip other comments
+                            if (line[0] == '#')
+                                continue;
+
+                            // if we have reached the expected number of columns add a new row
+                            if (column_index == n_expected_columns) {
+                                ++n_lines;
+                                column_index = 0;
+                                eos_data.emplace_back();
+                            }
+
+                            const unsigned int line_index = n_lines - 1;
+                            eos_data[line_index].push_back(std::array<double, 6>());
+
+                            // make stream for reading
+                            std::istringstream stream(line);
+                            unsigned int field_index = 0;
+                            double tmp;
+
+                            while (stream >> tmp) {
+                                eos_data[line_index][column_index][field_index] = tmp;
+
+                                if (column_index == 0 && field_index == val1_property_index)
+                                    var1_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val2_property_index)
+                                    var2_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val3_property_index)
+                                    var3_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val4_property_index)
+                                    var4_vector.push_back(tmp);
+
+                                if (field_index == val1_property_index)
+                                    var1_vector_full.push_back(tmp);
+                                if (field_index == val2_property_index)
+                                    var2_vector_full.push_back(tmp);
+                                if (field_index == val3_property_index)
+                                    var3_vector_full.push_back(tmp);
+                                if (field_index == val4_property_index)
+                                    var4_vector_full.push_back(tmp);
+
+                                ++field_index;
+                            }
+                            ++column_index;
+                        }
+                    }
+                    input.close();
+                    return eos_data;
+                }
+            };
+
+            eos_data = readTillotsonfile::readfile(densities, energies,
+                                               entropies, temperatures, full_densities, full_energies, full_entropies, full_temperatures,
+                                               filename, 0, 1, 5, 2);
+
+
+
             //in MKS unit...
             //From Brundage 2013
             //"Implementation of Tillotson Equation of State for Hypervelocity Impact of Metals, Geologic Materials, and Liquids"
@@ -94,30 +217,26 @@ namespace EoS{
             alpha = a_alpha;// Tillotson parameter
             beta  = a_beta; // Tillotson parameter
 		}
-		inline type Pressure(const type dens, const type eng) const{
-			const type p_min = 1.0e+7;
-			if(dens >= rho0 || eng < uiv){
-				return std::max(P_co(dens, eng), p_min);
-			}else if(dens < rho0 && eng > ucv){
-				return std::max(P_ex(dens, eng), p_min);
-			}else{
-				return std::max(((eng - uiv) * P_ex(dens, eng) + (ucv - eng) * P_co(dens, eng)) / (ucv - uiv), p_min);
-			}
-		}
-		inline type SoundSpeed(const type dens, const type eng) const{
-			return sqrt(std::max(Pressure(dens, eng) / (dens * dens) * dPdu(dens, eng) + dPdrho(dens, eng), 0.0) + 1.0e-16);
-		}
 
-        inline type InternalEnergy(const type dens, const type ent) const{
-            return 0;
+        // use energy interpolation class to calculate temperature based on density and energy
+        inline type Pressure(const type dens, const type eng) const{
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
+        }
+
+        inline type SoundSpeed(const type dens, const type eng) const{
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data);
+        }
+
+        inline type InternalEnergy(const type dens, const type ent, const type grid_size) const{
+            return RestrictedBilinearInterpolation::interpolate(dens, ent, full_densities, full_entropies, full_energies, 1, eos_data, 120);
         }
 
         inline type Entropy(const type dens, const type eng) const{
-            return 0;
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
         }
 
         inline type Temperature(const type dens, const type eng) const{
-            return 0;
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 2, eos_data);
         }
 	};
 
@@ -258,7 +377,7 @@ namespace EoS{
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 4, eos_data);
 		}
 
-        inline type InternalEnergy(const type dens, const type ent) const{
+        inline type InternalEnergy(const type dens, const type ent, const type grid_size) const{
             return RestrictedBilinearInterpolation::interpolate(dens, ent, full_densities, full_entropies, full_energies, 1, eos_data, 120);
         }
 
@@ -267,7 +386,7 @@ namespace EoS{
         }
 
         inline type Temperature(const type dens, const type eng) const{
-            return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies, full_temperatures, 2, eos_data, 120);
+            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 2, eos_data);
         }
 
 
@@ -303,7 +422,7 @@ namespace EoS{
 
 static const EoS::IdealGas<PS::F64>  Monoatomic(5./3.);
 static const EoS::IdealGas<PS::F64>  Diatomic  (1.4);
-static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0);
-static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
+static const EoS::Tillotson<PS::F64> Granite   (2680.0, 16.0e+6, 3.5e+6, 18.00e+6,  18.0e+9,  18.0e+9, 0.5, 1.3, 5.0, 5.0, "eos/granite.rho_u.txt");
+static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0, "eos/granite.rho_u.txt");
 static const EoS::ANEOS<PS::F64> AGranite      ("eos/granite.rho_u.txt");
 
