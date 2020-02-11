@@ -54,21 +54,6 @@ private:
         return std::make_pair(std::min(line_index, max_line_index), std::min(column_index, max_column_index));
     }
 
-    static std::pair<unsigned int, unsigned int> get_neighbors_restricted_indices(
-            double val, //val1 is the value which will get a nearest neighbor from var1_vector
-            const std::vector<double> &var_vector //the vector from with var1 will be interpolated
-            ) {
-
-        auto lower_bound = std::lower_bound(var_vector.begin(), var_vector.end(),
-                                     val); //returns an iterator that points to the first value in var1_vector that is not < val
-        const unsigned int lower_bound_index = std::distance(var_vector.begin(), lower_bound);
-        auto upper_bound = std::upper_bound(var_vector.begin(), var_vector.end(),
-                                            val);
-        const unsigned int upper_bound_index = std::distance(var_vector.begin(), upper_bound);
-
-        return std::make_pair(lower_bound_index, upper_bound_index);
-    }
-
 
 //allow these functions and variables to be externally accessible
 public:
