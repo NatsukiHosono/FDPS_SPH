@@ -7,8 +7,7 @@
 
 // function to print vector contents
 template<typename T>
-void print(std::vector<T> const &v)
-{
+void print(std::vector<T> const &v) {
     for (auto i: v) {
         std::cout << i << ' ';
     }
@@ -17,8 +16,7 @@ void print(std::vector<T> const &v)
 
 // subsamples a vector "v" given a lower index bound "m" and upper index bound "n"
 template<typename T>
-std::vector<T> slice(std::vector<T> const &v, int m, int n)
-{
+std::vector<T> slice(std::vector<T> const &v, int m, int n) {
     auto first = v.cbegin() + m;
     auto last = v.cbegin() + n + 1;
 
@@ -47,8 +45,10 @@ private:
         const unsigned int column_index = std::distance(var2_vector.begin(),
                                                         column); //returns an int which is the number of elements between the first element of var2_vector and column
 
-        const unsigned int max_line_index = var1_vector.size() - 1; // get the largest index value possible of var1_vector
-        const unsigned int max_column_index = var2_vector.size() - 1; //get the largest index value possible of var2_vector
+        const unsigned int max_line_index =
+                var1_vector.size() - 1; // get the largest index value possible of var1_vector
+        const unsigned int max_column_index =
+                var2_vector.size() - 1; //get the largest index value possible of var2_vector
 
 //        make a tuple of the nearest neighbor indices: std::min returns either the value in argument 1 (the index calculated above) or the value of argument 2, which is the max index (i.e. the boundary)
         return std::make_pair(std::min(line_index, max_line_index), std::min(column_index, max_column_index));
@@ -73,7 +73,7 @@ public:
                 val2,
                 var1_vector,
                 var2_vector
-                );
+        );
 
         // If we are not at the boundaries of the data table
         if ((neighbors.first < var1_vector.size() - 1) &&
@@ -84,14 +84,15 @@ public:
             const auto xi = (val1 - var1_vector[neighbors.first - 1]) /
                             (var1_vector[neighbors.first] - var1_vector[neighbors.first - 1]);
 
-            const auto eta = (val2 - var2_vector[neighbors.second-1]) /
-                             (var2_vector[neighbors.second] - var2_vector[neighbors.second-1]);
+            const auto eta = (val2 - var2_vector[neighbors.second - 1]) /
+                             (var2_vector[neighbors.second] - var2_vector[neighbors.second - 1]);
 
             // use these coordinates for a bilinear interpolation
-            const double interpolated_value = (1 - xi) * (1 - eta) * eos_data[neighbors.first - 1][neighbors.second - 1][property_index] +
-                                              xi * (1 - eta) * eos_data[neighbors.first][neighbors.second - 1][property_index] +
-                                              (1 - xi) * eta * eos_data[neighbors.first - 1][neighbors.second][property_index] +
-                                              xi * eta * eos_data[neighbors.first][neighbors.second][property_index];
+            const double interpolated_value =
+                    (1 - xi) * (1 - eta) * eos_data[neighbors.first - 1][neighbors.second - 1][property_index] +
+                    xi * (1 - eta) * eos_data[neighbors.first][neighbors.second - 1][property_index] +
+                    (1 - xi) * eta * eos_data[neighbors.first - 1][neighbors.second][property_index] +
+                    xi * eta * eos_data[neighbors.first][neighbors.second][property_index];
             return interpolated_value;
         } else {
             // Return the boundary value
@@ -133,7 +134,7 @@ private:
             const std::vector<double> &v,
             double value,
             unsigned int grid_length,
-            const std::string& bound
+            const std::string &bound
     ) {
         unsigned int b1 = 0; // lower bound index
         unsigned int b2 = 0; // upper bound index
@@ -151,9 +152,9 @@ private:
                     break;
                 }
             }
-        }
-        else {
-            std::vector<double> reversed_vector(v.size()); // declare a new vector which will be the reversed original vector given in the function
+        } else {
+            std::vector<double> reversed_vector(
+                    v.size()); // declare a new vector which will be the reversed original vector given in the function
             std::reverse_copy(std::begin(v), std::end(v), std::begin(reversed_vector)); // reverse the vector
 
             for (unsigned int a = 0; a < reversed_vector.size(); a = a + 1) {
@@ -286,10 +287,14 @@ public:
 
         std::pair<unsigned int, unsigned int> neighbors_lower;
         std::pair<unsigned int, unsigned int> neighbors_upper;
-        std::pair<unsigned int, unsigned int> restricted_index_pair_lower_bound = get_neighbors_restricted_indices(var1_vector, val1, grid_length, "lower");
-        std::pair<unsigned int, unsigned int> restricted_index_pair_upper_bound = get_neighbors_restricted_indices(var1_vector, val1, grid_length, "upper");
-        neighbors_lower = get_var2_neighbors(restricted_index_pair_lower_bound, var2_vector, val2, grid_length);  // lower var2 neighbors
-        neighbors_upper = get_var2_neighbors(restricted_index_pair_upper_bound, var2_vector, val2, grid_length); // upper var2 neighbors
+        std::pair<unsigned int, unsigned int> restricted_index_pair_lower_bound = get_neighbors_restricted_indices(
+                var1_vector, val1, grid_length, "lower");
+        std::pair<unsigned int, unsigned int> restricted_index_pair_upper_bound = get_neighbors_restricted_indices(
+                var1_vector, val1, grid_length, "upper");
+        neighbors_lower = get_var2_neighbors(restricted_index_pair_lower_bound, var2_vector, val2,
+                                             grid_length);  // lower var2 neighbors
+        neighbors_upper = get_var2_neighbors(restricted_index_pair_upper_bound, var2_vector, val2,
+                                             grid_length); // upper var2 neighbors
 
 
         double var1_vector_lower_neighbor = slice(
@@ -297,14 +302,17 @@ public:
         double var1_vector_upper_neighbor = slice(
                 var1_vector, restricted_index_pair_upper_bound.first, restricted_index_pair_upper_bound.second)[0];
         std::vector<double> var2_vector_restricted_lower = slice(var2_vector,
-                restricted_index_pair_lower_bound.first, restricted_index_pair_lower_bound.second);
+                                                                 restricted_index_pair_lower_bound.first,
+                                                                 restricted_index_pair_lower_bound.second);
         std::vector<double> var2_vector_restricted_upper = slice(var2_vector,
-                restricted_index_pair_upper_bound.first, restricted_index_pair_upper_bound.second);
+                                                                 restricted_index_pair_upper_bound.first,
+                                                                 restricted_index_pair_upper_bound.second);
         std::vector<double> val3_vector_restricted_lower = slice(val3_vector,
-                restricted_index_pair_lower_bound.first, restricted_index_pair_lower_bound.second);
+                                                                 restricted_index_pair_lower_bound.first,
+                                                                 restricted_index_pair_lower_bound.second);
         std::vector<double> val3_vector_restricted_upper = slice(val3_vector,
-                restricted_index_pair_upper_bound.first, restricted_index_pair_upper_bound.second);
-
+                                                                 restricted_index_pair_upper_bound.first,
+                                                                 restricted_index_pair_upper_bound.second);
 
 
         const double interpolated_value = interpolate_restricted(
