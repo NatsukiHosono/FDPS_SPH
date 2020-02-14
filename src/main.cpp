@@ -113,7 +113,9 @@ int main(int argc, char *argv[]) {
     }
 
     const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
-    const double initial_entropy = parameter_file.getValueOf("entropy",
+    const double initial_mantle_entropy = parameter_file.getValueOf("mantle_entropy",
+                                                             3.12432609E+03); // initial constant entropy value
+    const double initial_core_entropy = parameter_file.getValueOf("core_entropy",
                                                              3.12432609E+03); // initial constant entropy value
     const unsigned int aneos_grid_size = parameter_file.getValueOf("aneos_grid_size",
                                                                    120); // get grid size of ANEOS input file
@@ -151,12 +153,8 @@ int main(int argc, char *argv[]) {
         }
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         if (mode == 2) {
-//            PTCL::CalcEntropyAndInternalEnergy(sph_system, initial_entropy);
-            PTCL::SetConstantEntropy(sph_system, initial_entropy);
-            PTCL::CalcAll(sph_system, initial_entropy, aneos_grid_size, tillotson_grid_size);
-//            PTCL::CalcInternalEnergy(sph_system, initial_entropy);
-//            PTCL::ReturnEnergy(sph_system);
-//            PTCL::CalcEntropy(sph_system);
+            PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
+            PTCL::CalcAll(sph_system, aneos_grid_size, tillotson_grid_size);
         }
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
