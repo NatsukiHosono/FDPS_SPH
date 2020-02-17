@@ -24,6 +24,8 @@ std::unordered_set<unsigned int> create_removal_list(const unsigned int lowest_i
 }
 
 
+
+
 template<class Ptcl>
 class GI_universal : public Problem<Ptcl> {
 public:
@@ -104,65 +106,147 @@ public:
             case 1:
                 // This mode will enable to create a target and an imapctor from input/tar.dat and input/imp.dat
             {
-                std::cout << "creating target from tar.dat" << std::endl;
-                FILE *tarFile;
-                tarFile = fopen("input/tar.txt", "r");
-                FileHeader tarheader;
-                int nptcltar;
-                nptcltar = tarheader.readAscii(tarFile);
-                std::cout << "num tar ptcl: " << nptcltar << std::endl;
-                for (int i = 0; i < nptcltar; i++) {
-                    Ptcl ith;
-                    ith.readAscii(tarFile);
-                    if (ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
-                }
 
-                for (PS::U32 i = 0; i < tar.size(); ++i) {
-                    ptcl.push_back(tar[i]);
-                }
+//                static constexpr double end_time = 100000.0;
+                static constexpr PS::F64 R = 6400.0e+3;
+                static constexpr PS::F64 M = 6.0e+24;
+                static constexpr double Grav = 6.67e-11;
+                static constexpr double L_EM = 3.5e+34;
+//                static constexpr double damping = 1.0;
 
-                for (PS::U32 i = 0; i < tar.size(); ++i) {
-                    if (tar[i].tag == 0) {
-                        tarNmntl += 1;
-                    } else {
-                        tarNcore += 1;
+                if (PS::Comm::getRank() != 0) return;
+                std::vector<Ptcl> tar, imp;
+                {
+                    std::ifstream fin("input/tar.dat");
+                    double time;
+                    std::size_t N;
+                    fin >> time;
+                    fin >> N;
+                    while (!fin.eof()) {
+                        Ptcl ith;
+                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
+                            >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
+                        tar.push_back(ith);
+                    }
+                    tar.pop_back();
+                }
+                {
+                    std::ifstream fin("input/imp.dat");
+                    double time;
+                    std::size_t N;
+                    fin >> time;
+                    fin >> N;
+                    while (!fin.eof()) {
+                        Ptcl ith;
+                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
+                            >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
+                        imp.push_back(ith);
+                    }
+                    imp.pop_back();
+                }
+                {
+                    sph_system.setNumberOfParticleLocal(tar.size() + imp.size());
+                    std::size_t cnt = 0;
+                    for (int i = 0; i < tar.size(); ++i) {
+                        sph_system[cnt] = tar[i];
+                        ++cnt;
+                    }
+                    for (int i = 0; i < imp.size(); ++i) {
+                        //ad-hoc modification
+                        imp[i].tag += 2;
+                        sph_system[cnt] = imp[i];
+                        ++cnt;
                     }
                 }
 
-                tarNptcl = tarNmntl + tarNcore;
 
-                std::cout << "creating impactor from imp.dat" << std::endl;
-                FILE *impFile;
-                impFile = fopen("input/imp.dat", "r");
-                FileHeader impheader;
-                int nptclimp;
-                nptclimp = impheader.readAscii(impFile);
-                std::cout << "num imp ptcl: " << nptclimp << std::endl;
-                for (int i = 0; i < nptclimp; i++) {
-                    Ptcl ith;
-                    ith.readAscii(impFile);
-                    ith.vel.x += (-1) * cos(impAngle) * impVel;
-                    ith.vel.y += (-1) * sin(impAngle) * impVel;
-                    ith.pos.x += (impRadi + tarRadi) * cos(impAngle);
-                    ith.pos.y += (impRadi + tarRadi) * sin(impAngle);
-
-                    if (ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
-                }
-
-                for (PS::U32 i = 0; i < imp.size(); ++i) {
-                    ptcl.push_back(imp[i]);
-                    if (imp[i].tag == 0) {
-                        impNmntl += 1;
+                //Shift positions
+                PS::F64vec pos_tar = 0;
+                PS::F64vec pos_imp = 0;
+                PS::F64vec vel_imp = 0;
+                PS::F64 mass_tar = 0;
+                PS::F64 mass_imp = 0;
+                PS::F64 radi_tar = 0;
+                PS::F64 radi_imp = 0;
+                for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+                    if (sph_system[i].tag <= 1) {
+                        //target
+                        pos_tar += sph_system[i].mass * sph_system[i].pos;
+                        mass_tar += sph_system[i].mass;
                     } else {
-                        impNcore += 1;
+                        //impactor
+                        pos_imp += sph_system[i].mass * sph_system[i].pos;
+                        vel_imp += sph_system[i].mass * sph_system[i].vel;
+                        mass_imp += sph_system[i].mass;
                     }
                 }
+                //accumurate
+                pos_tar = PS::Comm::getSum(pos_tar);
+                pos_imp = PS::Comm::getSum(pos_imp);
+                vel_imp = PS::Comm::getSum(vel_imp);
+                mass_tar = PS::Comm::getSum(mass_tar);
+                mass_imp = PS::Comm::getSum(mass_imp);
+                pos_tar /= mass_tar;
+                pos_imp /= mass_imp;
+                vel_imp /= mass_imp;
+                for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+                    if (sph_system[i].tag <= 1) {
+                        //target
+                        radi_tar = std::max(radi_tar, sqrt((pos_tar - sph_system[i].pos) * (pos_tar - sph_system[i].pos)));
+                    } else {
+                        //impactor
+                        radi_imp = std::max(radi_imp, sqrt((pos_imp - sph_system[i].pos) * (pos_imp - sph_system[i].pos)));
+                    }
+                }
+                radi_tar = PS::Comm::getMaxValue(radi_tar);
+                radi_imp = PS::Comm::getMaxValue(radi_imp);
 
-                impNptcl = impNmntl + impNcore;
+                const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
+                const double x_init = 3.0 * radi_tar;
+                double input = 0;
+                std::cout << "Input L_init / L_EM" << std::endl;
+                std::cin >> input;
+                const double L_init = L_EM * input;
+                std::cout << "Input v_imp / v_esc" << std::endl;
+                std::cin >> input;
+                const double v_imp = v_esc * input;
 
-                Nptcl = tarNptcl + impNptcl;
+                const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
+                double y_init = radi_tar;//Initial guess.
+                double v_init;
+                std::cout << "v_esc = " << v_esc << std::endl;
+                for (int it = 0; it < 10; ++it) {
+                    v_init = sqrt(v_inf * v_inf + 2.0 * Grav * mass_tar / sqrt(x_init * x_init + y_init * y_init));
+                    y_init = L_init / (mass_imp * v_init);
+                }
 
-                break;
+                std::cout << "v_init = " << v_init << std::endl;
+                std::cout << "y_init / Rtar = " << y_init / radi_tar << std::endl;
+                std::cout << "v_imp  = " << v_imp << " = " << v_imp / v_esc << "v_esc" << std::endl;
+                std::cout << "m_imp  = " << mass_imp / M << std::endl;
+                //shift'em
+                for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+                    if (sph_system[i].tag <= 1) {
+                    } else {
+                        sph_system[i].pos -= pos_imp;
+                        sph_system[i].vel -= vel_imp;
+                        sph_system[i].pos.x += x_init;
+                        sph_system[i].pos.y += y_init;
+                        sph_system[i].vel.x -= v_init;
+                    }
+                }
+                //
+                const double b = L_init / v_inf / mass_imp;
+                const double a = -Grav * mass_tar / (v_inf * v_inf);
+                const double rp = (sqrt(a * a + b * b) + a);
+                const double r_imp = 2.0 / (v_imp * v_imp / (Grav * mass_tar) + 1.0 / a);
+                std::cout << "a = " << a / radi_tar << " R_tar" << std::endl;
+                std::cout << "b = " << b / radi_tar << " R_tar" << std::endl;
+                std::cout << "r_imp = " << r_imp / radi_tar << " R_tar" << std::endl;
+                std::cout << "r_p   = " << rp / radi_tar << " R_tar" << std::endl;
+                std::cout << "angle = " << asin(r_imp / (radi_tar + radi_imp)) / M_PI << "pi" << std::endl;
+
+                std::cout << "setup..." << std::endl;
             }
             case 2:
                 // This mode will create an initial condition
@@ -380,6 +464,17 @@ public:
         }
     }
 };
+
+
+
+
+
+
+
+
+
+
+
 
 
 template<class Ptcl>
@@ -762,7 +857,7 @@ public:
             while (!fin.eof()) {
                 Ptcl ith;
                 fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
-                    >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent;
+                    >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                 tar.push_back(ith);
             }
             tar.pop_back();
@@ -776,7 +871,7 @@ public:
             while (!fin.eof()) {
                 Ptcl ith;
                 fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
-                    >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent;
+                    >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                 imp.push_back(ith);
             }
             imp.pop_back();
