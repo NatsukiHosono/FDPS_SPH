@@ -24,13 +24,15 @@ std::unordered_set<unsigned int> create_removal_list(const unsigned int lowest_i
 }
 
 
-
-
 template<class Ptcl>
 class GI_universal : public Problem<Ptcl> {
 public:
     static double end_time;
     static double damping;
+    static constexpr PS::F64 R = 6400.0e+3;
+    static constexpr PS::F64 M = 6.0e+24;
+    static constexpr double Grav = 6.67e-11;
+    static constexpr double L_EM = 3.5e+34;
 
     static void setupIC(PS::ParticleSystem<Ptcl> &sph_system, system_t &sysinfo, PS::DomainInfo &dinfo,
                         ParameterFile &parameter_file) {
@@ -72,7 +74,6 @@ public:
         const PS::F64 impCoreMass = impMass * coreFracMass;
         const PS::F64 impCoreRadi = impRadi * coreFracRadi;
 
-
         const double offset = 5.0 * UnitRadi;
         /* the following line predicts the number of grid points in one direction
           The volume of a recutangular box whose radius is L^3
@@ -84,7 +85,6 @@ public:
           we multiply by 1.1 so that enough particles are created to generate a sphere */
         const int gridpoint = int(2.0 / pow(4.0 / 3.0 * math::pi * 1.1 / Nptcl, 0.333));
         const PS::F64 dx = 2.0 / gridpoint;
-        const PS::F64 Grav = 6.67e-11;
 
         //target
         int tarNptcl = 0;
@@ -107,15 +107,7 @@ public:
                 // This mode will enable to create a target and an imapctor from input/tar.dat and input/imp.dat
             {
 
-//                static constexpr double end_time = 100000.0;
-                static constexpr PS::F64 R = 6400.0e+3;
-                static constexpr PS::F64 M = 6.0e+24;
-                static constexpr double Grav = 6.67e-11;
-                static constexpr double L_EM = 3.5e+34;
-//                static constexpr double damping = 1.0;
-
                 if (PS::Comm::getRank() != 0) return;
-                std::vector<Ptcl> tar, imp;
                 {
                     std::ifstream fin("input/tar.dat");
                     double time;
@@ -124,7 +116,8 @@ public:
                     fin >> N;
                     while (!fin.eof()) {
                         Ptcl ith;
-                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
+                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
+                            >> ith.vel.y
                             >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                         tar.push_back(ith);
                     }
@@ -138,7 +131,8 @@ public:
                     fin >> N;
                     while (!fin.eof()) {
                         Ptcl ith;
-                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
+                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
+                            >> ith.vel.y
                             >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                         imp.push_back(ith);
                     }
@@ -192,10 +186,12 @@ public:
                 for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
                     if (sph_system[i].tag <= 1) {
                         //target
-                        radi_tar = std::max(radi_tar, sqrt((pos_tar - sph_system[i].pos) * (pos_tar - sph_system[i].pos)));
+                        radi_tar = std::max(radi_tar,
+                                            sqrt((pos_tar - sph_system[i].pos) * (pos_tar - sph_system[i].pos)));
                     } else {
                         //impactor
-                        radi_imp = std::max(radi_imp, sqrt((pos_imp - sph_system[i].pos) * (pos_imp - sph_system[i].pos)));
+                        radi_imp = std::max(radi_imp,
+                                            sqrt((pos_imp - sph_system[i].pos) * (pos_imp - sph_system[i].pos)));
                     }
                 }
                 radi_tar = PS::Comm::getMaxValue(radi_tar);
@@ -204,11 +200,9 @@ public:
                 const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
                 const double x_init = 3.0 * radi_tar;
                 double input = 0;
-                std::cout << "Input L_init / L_EM" << std::endl;
-                std::cin >> input;
+                input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
                 const double L_init = L_EM * input;
-                std::cout << "Input v_imp / v_esc" << std::endl;
-                std::cin >> input;
+                input = parameter_file.getValueOf("v_imp_vs_v_esc", 0.10);
                 const double v_imp = v_esc * input;
 
                 const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
@@ -388,6 +382,20 @@ public:
                 for (PS::U32 i = 0; i < tar.size(); ++i) {
                     ptcl.push_back(tar[i]);
                 }
+
+                assert(Nptcl == tarNptcl + impNptcl);
+
+                std::cout << "Total number of particles:" << Nptcl << std::endl;
+
+                const PS::S32 numPtclLocal = ptcl.size();
+                sph_system.setNumberOfParticleLocal(numPtclLocal);
+                for (PS::U32 i = 0; i < ptcl.size(); ++i) {
+                    sph_system[i] = ptcl[i];
+                }
+                //Fin.
+                std::cout << "# of ptcls = " << ptcl.size() << std::endl;
+                std::cout << "setup..." << std::endl;
+
                 break;
             }
         }
@@ -429,19 +437,6 @@ public:
             std::cout << "    velocity         : " << impVel << std::endl;
             std::cout << "Tar-to-Imp mass ratio: " << (double) (impNmntl) / (double) (tarNmntl) << std::endl;
         }
-
-        assert(Nptcl == tarNptcl + impNptcl);
-
-        std::cout << "Total number of particles:" << Nptcl << std::endl;
-
-        const PS::S32 numPtclLocal = ptcl.size();
-        sph_system.setNumberOfParticleLocal(numPtclLocal);
-        for (PS::U32 i = 0; i < ptcl.size(); ++i) {
-            sph_system[i] = ptcl[i];
-        }
-        //Fin.
-        std::cout << "# of ptcls = " << ptcl.size() << std::endl;
-        std::cout << "setup..." << std::endl;
     }
 
     static void setEoS(PS::ParticleSystem<Ptcl> &sph_system) {
@@ -463,18 +458,70 @@ public:
             sph_system[i].acc += -sph_system[i].vel * 0.05 / sph_system[i].dt;
         }
     }
+
+    static void postTimestepProcess(PS::ParticleSystem<Ptcl> &sph_system, system_t &sys) {
+        //SANITY Check
+        for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            sph_system[i].eng = std::max(sph_system[i].eng, 1.0e+4);
+            sph_system[i].dens = std::max(sph_system[i].dens, 100.0);
+        }
+        if (sys.step % 100 == 0 || 1) {
+            //Shift Origin
+            PS::F64vec com_loc = 0;//center of mass
+            PS::F64vec mom_loc = 0;//moment
+            PS::F64 mass_loc = 0;//
+            PS::F64 eng_loc = 0;//
+            for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+                com_loc += sph_system[i].pos * sph_system[i].mass;
+                mom_loc += sph_system[i].vel * sph_system[i].mass;
+                mass_loc += sph_system[i].mass;
+                eng_loc += sph_system[i].mass *
+                           (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
+            }
+            PS::F64vec com = PS::Comm::getSum(com_loc);
+            PS::F64vec mom = PS::Comm::getSum(mom_loc);
+            PS::F64 mass = PS::Comm::getSum(mass_loc);
+            PS::F64 eng = PS::Comm::getSum(eng_loc);
+            std::cout << "Mom: " << mom << std::endl;
+            std::cout << "Eng: " << eng << std::endl;
+        }
+#if 0
+        //Shift Origin
+        PS::F64vec com_loc = 0;//center of mass of target core
+        PS::F64vec mom_loc = 0;//moment of target core
+        PS::F64 mass_loc = 0;//mass of target core
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+            if(sph_system[i].tag != 0) continue;
+            com_loc += sph_system[i].pos * sph_system[i].mass;
+            mom_loc += sph_system[i].vel * sph_system[i].mass;
+            mass_loc += sph_system[i].mass;
+        }
+        PS::F64vec com = PS::Comm::getSum(com_loc);
+        PS::F64vec mom = PS::Comm::getSum(mom_loc);
+        PS::F64 mass = PS::Comm::getSum(mass_loc);
+        com /= mass;
+        mom /= mass;
+        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+            sph_system[i].pos -= com;
+            sph_system[i].vel -= mom;
+        }
+#endif
+#if 1
+        std::size_t Nptcl = sph_system.getNumberOfParticleLocal();
+        for (PS::S32 i = 0; i < Nptcl; ++i) {
+            if (sqrt(sph_system[i].pos * sph_system[i].pos) / R > 150.0) {
+                //bounded particles should not be killed.
+                if (0.5 * sph_system[i].vel * sph_system[i].vel + sph_system[i].pot < 0) continue;
+                std::cout << "KILL" << std::endl;
+                sph_system[i] = sph_system[--Nptcl];
+                --i;
+            }
+        }
+        sph_system.setNumberOfParticleLocal(Nptcl);
+#endif
+    }
+
 };
-
-
-
-
-
-
-
-
-
-
-
 
 
 template<class Ptcl>
@@ -912,7 +959,7 @@ public:
                 mass_imp += sph_system[i].mass;
             }
         }
-        //accumurate
+        //accumulate
         pos_tar = PS::Comm::getSum(pos_tar);
         pos_imp = PS::Comm::getSum(pos_imp);
         vel_imp = PS::Comm::getSum(vel_imp);
