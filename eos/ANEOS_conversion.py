@@ -5,13 +5,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, interp2d
 from scipy import interpolate
 
 #----- A user has to change these three parameters  ----------------
 
-inputfilename="granite.table.txt"    #input ANEOS file. This follows the format from iSALE
-outputfilename="granite.rho_u.txt" #output ANEOS file
+inputfilename="iron___.table.txt"    #input ANEOS file. This follows the format from iSALE
+outputfilename="iron___.rho_u.txt" #output ANEOS file
 nu=120 #number of the grid for the internal energy (exponential)
 
 #-------------------------------------------------------------------
@@ -20,7 +20,12 @@ nu=120 #number of the grid for the internal energy (exponential)
 # This seems to  occur when the exponent reaches -101
 def reformat(number):
     if number.find('E') == -1:
-        exponent = "-101"
+
+        if number.find("-100") >= 1:
+            exponent = "-100"
+        elif number.find("-101") >= 1:
+            exponent = "-101"
+        
         mantissa  = number.split(exponent)      
         return float(mantissa[0])*10**float(exponent)
     else:
@@ -86,10 +91,13 @@ new_soundspeed=np.zeros(shape=(nr,nu))
 new_entropy=np.zeros(shape=(nr,nu))
 
 
+
 # 1D interpolation & extrapolation (linear)
 for m in range(0,nu):
 
     # internal energy
+    #f_energy = interpolate.interp1d(density, entropy, new_energy, kind='linear', fill_value='extrapolate')
+    #energy = f_energy(density, entropy)
     f_temperature = interpolate.interp1d(energy[m,:], temperature, kind='linear', fill_value='extrapolate')
     new_temperature[m][:]=f_temperature(new_energy)
 
@@ -134,10 +142,10 @@ for m in range(0,nr, int(nr/6)):
     fig.savefig("Density" + str(m) + ".png")
 
 h = open(outputfilename,'w')
-h.write("%i %i %s \n" % (nr, nu , ':Grid numbers for density and internal energy'))
-h.write('Density (km/m3), Internal energy (kJ/kg), Temperature (K), Sound speed (m/s), Entropy (J/K/kg) \n')
+h.write("%s %i %i %s \n" % ('# ', nr, nu , ':Grid numbers for density and internal energy'))
+h.write('# Density (km/m3), Internal energy (kJ/kg), Temperature (K), Pressure (Pa), Sound speed (m/s), Entropy (J/K/kg) \n')
 
 
 for m in range(0,nr):
     for n in range(0,nu):
-        h.write("%15.8E %15.8E %15.8E %15.8E %15.8E \n" % (density[m], new_energy[n], new_temperature[m][n],  new_soundspeed[m][n], new_entropy[m][n]))
+        h.write("%15.8E %15.8E %15.8E  %15.8E %15.8E %15.8E \n" % (density[m], new_energy[n],  new_temperature[m][n], new_pressure[m][n], new_soundspeed[m][n], new_entropy[m][n]))
