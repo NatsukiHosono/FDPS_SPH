@@ -116,8 +116,7 @@ public:
                     fin >> N;
                     while (!fin.eof()) {
                         Ptcl ith;
-                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
-                            >> ith.vel.y
+                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
                             >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                         tar.push_back(ith);
                     }
@@ -131,8 +130,7 @@ public:
                     fin >> N;
                     while (!fin.eof()) {
                         Ptcl ith;
-                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
-                            >> ith.vel.y
+                        fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x >> ith.vel.y
                             >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                         imp.push_back(ith);
                     }
@@ -174,7 +172,7 @@ public:
                         mass_imp += sph_system[i].mass;
                     }
                 }
-                //accumurate
+                //accumulate
                 pos_tar = PS::Comm::getSum(pos_tar);
                 pos_imp = PS::Comm::getSum(pos_imp);
                 vel_imp = PS::Comm::getSum(vel_imp);
@@ -229,6 +227,9 @@ public:
                         sph_system[i].vel.x -= v_init;
                     }
                 }
+
+                std::cout << "Total number of particles:" << Nptcl << std::endl;
+
                 //
                 const double b = L_init / v_inf / mass_imp;
                 const double a = -Grav * mass_tar / (v_inf * v_inf);
@@ -400,10 +401,6 @@ public:
             }
         }
 
-
-        tarNptcl = tarNcore + tarNmntl;
-        impNptcl = impNcore + impNmntl;
-
         std::cout << "Target  :" << tarNptcl << std::endl;
         std::cout << "    radius           : " << tarRadi << std::endl;
         std::cout << "    total-to-core    : " << (double) (tarNcore) / (double) (tarNptcl) << std::endl;
@@ -463,67 +460,67 @@ public:
         }
     }
 
-    static void postTimestepProcess(PS::ParticleSystem<Ptcl> &sph_system, system_t &sys) {
-        //SANITY Check
-        for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].eng = std::max(sph_system[i].eng, 1.0e+4);
-            sph_system[i].dens = std::max(sph_system[i].dens, 100.0);
-        }
-        if (sys.step % 100 == 0 || 1) {
-            //Shift Origin
-            PS::F64vec com_loc = 0;//center of mass
-            PS::F64vec mom_loc = 0;//moment
-            PS::F64 mass_loc = 0;//
-            PS::F64 eng_loc = 0;//
-            for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-                com_loc += sph_system[i].pos * sph_system[i].mass;
-                mom_loc += sph_system[i].vel * sph_system[i].mass;
-                mass_loc += sph_system[i].mass;
-                eng_loc += sph_system[i].mass *
-                           (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
-            }
-            PS::F64vec com = PS::Comm::getSum(com_loc);
-            PS::F64vec mom = PS::Comm::getSum(mom_loc);
-            PS::F64 mass = PS::Comm::getSum(mass_loc);
-            PS::F64 eng = PS::Comm::getSum(eng_loc);
-            std::cout << "Mom: " << mom << std::endl;
-            std::cout << "Eng: " << eng << std::endl;
-        }
-#if 0
-        //Shift Origin
-        PS::F64vec com_loc = 0;//center of mass of target core
-        PS::F64vec mom_loc = 0;//moment of target core
-        PS::F64 mass_loc = 0;//mass of target core
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
-            if(sph_system[i].tag != 0) continue;
-            com_loc += sph_system[i].pos * sph_system[i].mass;
-            mom_loc += sph_system[i].vel * sph_system[i].mass;
-            mass_loc += sph_system[i].mass;
-        }
-        PS::F64vec com = PS::Comm::getSum(com_loc);
-        PS::F64vec mom = PS::Comm::getSum(mom_loc);
-        PS::F64 mass = PS::Comm::getSum(mass_loc);
-        com /= mass;
-        mom /= mass;
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
-            sph_system[i].pos -= com;
-            sph_system[i].vel -= mom;
-        }
-#endif
-#if 1
-        std::size_t Nptcl = sph_system.getNumberOfParticleLocal();
-        for (PS::S32 i = 0; i < Nptcl; ++i) {
-            if (sqrt(sph_system[i].pos * sph_system[i].pos) / R > 150.0) {
-                //bounded particles should not be killed.
-                if (0.5 * sph_system[i].vel * sph_system[i].vel + sph_system[i].pot < 0) continue;
-                std::cout << "KILL" << std::endl;
-                sph_system[i] = sph_system[--Nptcl];
-                --i;
-            }
-        }
-        sph_system.setNumberOfParticleLocal(Nptcl);
-#endif
-    }
+//    static void postTimestepProcess(PS::ParticleSystem<Ptcl> &sph_system, system_t &sys) {
+//        //SANITY Check
+//        for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            sph_system[i].eng = std::max(sph_system[i].eng, 1.0e+4);
+//            sph_system[i].dens = std::max(sph_system[i].dens, 100.0);
+//        }
+//        if (sys.step % 100 == 0 || 1) {
+//            //Shift Origin
+//            PS::F64vec com_loc = 0;//center of mass
+//            PS::F64vec mom_loc = 0;//moment
+//            PS::F64 mass_loc = 0;//
+//            PS::F64 eng_loc = 0;//
+//            for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//                com_loc += sph_system[i].pos * sph_system[i].mass;
+//                mom_loc += sph_system[i].vel * sph_system[i].mass;
+//                mass_loc += sph_system[i].mass;
+//                eng_loc += sph_system[i].mass *
+//                           (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
+//            }
+//            PS::F64vec com = PS::Comm::getSum(com_loc);
+//            PS::F64vec mom = PS::Comm::getSum(mom_loc);
+//            PS::F64 mass = PS::Comm::getSum(mass_loc);
+//            PS::F64 eng = PS::Comm::getSum(eng_loc);
+//            std::cout << "Mom: " << mom << std::endl;
+//            std::cout << "Eng: " << eng << std::endl;
+//        }
+//#if 0
+//        //Shift Origin
+//        PS::F64vec com_loc = 0;//center of mass of target core
+//        PS::F64vec mom_loc = 0;//moment of target core
+//        PS::F64 mass_loc = 0;//mass of target core
+//        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+//            if(sph_system[i].tag != 0) continue;
+//            com_loc += sph_system[i].pos * sph_system[i].mass;
+//            mom_loc += sph_system[i].vel * sph_system[i].mass;
+//            mass_loc += sph_system[i].mass;
+//        }
+//        PS::F64vec com = PS::Comm::getSum(com_loc);
+//        PS::F64vec mom = PS::Comm::getSum(mom_loc);
+//        PS::F64 mass = PS::Comm::getSum(mass_loc);
+//        com /= mass;
+//        mom /= mass;
+//        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+//            sph_system[i].pos -= com;
+//            sph_system[i].vel -= mom;
+//        }
+//#endif
+//#if 1
+//        std::size_t Nptcl = sph_system.getNumberOfParticleLocal();
+//        for (PS::S32 i = 0; i < Nptcl; ++i) {
+//            if (sqrt(sph_system[i].pos * sph_system[i].pos) / R > 150.0) {
+//                //bounded particles should not be killed.
+//                if (0.5 * sph_system[i].vel * sph_system[i].vel + sph_system[i].pot < 0) continue;
+//                std::cout << "KILL" << std::endl;
+//                sph_system[i] = sph_system[--Nptcl];
+//                --i;
+//            }
+//        }
+//        sph_system.setNumberOfParticleLocal(Nptcl);
+//#endif
+//    }
 
 };
 
@@ -1032,67 +1029,67 @@ public:
         std::cout << "setup..." << std::endl;
     }
 
-    static void postTimestepProcess(PS::ParticleSystem<Ptcl> &sph_system, system_t &sys) {
-        //SANITY Check
-        for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].eng = std::max(sph_system[i].eng, 1.0e+4);
-            sph_system[i].dens = std::max(sph_system[i].dens, 100.0);
-        }
-        if (sys.step % 100 == 0 || 1) {
-            //Shift Origin
-            PS::F64vec com_loc = 0;//center of mass
-            PS::F64vec mom_loc = 0;//moment
-            PS::F64 mass_loc = 0;//
-            PS::F64 eng_loc = 0;//
-            for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-                com_loc += sph_system[i].pos * sph_system[i].mass;
-                mom_loc += sph_system[i].vel * sph_system[i].mass;
-                mass_loc += sph_system[i].mass;
-                eng_loc += sph_system[i].mass *
-                           (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
-            }
-            PS::F64vec com = PS::Comm::getSum(com_loc);
-            PS::F64vec mom = PS::Comm::getSum(mom_loc);
-            PS::F64 mass = PS::Comm::getSum(mass_loc);
-            PS::F64 eng = PS::Comm::getSum(eng_loc);
-            std::cout << "Mom: " << mom << std::endl;
-            std::cout << "Eng: " << eng << std::endl;
-        }
-#if 0
-        //Shift Origin
-        PS::F64vec com_loc = 0;//center of mass of target core
-        PS::F64vec mom_loc = 0;//moment of target core
-        PS::F64 mass_loc = 0;//mass of target core
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
-            if(sph_system[i].tag != 0) continue;
-            com_loc += sph_system[i].pos * sph_system[i].mass;
-            mom_loc += sph_system[i].vel * sph_system[i].mass;
-            mass_loc += sph_system[i].mass;
-        }
-        PS::F64vec com = PS::Comm::getSum(com_loc);
-        PS::F64vec mom = PS::Comm::getSum(mom_loc);
-        PS::F64 mass = PS::Comm::getSum(mass_loc);
-        com /= mass;
-        mom /= mass;
-        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
-            sph_system[i].pos -= com;
-            sph_system[i].vel -= mom;
-        }
-#endif
-#if 1
-        std::size_t Nptcl = sph_system.getNumberOfParticleLocal();
-        for (PS::S32 i = 0; i < Nptcl; ++i) {
-            if (sqrt(sph_system[i].pos * sph_system[i].pos) / R > 150.0) {
-                //bounded particles should not be killed.
-                if (0.5 * sph_system[i].vel * sph_system[i].vel + sph_system[i].pot < 0) continue;
-                std::cout << "KILL" << std::endl;
-                sph_system[i] = sph_system[--Nptcl];
-                --i;
-            }
-        }
-        sph_system.setNumberOfParticleLocal(Nptcl);
-#endif
-    }
+//    static void postTimestepProcess(PS::ParticleSystem<Ptcl> &sph_system, system_t &sys) {
+//        //SANITY Check
+//        for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            sph_system[i].eng = std::max(sph_system[i].eng, 1.0e+4);
+//            sph_system[i].dens = std::max(sph_system[i].dens, 100.0);
+//        }
+//        if (sys.step % 100 == 0 || 1) {
+//            //Shift Origin
+//            PS::F64vec com_loc = 0;//center of mass
+//            PS::F64vec mom_loc = 0;//moment
+//            PS::F64 mass_loc = 0;//
+//            PS::F64 eng_loc = 0;//
+//            for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//                com_loc += sph_system[i].pos * sph_system[i].mass;
+//                mom_loc += sph_system[i].vel * sph_system[i].mass;
+//                mass_loc += sph_system[i].mass;
+//                eng_loc += sph_system[i].mass *
+//                           (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
+//            }
+//            PS::F64vec com = PS::Comm::getSum(com_loc);
+//            PS::F64vec mom = PS::Comm::getSum(mom_loc);
+//            PS::F64 mass = PS::Comm::getSum(mass_loc);
+//            PS::F64 eng = PS::Comm::getSum(eng_loc);
+//            std::cout << "Mom: " << mom << std::endl;
+//            std::cout << "Eng: " << eng << std::endl;
+//        }
+//#if 0
+//        //Shift Origin
+//        PS::F64vec com_loc = 0;//center of mass of target core
+//        PS::F64vec mom_loc = 0;//moment of target core
+//        PS::F64 mass_loc = 0;//mass of target core
+//        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+//            if(sph_system[i].tag != 0) continue;
+//            com_loc += sph_system[i].pos * sph_system[i].mass;
+//            mom_loc += sph_system[i].vel * sph_system[i].mass;
+//            mass_loc += sph_system[i].mass;
+//        }
+//        PS::F64vec com = PS::Comm::getSum(com_loc);
+//        PS::F64vec mom = PS::Comm::getSum(mom_loc);
+//        PS::F64 mass = PS::Comm::getSum(mass_loc);
+//        com /= mass;
+//        mom /= mass;
+//        for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+//            sph_system[i].pos -= com;
+//            sph_system[i].vel -= mom;
+//        }
+//#endif
+//#if 1
+//        std::size_t Nptcl = sph_system.getNumberOfParticleLocal();
+//        for (PS::S32 i = 0; i < Nptcl; ++i) {
+//            if (sqrt(sph_system[i].pos * sph_system[i].pos) / R > 150.0) {
+//                //bounded particles should not be killed.
+//                if (0.5 * sph_system[i].vel * sph_system[i].vel + sph_system[i].pot < 0) continue;
+//                std::cout << "KILL" << std::endl;
+//                sph_system[i] = sph_system[--Nptcl];
+//                --i;
+//            }
+//        }
+//        sph_system.setNumberOfParticleLocal(Nptcl);
+//#endif
+//    }
 
     static void setEoS(PS::ParticleSystem<Ptcl> &sph_system) {
 #pragma omp parallel for
