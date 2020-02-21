@@ -383,6 +383,8 @@ public:
                     ptcl.push_back(tar[i]);
                 }
 
+                tarNptcl = tarNcore + tarNmntl;
+                impNptcl = impNcore + impNmntl;
                 assert(Nptcl == tarNptcl + impNptcl);
 
                 std::cout << "Total number of particles:" << Nptcl << std::endl;
@@ -392,9 +394,7 @@ public:
                 for (PS::U32 i = 0; i < ptcl.size(); ++i) {
                     sph_system[i] = ptcl[i];
                 }
-                //Fin.
-                std::cout << "# of ptcls = " << ptcl.size() << std::endl;
-                std::cout << "setup..." << std::endl;
+
 
                 break;
             }
@@ -437,6 +437,10 @@ public:
             std::cout << "    velocity         : " << impVel << std::endl;
             std::cout << "Tar-to-Imp mass ratio: " << (double) (impNmntl) / (double) (tarNmntl) << std::endl;
         }
+
+        //Fin.
+        std::cout << "# of ptcls = " << ptcl.size() << std::endl;
+        std::cout << "setup..." << std::endl;
     }
 
     static void setEoS(PS::ParticleSystem<Ptcl> &sph_system) {
