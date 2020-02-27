@@ -147,16 +147,20 @@ public:
             const double x_init = 3.0 * radi_tar;
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
-            input = parameter_file.getValueOf("v_imp_vs_v_esc", 0.00);
-            const double v_imp = v_esc * input;
+//            input = parameter_file.getValueOf("v_imp_vs_v_esc", 0.00);
+//            const double v_imp = v_esc * input;
+            const double v_imp = parameter_file.getValueOf("impVel", 100);
+            PS::F64 impAngle =
+                    parameter_file.getValueOf("impact_angle", 0.) / 180.0 * math::pi; //converting from degree to radian
 
             const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
-            double y_init = radi_tar;//Initial guess.
+//            double y_init = radi_tar;//Initial guess.
+            double y_init = sin(impAngle) * (radi_imp + radi_tar);
             double v_init;
             std::cout << "v_esc = " << v_esc << std::endl;
             for (int it = 0; it < 10; ++it) {
                 v_init = sqrt(v_inf * v_inf + 2.0 * Grav * mass_tar / sqrt(x_init * x_init + y_init * y_init));
-                y_init = L_init / (mass_imp * v_init);
+//                y_init = L_init / (mass_imp * v_init);
             }
 
             std::cout << "v_init = " << v_init << std::endl;
@@ -183,7 +187,7 @@ public:
             std::cout << "b = " << b / radi_tar << " R_tar" << std::endl;
             std::cout << "r_imp = " << r_imp / radi_tar << " R_tar" << std::endl;
             std::cout << "r_p   = " << rp / radi_tar << " R_tar" << std::endl;
-            std::cout << "angle = " << asin(r_imp / (radi_tar + radi_imp)) / M_PI << "pi" << std::endl;
+            std::cout << "angle = " << impAngle << std::endl;
 
             std::cout << "setup..." << std::endl;
         } else if (mode == 2) {

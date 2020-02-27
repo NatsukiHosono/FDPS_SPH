@@ -38,7 +38,7 @@ namespace STD {
             // switch to tillotson for iron using id tag (it already is doing this?)
             // need to use the iron table for interpolating against iron
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
-                    aneos_grid_size);
+                                                                  aneos_grid_size);
         }
     }
 
@@ -50,7 +50,7 @@ namespace STD {
     }
 
     void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double &mantle_entropy,
-            const double &core_entropy) {
+                            const double &core_entropy) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag == 0) {
@@ -71,14 +71,15 @@ namespace STD {
     }
 
     void CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system, const unsigned int aneos_grid_size,
-            const unsigned int tillotson_grid_size) {
+                 const unsigned int tillotson_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             // switch to tillotson for iron using id tag
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
             // add temperature to output files
-            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent, aneos_grid_size);
+            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
+                                                                  aneos_grid_size);
             sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng);
         }
     }
