@@ -144,7 +144,7 @@ public:
             radi_imp = PS::Comm::getMaxValue(radi_imp);
 
             const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
-            const double x_init = radi_tar;
+            const double x_init = radi_tar + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
 //            input = parameter_file.getValueOf("v_imp_vs_v_esc", 0.00);
