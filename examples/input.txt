@@ -1,7 +1,7 @@
 mode = 1
 total_number_of_particles = 15000
 impVel = 5000.0
-delta_x = 0
+delta_x = 6000.0e3
 UnitMass = 5.97e+24
 UnitRadi = 7000e3
 coreFracRadi = 0.54
@@ -12,7 +12,7 @@ damping = 1
 output_directory = test2/
 output_interval = 100.0
 L_init_vs_L_em = 0.10
-impact_angle = 85
+impact_angle = 0
 mantle_entropy = 3000.0
 core_entropy = 1750.0
 aneos_grid_size = 120

@@ -93,9 +93,10 @@ public:
                     sph_system[cnt] = tar[i];
                     ++cnt;
                 }
+                // target: id < 2; impactor: id >= 2
                 for (int i = 0; i < imp.size(); ++i) {
                     //ad-hoc modification
-                    imp[i].tag += 2;
+                    imp[i].tag += 2; // impactor particles are tagged so that mantle and core particles take id values 2 and 3 (i.e. values 0 and 1 assigned to target)
                     sph_system[cnt] = imp[i];
                     ++cnt;
                 }
@@ -144,12 +145,12 @@ public:
             radi_imp = PS::Comm::getMaxValue(radi_imp);
 
             const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
-            const double x_init = radi_tar + parameter_file.getValueOf("delta_x", 0.0);
+            const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
 //            input = parameter_file.getValueOf("v_imp_vs_v_esc", 0.00);
 //            const double v_imp = v_esc * input;
-            const double v_imp = parameter_file.getValueOf("impVel", 100);
+            const double v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
             PS::F64 impAngle =
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
 
@@ -169,8 +170,8 @@ public:
             std::cout << "m_imp  = " << mass_imp / M << std::endl;
             //shift'em
             for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-                if (sph_system[i].tag > 1) {
-                } else {
+                // this currently sets parameters for target-tagged particles
+                if (sph_system[i].tag >= 2) {
                     sph_system[i].pos -= pos_imp;
                     sph_system[i].vel -= vel_imp;
                     sph_system[i].pos.x += x_init;
@@ -183,6 +184,10 @@ public:
             const double a = -Grav * mass_tar / (v_inf * v_inf);
             const double rp = (sqrt(a * a + b * b) + a);
             const double r_imp = 2.0 / (v_imp * v_imp / (Grav * mass_tar) + 1.0 / a);
+            std::cout << "target radius: " << radi_tar << std::endl;
+            std::cout << "impactor radius: " << radi_imp << std::endl;
+            std::cout << "impactor initial x: " << x_init << std::endl;
+            std::cout << "impactor initial y: " << y_init << std::endl;
             std::cout << "a = " << a / radi_tar << " R_tar" << std::endl;
             std::cout << "b = " << b / radi_tar << " R_tar" << std::endl;
             std::cout << "r_imp = " << r_imp / radi_tar << " R_tar" << std::endl;
