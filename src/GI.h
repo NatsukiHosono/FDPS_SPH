@@ -47,12 +47,12 @@ public:
         const unsigned int mode = parameter_file.getValueOf("mode", 2);
 
         if (mode == 1) {
-            end_time = 100000.0;
+            end_time = parameter_file.getValueOf("end_time", 100000.0);
             static constexpr PS::F64 R = 6400.0e+3;
             static constexpr PS::F64 M = 6.0e+24;
             static constexpr double Grav = 6.67e-11;
             static constexpr double L_EM = 3.5e+34;
-            damping = 1.0;
+            damping = parameter_file.getValueOf("damping", 1.0);
 
             if (PS::Comm::getRank() != 0) return;
             std::vector<Ptcl> tar, imp;
@@ -104,13 +104,13 @@ public:
 
 
             //Shift positions
-            PS::F64vec pos_tar = 0;
-            PS::F64vec pos_imp = 0;
-            PS::F64vec vel_imp = 0;
-            PS::F64 mass_tar = 0;
-            PS::F64 mass_imp = 0;
-            PS::F64 radi_tar = 0;
-            PS::F64 radi_imp = 0;
+            PS::F64vec pos_tar = 0; // position of the target
+            PS::F64vec pos_imp = 0; // position of the impactor
+            PS::F64 mass_tar = 0; // mass of the target
+            PS::F64 mass_imp = 0; // mass of the impactor
+            PS::F64 mass_total = 0; // total mass (mass impactor + mass target)
+            PS::F64 radi_tar = 0; // radius of the target
+            PS::F64 radi_imp = 0; // radius of the impacor
             for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
                 if (sph_system[i].tag <= 1) {
                     //target
@@ -119,19 +119,17 @@ public:
                 } else {
                     //impactor
                     pos_imp += sph_system[i].mass * sph_system[i].pos;
-                    vel_imp += sph_system[i].mass * sph_system[i].vel;
                     mass_imp += sph_system[i].mass;
                 }
             }
             //accumulate
             pos_tar = PS::Comm::getSum(pos_tar);
             pos_imp = PS::Comm::getSum(pos_imp);
-            vel_imp = PS::Comm::getSum(vel_imp);
             mass_tar = PS::Comm::getSum(mass_tar);
             mass_imp = PS::Comm::getSum(mass_imp);
+            mass_total = mass_tar + mass_imp;
             pos_tar /= mass_tar;
             pos_imp /= mass_imp;
-            vel_imp /= mass_imp;
             for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
                 if (sph_system[i].tag <= 1) {
                     //target
@@ -144,54 +142,57 @@ public:
             radi_tar = PS::Comm::getMaxValue(radi_tar);
             radi_imp = PS::Comm::getMaxValue(radi_imp);
 
-            const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
             const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
-//            input = parameter_file.getValueOf("v_imp_vs_v_esc", 0.00);
-//            const double v_imp = v_esc * input;
             const double v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
+
+            const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
+            const double v_impactor = (mass_imp / mass_total) * v_imp;
+            const double v_target = (mass_tar / mass_total) * v_imp;
+
             PS::F64 impAngle =
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
 
-            const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
-//            double y_init = radi_tar;//Initial guess.
+//            const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
             double y_init = sin(impAngle) * (radi_imp + radi_tar);
-            double v_init;
-            std::cout << "v_esc = " << v_esc << std::endl;
-            for (int it = 0; it < 10; ++it) {
-                v_init = sqrt(v_inf * v_inf + 2.0 * Grav * mass_tar / sqrt(x_init * x_init + y_init * y_init));
-//                y_init = L_init / (mass_imp * v_init);
-            }
+//            double v_init = 0;
+//            std::cout << "v_esc = " << v_esc << std::endl;
+//            for (int it = 0; it < 10; ++it) {
+//                v_init = sqrt(v_inf * v_inf + 2.0 * Grav * mass_tar / sqrt(x_init * x_init + y_init * y_init));
+//            }
 
-            std::cout << "v_init = " << v_init << std::endl;
+//            std::cout << "v_init = " << v_init << std::endl;
             std::cout << "y_init / Rtar = " << y_init / radi_tar << std::endl;
-            std::cout << "v_imp  = " << v_imp << " = " << v_imp / v_esc << "v_esc" << std::endl;
+//            std::cout << "v_imp  = " << v_imp << " = " << v_imp / v_esc << "v_esc" << std::endl;
             std::cout << "m_imp  = " << mass_imp / M << std::endl;
             //shift'em
             for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-                // this currently sets parameters for target-tagged particles
-                if (sph_system[i].tag >= 2) {
+                // target particles
+                if (sph_system[i].tag >= 2) { // this currently sets parameters for impactor-tagged particles
                     sph_system[i].pos -= pos_imp;
-                    sph_system[i].vel -= vel_imp;
                     sph_system[i].pos.x += x_init;
                     sph_system[i].pos.y += y_init;
-                    sph_system[i].vel.x -= v_init;
+//                    sph_system[i].vel.x -= v_init;
+                    sph_system[i].vel.x -= v_impactor;
+                } else { // this currently sets parameters for target-tagged particles
+                    sph_system[i].vel.x += v_target;
                 }
             }
+
             //
-            const double b = L_init / v_inf / mass_imp;
-            const double a = -Grav * mass_tar / (v_inf * v_inf);
-            const double rp = (sqrt(a * a + b * b) + a);
-            const double r_imp = 2.0 / (v_imp * v_imp / (Grav * mass_tar) + 1.0 / a);
+//            const double b = L_init / v_inf / mass_imp;
+//            const double a = -Grav * mass_tar / (v_inf * v_inf);
+//            const double rp = (sqrt(a * a + b * b) + a);
+//            const double r_imp = 2.0 / (v_imp * v_imp / (Grav * mass_tar) + 1.0 / a);
             std::cout << "target radius: " << radi_tar << std::endl;
             std::cout << "impactor radius: " << radi_imp << std::endl;
             std::cout << "impactor initial x: " << x_init << std::endl;
             std::cout << "impactor initial y: " << y_init << std::endl;
-            std::cout << "a = " << a / radi_tar << " R_tar" << std::endl;
-            std::cout << "b = " << b / radi_tar << " R_tar" << std::endl;
-            std::cout << "r_imp = " << r_imp / radi_tar << " R_tar" << std::endl;
-            std::cout << "r_p   = " << rp / radi_tar << " R_tar" << std::endl;
+//            std::cout << "a = " << a / radi_tar << " R_tar" << std::endl;
+//            std::cout << "b = " << b / radi_tar << " R_tar" << std::endl;
+//            std::cout << "r_imp = " << r_imp / radi_tar << " R_tar" << std::endl;
+//            std::cout << "r_p   = " << rp / radi_tar << " R_tar" << std::endl;
             std::cout << "angle = " << impAngle << std::endl;
 
             std::cout << "setup..." << std::endl;
