@@ -10,8 +10,8 @@ from scipy import interpolate
 
 #----- A user has to change these three parameters  ----------------
 
-inputfilename="iron___.table.txt"    #input ANEOS file. This follows the format from iSALE
-outputfilename="iron___.rho_u.txt" #output ANEOS file
+inputfilename="dunite_.table.txt"    #input ANEOS file. This follows the format from iSALE
+outputfilename="dunite_.rho_u.txt" #output ANEOS file
 nu=120 #number of the grid for the internal energy (exponential)
 
 #-------------------------------------------------------------------
@@ -19,13 +19,14 @@ nu=120 #number of the grid for the internal energy (exponential)
 # This function is to correct the original ANEOS format that does not include "E"
 # This seems to  occur when the exponent reaches -101
 def reformat(number):
-    if number.find('E') == -1:
 
-        if number.find("-100") >= 1:
-            exponent = "-100"
-        elif number.find("-101") >= 1:
-            exponent = "-101"
-        
+    if number.find('E') == -1:       
+        for i in range(100,200):
+            number_to_find =  '-' + str(i)
+            if number.find(number_to_find) >= 1:
+                exponent = number_to_find
+
+
         mantissa  = number.split(exponent)      
         return float(mantissa[0])*10**float(exponent)
     else:
@@ -45,10 +46,11 @@ for i in range(1,len(aneosfile)):
     except IndexError:
         nt=i-1
         break
+
+
     
 for i in range(1,len(aneosfile), nt+1):
     density=np.append(density,reformat(aneosfile[i][0]))
-
 
 nr=len(density) #density grid number
 
@@ -74,12 +76,20 @@ for m in range(0,nr):
             entropy[m][n]=reformat(aneosfile[i][5])
         i=i+1
 
+        #print(energy[m][n], pressure[m][n],soundspeed[m][n],entropy[m][n])
+        
 
 # Taking the min and max internal energy from the original ANEOS data
-umin=np.min(energy)
+umin=np.min(energy)*1.01 # this is added to make interpolation working
 umax=np.max(energy)
 
+
+
 delta=(umax/umin)**(1.0/(nu-1))
+
+
+#print(delta, umin, umax)
+#sys.exit()
 
 new_energy=np.zeros(shape=(0,0))
 for m in range(0,nu):
@@ -91,16 +101,17 @@ new_soundspeed=np.zeros(shape=(nr,nu))
 new_entropy=np.zeros(shape=(nr,nu))
 
 
-
 # 1D interpolation & extrapolation (linear)
 for m in range(0,nu):
 
     # internal energy
     #f_energy = interpolate.interp1d(density, entropy, new_energy, kind='linear', fill_value='extrapolate')
     #energy = f_energy(density, entropy)
+
+    
     f_temperature = interpolate.interp1d(energy[m,:], temperature, kind='linear', fill_value='extrapolate')
     new_temperature[m][:]=f_temperature(new_energy)
-
+    
     # pressure
     f_pressure  = interpolate.interp1d(temperature, pressure[m,:], kind='linear', fill_value='extrapolate')
     new_pressure[m][:]=f_pressure(new_temperature[m][:])
@@ -114,6 +125,8 @@ for m in range(0,nu):
     new_entropy[m][:]=f_entropy(new_temperature[m][:])    
 
 
+new_pressure = new_pressure.clip(min=0.0)
+    
 # producing a few output images to make sure that this fitting is doing an okay job
 for m in range(0,nr, int(nr/6)):
 
