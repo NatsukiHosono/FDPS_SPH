@@ -39,8 +39,8 @@ namespace STD {
                 PS::F64* old_z = &sph_system[i].pos.z;
                 std::pair<PS::F64, PS::F64> v_x_v_y = velocity_xy(reinterpret_cast<ParticleSimulator::F64 &>(old_x),
                                                                   reinterpret_cast<ParticleSimulator::F64 &>(old_y), angular_velocity, dt);
-                sph_system[i].pos.x = v_x_v_y.first;
-                sph_system[i].pos.y = v_x_v_y.second;
+                sph_system[i].vel.x = v_x_v_y.first;
+                sph_system[i].vel.y = v_x_v_y.second;
             }
         }
     };
