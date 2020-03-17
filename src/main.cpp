@@ -151,13 +151,17 @@ int main(int argc, char *argv[]) {
             sph_system[i].finalKick(sysinfo.dt);
             sph_system[i].dampMotion(PROBLEM::damping);
         }
+        sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
+            if (sysinfo.step % 30 == 0) {
+                PS::F64 angular_velocity = 0.2;
+                PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
+            };
         }
         PTCL::CalcAll(sph_system, aneos_grid_size, tillotson_grid_size);
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
-        sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_interval, output_directory);
         ++sysinfo.step;
         if (PS::Comm::getRank() == 0) {
