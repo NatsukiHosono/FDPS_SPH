@@ -26,21 +26,19 @@ namespace STD {
     class AngularVelocity {
     private:
         static std::pair<PS::F64, PS::F64> velocity_xy(PS::F64 &position_x, PS::F64 &position_y, PS::F64 &angular_velocity, PS::F64 &dt) {
-            PS::F64 x = (position_x * cos(angular_velocity * dt)) - (position_y * sin(angular_velocity * dt));
-            PS::F64 y = (position_x * cos(angular_velocity * dt)) - (position_y * sin(angular_velocity * dt));
-            return std::make_pair(x, y);
+            PS::F64 v_x = (position_x * angular_velocity * cos(angular_velocity * dt)) - (position_y * angular_velocity * sin(angular_velocity * dt));
+            PS::F64 v_y = (position_x * angular_velocity * cos(angular_velocity * dt)) - (position_y * angular_velocity * sin(angular_velocity * dt));
+            return std::make_pair(v_x, v_y);
         };
     public:
         static void add_angular_velocity_xy(PS::ParticleSystem<STD::RealPtcl> &sph_system, PS::F64 angular_velocity, PS::F64 &dt) {
 #pragma omp parallel for
             for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-                PS::F64* old_x = &sph_system[i].pos.x;
-                PS::F64* old_y = &sph_system[i].pos.y;
-                PS::F64* old_z = &sph_system[i].pos.z;
-                std::pair<PS::F64, PS::F64> v_x_v_y = velocity_xy(reinterpret_cast<ParticleSimulator::F64 &>(old_x),
-                                                                  reinterpret_cast<ParticleSimulator::F64 &>(old_y), angular_velocity, dt);
+                std::pair<PS::F64, PS::F64> v_x_v_y = velocity_xy(sph_system[i].pos.x,sph_system[i].pos.y, angular_velocity, dt);
                 sph_system[i].vel.x = v_x_v_y.first;
                 sph_system[i].vel.y = v_x_v_y.second;
+                std::cout << sph_system[i].vel.x << std::endl;
+                std::cout << sph_system[i].vel.y << std::endl;
             }
         }
     };
