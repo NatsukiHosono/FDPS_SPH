@@ -26,7 +26,7 @@ namespace STD {
     class AngularVelocity {
     private:
         static std::pair<PS::F64, PS::F64> velocity_xy(PS::F64 &position_x, PS::F64 &position_y, PS::F64 &angular_velocity, PS::F64 &dt) {
-            PS::F64 v_x = (position_x * angular_velocity * cos(angular_velocity * dt)) - (position_y * angular_velocity * sin(angular_velocity * dt));
+            PS::F64 v_x = -(position_x * angular_velocity * sin(angular_velocity * dt)) - (position_y * angular_velocity * cos(angular_velocity * dt));
             PS::F64 v_y = (position_x * angular_velocity * cos(angular_velocity * dt)) - (position_y * angular_velocity * sin(angular_velocity * dt));
             return std::make_pair(v_x, v_y);
         };
