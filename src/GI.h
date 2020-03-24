@@ -28,11 +28,15 @@ template<class Ptcl>
 class GI_universal : public Problem<Ptcl> {
 public:
 
-    static void setEoS(PS::ParticleSystem<Ptcl> &sph_system) {
+    static void setEoS(PS::ParticleSystem<Ptcl> &sph_system, std::string &silicate_material) {
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&AGranite);
+                if (silicate_material == "granite") {
+                    sph_system[i].setPressure(&AGranite);
+                } else {
+                    sph_system[i].setPressure(&ADunite);
+                }
             } else {
                 sph_system[i].setPressure(&Iron);
             }

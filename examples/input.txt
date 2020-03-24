@@ -18,3 +18,4 @@ core_entropy = 1750.0
 aneos_grid_size = 120
 tillotson_grid_size = 120
 angular_velocity = 1e-4
+silicate_material = dunite

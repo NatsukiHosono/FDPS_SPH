@@ -56,13 +56,14 @@ int main(int argc, char *argv[]) {
     if (output_directory.back() != '/')
         output_directory.back() += '/';
     createOutputDirectory(output_directory);
+    std::string silicate_material = parameter_file.getValueOf("silicate_material", std::string("granite"));
     if (newSim) {
         PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
-        PROBLEM::setEoS(sph_system);
+        PROBLEM::setEoS(sph_system, silicate_material);
         PTCL::CalcPressure(sph_system);
     } else {
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
-        PROBLEM::setEoS(sph_system);
+        PROBLEM::setEoS(sph_system, silicate_material);
     }
     PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
 
@@ -133,7 +134,7 @@ int main(int argc, char *argv[]) {
         sph_system.adjustPositionIntoRootDomain(dinfo);
         dinfo.decomposeDomainAll(sph_system);
         sph_system.exchangeParticle(dinfo);
-        PROBLEM::setEoS(sph_system);
+        PROBLEM::setEoS(sph_system, silicate_material);
 
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);

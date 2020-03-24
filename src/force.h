@@ -32,13 +32,14 @@ namespace STD {
         };
     public:
         static void add_angular_velocity_xy(PS::ParticleSystem<STD::RealPtcl> &sph_system, PS::F64 angular_velocity, PS::F64 &dt) {
+            if (angular_velocity != 0) {
 #pragma omp parallel for
-            for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-                std::pair<PS::F64, PS::F64> v_x_v_y = velocity_xy(sph_system[i].pos.x,sph_system[i].pos.y, angular_velocity, dt);
-                sph_system[i].vel.x = v_x_v_y.first;
-                sph_system[i].vel.y = v_x_v_y.second;
-                std::cout << sph_system[i].vel.x << std::endl;
-                std::cout << sph_system[i].vel.y << std::endl;
+                for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+                    std::pair<PS::F64, PS::F64> v_x_v_y = velocity_xy(sph_system[i].pos.x, sph_system[i].pos.y,
+                                                                      angular_velocity, dt);
+                    sph_system[i].vel.x = v_x_v_y.first;
+                    sph_system[i].vel.y = v_x_v_y.second;
+                }
             }
         }
     };
