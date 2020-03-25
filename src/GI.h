@@ -38,8 +38,7 @@ public:
                     sph_system[i].setPressure(&ADunite);
                 }
             } else {
-                sph_system[i].setPressure(&Iron);
-            }
+                sph_system[i].setPressure(&Iron);}
         }
     }
 

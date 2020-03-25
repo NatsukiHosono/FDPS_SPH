@@ -98,7 +98,6 @@ namespace STD {
             // switch to tillotson for iron using id tag
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
-            // add temperature to output files
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                   aneos_grid_size);
             sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng);
