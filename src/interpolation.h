@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include "math.h"
 #include "array"
 
 // function to print vector contents
@@ -314,6 +315,22 @@ public:
                                                                  restricted_index_pair_upper_bound.first,
                                                                  restricted_index_pair_upper_bound.second);
 
+//        std::cout << "********************" << std::endl;
+//        std::cout << val1 << std::endl;
+//        std::cout << val2 << std::endl;
+//        std::cout << var1_vector_lower_neighbor << std::endl;
+//        std::cout << var1_vector_upper_neighbor << std::endl;
+//        std::cout << var2_vector_restricted_lower[neighbors_lower.first] << std::endl;
+//        std::cout << var2_vector_restricted_lower[neighbors_lower.second] << std::endl;
+//        std::cout << var2_vector_restricted_lower[neighbors_upper.first] << std::endl;
+//        std::cout << var2_vector_restricted_lower[neighbors_upper.second] << std::endl;
+//        std::cout << val3_vector_restricted_lower[neighbors_lower.first] << std::endl;
+//        std::cout << val3_vector_restricted_lower[neighbors_lower.second] << std::endl;
+//        std::cout << val3_vector_restricted_lower[neighbors_upper.first] << std::endl;
+//        std::cout << val3_vector_restricted_lower[neighbors_upper.second] << std::endl;
+//        std::cout << val1 << std::endl;
+//        std::cout << val2 << std::endl;
+//        std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
         const double interpolated_value = interpolate_restricted(
                 var1_vector_lower_neighbor,
