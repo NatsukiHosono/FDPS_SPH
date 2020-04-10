@@ -103,6 +103,7 @@ namespace STD {
             // switch to tillotson for iron using id tag
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
+            // hack, fix later
             if (sph_system[i].id == 0) {
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       silicate_grid_size);
