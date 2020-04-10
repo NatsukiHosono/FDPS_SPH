@@ -201,7 +201,7 @@ namespace STD {
         void initialKick(const PS::F64 dt_glb) {
             //if(type == FREEZE) return;
             vel_half = vel + 0.5 * dt_glb * (acc + grav);
-            eng_half = eng + 0.5 * dt_glb * eng_dot;
+//            eng_half = eng + 0.5 * dt_glb * eng_dot;
         }
 
         void fullDrift(const PS::F64 dt_glb) {
@@ -215,13 +215,13 @@ namespace STD {
         void predict(const PS::F64 dt_glb) {
             //if(type == FREEZE) return;
             vel += dt_glb * (acc + grav);
-            eng += dt_glb * eng_dot;
+//            eng += dt_glb * eng_dot;
         }
 
         void finalKick(const PS::F64 dt_glb) {
             //if(type == FREEZE) return;
             vel = vel_half + 0.5 * dt_glb * (acc + grav);
-            eng = eng_half + 0.5 * dt_glb * eng_dot;  // commented out for energy interpolation testing
+//            eng = eng_half + 0.5 * dt_glb * eng_dot;  // commented out for energy interpolation testing
         }
 
         void dampMotion(double damping) {

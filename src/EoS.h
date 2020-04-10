@@ -19,15 +19,15 @@ namespace EoS {
             return;
         }
 
-        virtual type Pressure(const type dens, const type eng) const = 0;
+        virtual type Pressure(const type dens, const type eng, const type grid_size) const = 0;
 
         virtual type SoundSpeed(const type dens, const type eng) const = 0;
 
         virtual type InternalEnergy(const type dens, const type ent, const type grid_size) const = 0;
 
-        virtual type Entropy(const type dens, const type eng) const = 0;
+        virtual type Entropy(const type dens, const type eng, const type grid_size) const = 0;
 
-        virtual type Temperature(const type dens, const type eng) const = 0;
+        virtual type Temperature(const type dens, const type eng, const type grid_size) const = 0;
     };
 
     //////////////////
@@ -40,7 +40,7 @@ namespace EoS {
         IdealGas(const type _hcr) : hcr(_hcr) {
         }
 
-        inline type Pressure(const type dens, const type eng) const {
+        inline type Pressure(const type dens, const type eng, const type grid_size) const {
             return (hcr - 1.0) * dens * eng;
         }
 
@@ -52,11 +52,11 @@ namespace EoS {
             return 0;
         }
 
-        inline type Entropy(const type dens, const type eng) const {
+        inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return 0;
         }
 
-        inline type Temperature(const type dens, const type eng) const {
+        inline type Temperature(const type dens, const type eng, const type grid_size) const {
             return 0;
         }
 
@@ -238,7 +238,7 @@ namespace EoS {
         }
 
         // use energy interpolation class to calculate temperature based on density and energy
-        inline type Pressure(const type dens, const type eng) const {
+        inline type Pressure(const type dens, const type eng, const type grid_size) const {
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
         }
 
@@ -251,11 +251,11 @@ namespace EoS {
                                                                 full_energies, 1, eos_data, 120);
         }
 
-        inline type Entropy(const type dens, const type eng) const {
+        inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
         }
 
-        inline type Temperature(const type dens, const type eng) const {
+        inline type Temperature(const type dens, const type eng, const type grid_size) const {
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 2, eos_data);
         }
     };
@@ -397,8 +397,9 @@ namespace EoS {
         }
 
         // use energy interpolation class to calculate temperature based on density and energy
-        inline type Pressure(const type dens, const type eng) const {
+        inline type Pressure(const type dens, const type eng, const type grid_size) const {
 //            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
+//            std::cout << "pressure" << std::endl;
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
                                                                 full_pressures, 3, eos_data, 120);
         }
@@ -408,15 +409,16 @@ namespace EoS {
         }
 
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
+//            std::cout << "energy" << std::endl;
             return RestrictedBilinearInterpolation::interpolate(dens, ent, full_densities, full_entropies,
                                                                 full_energies, 1, eos_data, 120);
         }
 
-        inline type Entropy(const type dens, const type eng) const {
+        inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 5, eos_data);
         }
 
-        inline type Temperature(const type dens, const type eng) const {
+        inline type Temperature(const type dens, const type eng, const type grid_size) const {
             return BilinearInterpolation::interpolate(dens, eng, densities, energies, 2, eos_data);
         }
 
@@ -456,4 +458,4 @@ static const EoS::Tillotson<PS::F64> Granite(2680.0, 16.0e+6, 3.5e+6, 18.00e+6, 
 //static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0, "eos/iron___.rho_u.txt");
 static const EoS::ANEOS<PS::F64> Iron("eos/iron___.rho_u.txt");
 static const EoS::ANEOS<PS::F64> AGranite("eos/granite.rho_u.txt");
-static const EoS::ANEOS<PS::F64> ADunite("eos/dunite.rho_u.txt");
+static const EoS::ANEOS<PS::F64> ADunite("eos/dunite2.rho_u.txt");

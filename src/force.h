@@ -44,31 +44,36 @@ namespace STD {
         }
     };
 
-    void CalcPressure(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+    void CalcPressure(PS::ParticleSystem<STD::RealPtcl> &sph_system, unsigned int iron_grid_size,
+            unsigned int silicate_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng);
-            sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
+            if (sph_system[i].id == 0) {
+                sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
+                sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
+            } else {
+                sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
+            }
         }
     }
 
-    void CalcInternalEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system,
-                            const unsigned int aneos_grid_size, const unsigned int tillotson_grid_size) {
-#pragma omp parallel for
-        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            // switch to tillotson for iron using id tag (it already is doing this?)
-            // need to use the iron table for interpolating against iron
-            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
-                                                                  aneos_grid_size);
-        }
-    }
-
-    void CalcEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
-#pragma omp parallel for
-        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
-        }
-    }
+//    void CalcInternalEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system,
+//                            const unsigned int aneos_grid_size, const unsigned int tillotson_grid_size) {
+//#pragma omp parallel for
+//        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            // switch to tillotson for iron using id tag (it already is doing this?)
+//            // need to use the iron table for interpolating against iron
+//            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
+//                                                                  aneos_grid_size);
+//        }
+//    }
+//
+//    void CalcEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+//#pragma omp parallel for
+//        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
+//        }
+//    }
 
     void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double &mantle_entropy,
                             const double &core_entropy) {
@@ -82,25 +87,33 @@ namespace STD {
         }
     }
 
-    void CalcEntropyAndInternalEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double &entropy,
-                                      const unsigned int aneos_grid_size, const unsigned int tillotson_grid_size) {
-#pragma omp parallel for
-        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy, aneos_grid_size);
-            sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
-        }
-    }
+//    void CalcEntropyAndInternalEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double &entropy,
+//                                      const unsigned int aneos_grid_size, const unsigned int tillotson_grid_size) {
+//#pragma omp parallel for
+//        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, entropy, aneos_grid_size);
+//            sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng);
+//        }
+//    }
 
-    void CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system, const unsigned int aneos_grid_size,
-                 const unsigned int tillotson_grid_size) {
+    void CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system, unsigned int iron_grid_size,
+    unsigned int silicate_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             // switch to tillotson for iron using id tag
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
-            sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
-                                                                  aneos_grid_size);
-            sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng);
+            if (sph_system[i].id == 0) {
+                sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
+                                                                      silicate_grid_size);
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    silicate_grid_size);
+            } else {
+                sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
+                                                                      iron_grid_size);
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    iron_grid_size);
+            }
         }
     }
 

@@ -52,6 +52,18 @@ int main(int argc, char *argv[]) {
     }
     ParameterFile parameter_file(input_file);
     std::cout << "Reading parameters from " << input_file << std::endl;
+
+    const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
+    const double initial_mantle_entropy = parameter_file.getValueOf("mantle_entropy",
+                                                                    3.12432609E+03); // initial constant entropy value
+    const double initial_core_entropy = parameter_file.getValueOf("core_entropy",
+                                                                  3.12432609E+03); // initial constant entropy value
+    const unsigned int silicate_grid_size = parameter_file.getValueOf("silicate_grid_size",
+                                                                      120); // get grid size of ANEOS input file
+    const unsigned int iron_grid_size = parameter_file.getValueOf("iron_grid_size",
+                                                                  120); // get grid size of Tillotson input file
+
+
     std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     if (output_directory.back() != '/')
         output_directory.back() += '/';
@@ -60,12 +72,13 @@ int main(int argc, char *argv[]) {
     if (newSim) {
         PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
         PROBLEM::setEoS(sph_system, silicate_material);
-        PTCL::CalcPressure(sph_system);
+        PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
     } else {
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
         PROBLEM::setEoS(sph_system, silicate_material);
     }
     PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
+
 
 #pragma omp parallel for
     for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
@@ -94,7 +107,7 @@ int main(int argc, char *argv[]) {
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
     }
 
-    PTCL::CalcPressure(sph_system);
+    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
     hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
 #ifdef SELF_GRAVITY
@@ -113,16 +126,6 @@ int main(int argc, char *argv[]) {
         std::cout << "//================================" << std::endl;
     }
 
-    const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
-    const double initial_mantle_entropy = parameter_file.getValueOf("mantle_entropy",
-                                                                    3.12432609E+03); // initial constant entropy value
-    const double initial_core_entropy = parameter_file.getValueOf("core_entropy",
-                                                                  3.12432609E+03); // initial constant entropy value
-    const unsigned int aneos_grid_size = parameter_file.getValueOf("aneos_grid_size",
-                                                                   120); // get grid size of ANEOS input file
-    const unsigned int tillotson_grid_size = parameter_file.getValueOf("tillotson_grid_size",
-                                                                       120); // get grid size of Tillotson input file
-
     while (sysinfo.time < PROBLEM::end_time) {
 #pragma omp parallel for
         for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
@@ -139,7 +142,7 @@ int main(int argc, char *argv[]) {
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
-        PTCL::CalcPressure(sph_system);
+        PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
         hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
 #ifdef SELF_GRAVITY
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]) {
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
             };
         }
-        PTCL::CalcAll(sph_system, aneos_grid_size, tillotson_grid_size);
+        PTCL::CalcAll(sph_system, iron_grid_size, silicate_grid_size);
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
         OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_interval, output_directory);
         ++sysinfo.step;
