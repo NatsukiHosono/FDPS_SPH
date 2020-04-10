@@ -48,11 +48,12 @@ namespace STD {
             unsigned int silicate_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            if (sph_system[i].id == 0) {
+            if (sph_system[i].tag == 0) {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
                 sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
             } else {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
+                sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
             }
         }
     }
@@ -104,7 +105,7 @@ namespace STD {
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
             // hack, fix later
-            if (sph_system[i].id == 0) {
+            if (sph_system[i].tag == 0) {
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       silicate_grid_size);
                 sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,

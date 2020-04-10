@@ -401,7 +401,7 @@ namespace EoS {
 //            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 3, eos_data);
 //            std::cout << "pressure" << std::endl;
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_pressures, 3, eos_data, 120);
+                                                                full_pressures, 3, eos_data, grid_size);
         }
 
         inline type SoundSpeed(const type dens, const type eng) const {
@@ -411,7 +411,7 @@ namespace EoS {
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
 //            std::cout << "energy" << std::endl;
             return RestrictedBilinearInterpolation::interpolate(dens, ent, full_densities, full_entropies,
-                                                                full_energies, 1, eos_data, 120);
+                                                                full_energies, 1, eos_data, grid_size);
         }
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
@@ -419,7 +419,8 @@ namespace EoS {
         }
 
         inline type Temperature(const type dens, const type eng, const type grid_size) const {
-            return BilinearInterpolation::interpolate(dens, eng, densities, energies, 2, eos_data);
+            return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
+                                                                full_temperatures, 2, eos_data, grid_size);
         }
 
 
