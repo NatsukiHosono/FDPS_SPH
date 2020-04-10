@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-            if (sysinfo.step % 300 == 0) {
+            if (sysinfo.step % 100 == 0) {
                 PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
                                                                      1e-4);;
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);

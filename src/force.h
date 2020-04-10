@@ -47,8 +47,13 @@ namespace STD {
     void CalcPressure(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            std::cout << "Pressure*********" << std::endl;
+//            std::cout << i << std::endl;
+//            std::cout << sph_system[i].dens << std::endl;
+//            std::cout << sph_system[i].eng << std::endl;
             sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng);
             sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
+//            std::cout << sph_system[i].pres << std::endl;
         }
     }
 
@@ -95,12 +100,17 @@ namespace STD {
                  const unsigned int tillotson_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+//            std::cout << "Energy*********" << std::endl;
+//            std::cout << i << std::endl;
+//            std::cout << sph_system[i].dens << std::endl;
+//            std::cout << sph_system[i].ent << std::endl;
             // switch to tillotson for iron using id tag
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
             sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                   aneos_grid_size);
             sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng);
+//            std::cout << sph_system[i].eng << std::endl;
         }
     }
 
