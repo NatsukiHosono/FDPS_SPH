@@ -459,4 +459,4 @@ static const EoS::Tillotson<PS::F64> Granite(2680.0, 16.0e+6, 3.5e+6, 18.00e+6, 
 //static const EoS::Tillotson<PS::F64> Iron      (7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0, "eos/iron___.rho_u.txt");
 static const EoS::ANEOS<PS::F64> Iron("eos/iron___.rho_u.txt");
 static const EoS::ANEOS<PS::F64> AGranite("eos/granite.rho_u.txt");
-static const EoS::ANEOS<PS::F64> ADunite("eos/duniteS2duniteS2.rho_u.txt.rho_u.txt");
+static const EoS::ANEOS<PS::F64> ADunite("eos/duniteS2.rho_u.txt");
