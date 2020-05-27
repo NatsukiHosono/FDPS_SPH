@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
             };
         } else if (mode == 1) {
-            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size)
+            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
         PTCL::CalcAll(sph_system, iron_grid_size, silicate_grid_size);
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
