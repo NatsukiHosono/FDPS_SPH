@@ -88,6 +88,19 @@ namespace STD {
         }
     }
 
+    void CalcEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system, unsigned int iron_grid_size,
+                      unsigned int silicate_grid_size) {
+#pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            if (sph_system[i].tag == 0) {
+                sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
+            } else {
+                sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
+            }
+        }
+    }
+
+
 //    void CalcEntropyAndInternalEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double &entropy,
 //                                      const unsigned int aneos_grid_size, const unsigned int tillotson_grid_size) {
 //#pragma omp parallel for

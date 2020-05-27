@@ -126,10 +126,10 @@ public:
                 }
             }
             //accumulate
-            pos_tar = PS::Comm::getSum(pos_tar);
-            pos_imp = PS::Comm::getSum(pos_imp);
-            mass_tar = PS::Comm::getSum(mass_tar);
-            mass_imp = PS::Comm::getSum(mass_imp);
+//            pos_tar = PS::Comm::getSum(pos_tar);
+//            pos_imp = PS::Comm::getSum(pos_imp);
+//            mass_tar = PS::Comm::getSum(mass_tar);
+//            mass_imp = PS::Comm::getSum(mass_imp);
             mass_total = mass_tar + mass_imp;
             pos_tar /= mass_tar;
             pos_imp /= mass_imp;
@@ -142,8 +142,8 @@ public:
                     radi_imp = std::max(radi_imp, sqrt((pos_imp - sph_system[i].pos) * (pos_imp - sph_system[i].pos)));
                 }
             }
-            radi_tar = PS::Comm::getMaxValue(radi_tar);
-            radi_imp = PS::Comm::getMaxValue(radi_imp);
+//            radi_tar = PS::Comm::getMaxValue(radi_tar);
+//            radi_imp = PS::Comm::getMaxValue(radi_imp);
 
             const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
