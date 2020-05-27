@@ -55,6 +55,9 @@ namespace STD {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
                 sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
             }
+            if (sph_system[i].pres < 0) {
+                sph_system[i].pres = 0;
+            }
         }
     }
 
