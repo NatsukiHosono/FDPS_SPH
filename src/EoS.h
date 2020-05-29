@@ -78,11 +78,15 @@ namespace EoS {
         std::vector<double> energies;
         std::vector<double> entropies;
         std::vector<double> temperatures;
+        std::vector<double> pressures;
+        std::vector<double> soundspeeds;
 
         std::vector<double> full_densities;
         std::vector<double> full_energies;
         std::vector<double> full_entropies;
         std::vector<double> full_temperatures;
+        std::vector<double> full_pressures;
+        std::vector<double> full_soundspeeds;
 
         std::vector<std::vector<std::array<type, 6> > > eos_data;
 
@@ -125,15 +129,21 @@ namespace EoS {
                         std::vector<double> &var2_vector, // entropy
                         std::vector<double> &var3_vector, // energy
                         std::vector<double> &var4_vector, // temperature
+                        std::vector<double> &var5_vector, // pressure
+                        std::vector<double> &var6_vector, // soundspeed
                         std::vector<double> &var1_vector_full, // density
                         std::vector<double> &var2_vector_full, // entropy
                         std::vector<double> &var3_vector_full, // energy
                         std::vector<double> &var4_vector_full, // temperature
+                        std::vector<double> &var5_vector_full, // pressure
+                        std::vector<double> &var6_vector_full, // soundspeed
                         const std::string &file_path,
                         const int val1_property_index, // density index
                         const int val2_property_index, // entropy index
                         const int val3_property_index, // energy index
-                        const int val4_property_index // temperature index
+                        const int val4_property_index, // temperature index
+                        const int val5_property_index, // pressure index
+                        const int val6_property_index // soundspeed index
                 ) {
 
                     std::vector<std::vector<std::array<double, 6>>> eos_data;
@@ -195,6 +205,10 @@ namespace EoS {
                                     var3_vector.push_back(tmp);
                                 if (line_index == 0 && field_index == val4_property_index)
                                     var4_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val5_property_index)
+                                    var5_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val6_property_index)
+                                    var6_vector.push_back(tmp);
 
                                 if (field_index == val1_property_index)
                                     var1_vector_full.push_back(tmp);
@@ -204,6 +218,10 @@ namespace EoS {
                                     var3_vector_full.push_back(tmp);
                                 if (field_index == val4_property_index)
                                     var4_vector_full.push_back(tmp);
+                                if (field_index == val5_property_index)
+                                    var5_vector_full.push_back(tmp);
+                                if (field_index == val6_property_index)
+                                    var6_vector_full.push_back(tmp);
 
                                 ++field_index;
                             }
@@ -216,9 +234,10 @@ namespace EoS {
             };
 
             eos_data = readTillotsonfile::readfile(densities, energies,
-                                                   entropies, temperatures, full_densities, full_energies,
-                                                   full_entropies, full_temperatures,
-                                                   filename, 0, 1, 5, 2);
+                                                   entropies, temperatures, pressures, soundspeeds,
+                                                   full_densities, full_energies,
+                                                   full_entropies, full_temperatures, full_pressures, full_soundspeeds,
+                                                   filename, 0, 1, 5, 2, 3, 4);
 
 
 
@@ -273,12 +292,16 @@ namespace EoS {
         std::vector<double> energies;
         std::vector<double> entropies;
         std::vector<double> temperatures;
+        std::vector<double> pressures;
+        std::vector<double> soundspeeds;
+
 
         std::vector<double> full_densities;
         std::vector<double> full_energies;
         std::vector<double> full_entropies;
         std::vector<double> full_temperatures;
         std::vector<double> full_pressures;
+        std::vector<double> full_soundspeeds;
 
     public:
         /**
@@ -297,17 +320,21 @@ namespace EoS {
                         std::vector<double> &var2_vector, // entropy
                         std::vector<double> &var3_vector, // energy
                         std::vector<double> &var4_vector, // temperature
+                        std::vector<double> &var5_vector, // pressure
+                        std::vector<double> &var6_vector, // soundspeed
                         std::vector<double> &var1_vector_full, // density
                         std::vector<double> &var2_vector_full, // entropy
                         std::vector<double> &var3_vector_full, // energy
                         std::vector<double> &var4_vector_full, // temperature
                         std::vector<double> &var5_vector_full, // pressure
+                        std::vector<double> &var6_vector_full, // soundspeed
                         const std::string &file_path,
                         const int val1_property_index, // density index
                         const int val2_property_index, // entropy index
                         const int val3_property_index, // energy index
                         const int val4_property_index, // temperature index
-                        const int val5_property_index // pressure index
+                        const int val5_property_index, // pressure index
+                        const int val6_property_index // soundspeed index
                 ) {
 
                     std::vector<std::vector<std::array<double, 6>>> eos_data;
@@ -369,6 +396,10 @@ namespace EoS {
                                     var3_vector.push_back(tmp);
                                 if (line_index == 0 && field_index == val4_property_index)
                                     var4_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val5_property_index)
+                                    var5_vector.push_back(tmp);
+                                if (line_index == 0 && field_index == val6_property_index)
+                                    var6_vector.push_back(tmp);
 
                                 if (field_index == val1_property_index)
                                     var1_vector_full.push_back(tmp);
@@ -380,6 +411,8 @@ namespace EoS {
                                     var4_vector_full.push_back(tmp);
                                 if (field_index == val5_property_index)
                                     var5_vector_full.push_back(tmp);
+                                if (field_index == val6_property_index)
+                                    var6_vector_full.push_back(tmp);
 
                                 ++field_index;
                             }
@@ -392,10 +425,10 @@ namespace EoS {
             };
 
             eos_data = readANEOSfile::readfile(densities, energies,
-                                               entropies, temperatures, full_densities, full_energies, full_entropies,
-                                               full_temperatures, full_pressures,
-                                               filename, 0, 1,
-                                               5, 2, 3);
+                                               entropies, temperatures, pressures, soundspeeds,
+                                               full_densities, full_energies,
+                                               full_entropies, full_temperatures, full_pressures, full_soundspeeds,
+                                               filename, 0, 1, 5, 2, 3, 4);
         }
 
         // use energy interpolation class to calculate temperature based on density and energy
