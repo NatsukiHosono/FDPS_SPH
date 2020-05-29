@@ -263,7 +263,7 @@ namespace EoS {
 
         inline type SoundSpeed(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_pressures, 3, eos_data, grid_size);
+                                                                full_soundspeeds, 3, eos_data, grid_size);
         }
 
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
@@ -273,7 +273,7 @@ namespace EoS {
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_pressures, 3, eos_data, grid_size);
+                                                                full_entropies, 3, eos_data, grid_size);
         }
 
         inline type Temperature(const type dens, const type eng, const type grid_size) const {
@@ -441,7 +441,7 @@ namespace EoS {
 
         inline type SoundSpeed(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_pressures, 3, eos_data, grid_size);
+                                                                full_soundspeeds, 3, eos_data, grid_size);
         }
 
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
@@ -452,7 +452,7 @@ namespace EoS {
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_pressures, 3, eos_data, grid_size);
+                                                                full_entropies, 3, eos_data, grid_size);
         }
 
         inline type Temperature(const type dens, const type eng, const type grid_size) const {
