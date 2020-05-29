@@ -126,21 +126,21 @@ namespace EoS {
             public:
                 static std::vector<std::vector<std::array<double, 6>>> readfile(
                         std::vector<double> &var1_vector, // density
-                        std::vector<double> &var2_vector, // entropy
-                        std::vector<double> &var3_vector, // energy
+                        std::vector<double> &var2_vector, // energy
+                        std::vector<double> &var3_vector, // entropy
                         std::vector<double> &var4_vector, // temperature
                         std::vector<double> &var5_vector, // pressure
                         std::vector<double> &var6_vector, // soundspeed
                         std::vector<double> &var1_vector_full, // density
-                        std::vector<double> &var2_vector_full, // entropy
-                        std::vector<double> &var3_vector_full, // energy
+                        std::vector<double> &var2_vector_full, // energy
+                        std::vector<double> &var3_vector_full, // entropy
                         std::vector<double> &var4_vector_full, // temperature
                         std::vector<double> &var5_vector_full, // pressure
                         std::vector<double> &var6_vector_full, // soundspeed
                         const std::string &file_path,
                         const int val1_property_index, // density index
-                        const int val2_property_index, // entropy index
-                        const int val3_property_index, // energy index
+                        const int val2_property_index, // energy index
+                        const int val3_property_index, // entropy index
                         const int val4_property_index, // temperature index
                         const int val5_property_index, // pressure index
                         const int val6_property_index // soundspeed index
@@ -263,7 +263,7 @@ namespace EoS {
 
         inline type SoundSpeed(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_soundspeeds, 3, eos_data, grid_size);
+                                                                full_soundspeeds, 4, eos_data, grid_size);
         }
 
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
@@ -273,7 +273,7 @@ namespace EoS {
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_entropies, 3, eos_data, grid_size);
+                                                                full_entropies, 5, eos_data, grid_size);
         }
 
         inline type Temperature(const type dens, const type eng, const type grid_size) const {
@@ -317,21 +317,21 @@ namespace EoS {
             public:
                 static std::vector<std::vector<std::array<double, 6>>> readfile(
                         std::vector<double> &var1_vector, // density
-                        std::vector<double> &var2_vector, // entropy
-                        std::vector<double> &var3_vector, // energy
+                        std::vector<double> &var2_vector, // energy
+                        std::vector<double> &var3_vector, // entropy
                         std::vector<double> &var4_vector, // temperature
                         std::vector<double> &var5_vector, // pressure
                         std::vector<double> &var6_vector, // soundspeed
                         std::vector<double> &var1_vector_full, // density
-                        std::vector<double> &var2_vector_full, // entropy
-                        std::vector<double> &var3_vector_full, // energy
+                        std::vector<double> &var2_vector_full, // energy
+                        std::vector<double> &var3_vector_full, // entropy
                         std::vector<double> &var4_vector_full, // temperature
                         std::vector<double> &var5_vector_full, // pressure
                         std::vector<double> &var6_vector_full, // soundspeed
                         const std::string &file_path,
                         const int val1_property_index, // density index
-                        const int val2_property_index, // entropy index
-                        const int val3_property_index, // energy index
+                        const int val2_property_index, // energy index
+                        const int val3_property_index, // entropy index
                         const int val4_property_index, // temperature index
                         const int val5_property_index, // pressure index
                         const int val6_property_index // soundspeed index
@@ -441,7 +441,7 @@ namespace EoS {
 
         inline type SoundSpeed(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_soundspeeds, 3, eos_data, grid_size);
+                                                                full_soundspeeds, 4, eos_data, grid_size);
         }
 
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
@@ -452,7 +452,7 @@ namespace EoS {
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
             return RestrictedBilinearInterpolation::interpolate(dens, eng, full_densities, full_energies,
-                                                                full_entropies, 3, eos_data, grid_size);
+                                                                full_entropies, 5, eos_data, grid_size);
         }
 
         inline type Temperature(const type dens, const type eng, const type grid_size) const {
