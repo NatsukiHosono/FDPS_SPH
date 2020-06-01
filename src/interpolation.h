@@ -254,6 +254,7 @@ private:
         // perform a series of 3 linear interpolations in order to arrive at the final interpolated var3 value
         double u1 = 0.0;
         double u2 = 0.0;
+        double u = 0.0;
         if (s11 == s12) {
             u1 = u11;
         } else {
@@ -264,7 +265,11 @@ private:
         } else {
             u2 = linear_interpolate(s21, s22, val2, u21, u22);
         }
-        double u = linear_interpolate(p1, p2, val1, u1, u2);
+        if (p1 == p2) {
+            u = u1;
+        } else {
+            u = linear_interpolate(p1, p2, val1, u1, u2);
+        }
 
         return u;
     };
