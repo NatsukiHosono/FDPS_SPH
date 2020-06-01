@@ -252,8 +252,8 @@ private:
     ) {
 
         // perform a series of 3 linear interpolations in order to arrive at the final interpolated var3 value
-        double u1;
-        double u2;
+        double u1 = 0.0;
+        double u2 = 0.0;
         if (s11 == s12) {
             u1 = u11;
         } else {
