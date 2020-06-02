@@ -55,9 +55,6 @@ namespace STD {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
                 sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
             }
-            if (sph_system[i].pres < 0) {
-                sph_system[i].pres = 0;
-            }
         }
     }
 
@@ -124,12 +121,12 @@ namespace STD {
             if (sph_system[i].tag == 0) {
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       silicate_grid_size);
-                 sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
                                                                     silicate_grid_size);
             } else {
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       iron_grid_size);
-                 sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
                                                                     iron_grid_size);
             }
         }
