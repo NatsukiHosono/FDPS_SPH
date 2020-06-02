@@ -231,7 +231,7 @@ private:
             } else if (min_distance_index < 0) {
                 return std::make_pair(min_distance_index + 1, min_distance_index + 2);
             } else {
-                return std::make_pair(min_distance_index - 1, min_distance_index + 1);
+                return std::make_pair(min_distance_index, min_distance_index + 1);
             }
         }
     };
