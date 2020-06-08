@@ -48,7 +48,7 @@ namespace STD {
             unsigned int silicate_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            if (sph_system[i].tag == 0) {
+            if (sph_system[i].tag % 2 == 0) {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
                 sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
             } else {
@@ -80,7 +80,7 @@ namespace STD {
                             const double &core_entropy) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            if (sph_system[i].tag == 0) {
+            if (sph_system[i].tag % 2 == 0) {
                 sph_system[i].ent = mantle_entropy;
             } else {
                 sph_system[i].ent = core_entropy;
@@ -92,7 +92,7 @@ namespace STD {
                       unsigned int silicate_grid_size) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            if (sph_system[i].tag == 0) {
+            if (sph_system[i].tag % 2 == 0) {
                 sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
             } else {
                 sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
@@ -118,7 +118,7 @@ namespace STD {
             // if 0, then mantle, if 1, then core
             // need to use the iron table for interpolating against iron
             // hack, fix later
-            if (sph_system[i].tag == 0) {
+            if (sph_system[i].tag % 2 == 0) {
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       silicate_grid_size);
                 sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
