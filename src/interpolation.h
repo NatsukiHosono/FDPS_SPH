@@ -182,7 +182,7 @@ private:
         }
 
 
-        return std::make_pair(b1, b2);
+        return std::make_pair(b1, b2 - 1.0);
     };
 
     // function that returns the 4 nearest var2 neighbors
