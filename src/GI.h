@@ -1008,7 +1008,7 @@ public:
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&Granite);
+                sph_system[i].setPressure(&ADunite);
             } else {
                 sph_system[i].setPressure(&Iron);
             }
