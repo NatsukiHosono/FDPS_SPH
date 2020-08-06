@@ -132,6 +132,24 @@ namespace STD {
         }
     }
 
+    void CalcTemperature(PS::ParticleSystem<STD::RealPtcl> &sph_system, unsigned int iron_grid_size,
+                 unsigned int silicate_grid_size) {
+#pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            // switch to tillotson for iron using id tag
+            // if 0, then mantle, if 1, then core
+            // need to use the iron table for interpolating against iron
+            // hack, fix later
+            if (sph_system[i].tag % 2 == 0) {
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    silicate_grid_size);
+            } else {
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    iron_grid_size);
+            }
+        }
+    }
+
     class CalcDerivative {
         kernel_t kernel;
     public:

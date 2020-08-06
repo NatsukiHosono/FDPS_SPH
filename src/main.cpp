@@ -159,15 +159,15 @@ int main(int argc, char *argv[]) {
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
+            PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
             if (sysinfo.step % 100 == 0) {
                 PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
                                                                      1e-4);;
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
             };
         } else if (mode == 1) {
-            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
+//            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
-        PTCL::CalcAll(sph_system, iron_grid_size, silicate_grid_size);
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
         OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_interval, output_directory);
         ++sysinfo.step;
