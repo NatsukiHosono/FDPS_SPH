@@ -116,15 +116,15 @@ namespace EoS {
             return sqrt(std::max(Pressure(dens, eng, 0.0) / (dens * dens) * dPdu(dens, eng) + dPdrho(dens, eng), 0.0) + 1.0e-16);
         }
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
-            return 0.0;
+            return 0;
         }
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
-            return 0.0;
+            return 0;
         }
 
         inline type Temperature(const type dens, const type eng, const type grid_size) const {
-            return 0.0;
+            return 0;
         }
     };
 
