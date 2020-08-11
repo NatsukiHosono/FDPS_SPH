@@ -154,12 +154,12 @@ int main(int argc, char *argv[]) {
         } else if (mode == 1) {
 //            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
-        PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
         hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
 #ifdef SELF_GRAVITY
         grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                            PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+        PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
 #endif
         PROBLEM::addExternalForce(sph_system, sysinfo);
 #pragma omp parallel for
