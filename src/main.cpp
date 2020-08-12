@@ -139,27 +139,28 @@ int main(int argc, char *argv[]) {
         sph_system.exchangeParticle(dinfo);
         PROBLEM::setEoS(sph_system, silicate_material);
 
+        drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
+        hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
+#ifdef SELF_GRAVITY
+        grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
+                                           PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
             PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-            PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
             if (sysinfo.step % 100 == 0) {
                 PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
                                                                      1e-4);;
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
             };
         } else if (mode == 1) {
-//            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
+            PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
-        drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
-        hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
-#ifdef SELF_GRAVITY
-        grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
-                                           PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+        PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+        PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
 #endif
         PROBLEM::addExternalForce(sph_system, sysinfo);
 #pragma omp parallel for
