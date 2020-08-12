@@ -174,8 +174,8 @@ namespace STD {
 #ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
             fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",  id,  tag,  mass,  pos.x,  pos.y,  0.0  ,  vel.x,  vel.y,  0.0  ,  dens,  eng,  pres, pot, ent);
 #else
-            fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", id, tag, mass,
-                    pos.x, pos.y, pos.z, vel.x, vel.y, vel.z, dens, eng, pres, pot, ent, temp);
+            fprintf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", id, tag, mass,
+                    pos.x, pos.y, pos.z, vel.x, vel.y, vel.z, dens, eng, pres, pot, ent, temp, snds);
 #endif
         }
 
@@ -184,8 +184,8 @@ namespace STD {
             double dummy1, dummy2;
             fscanf (fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag, &mass, &pos.x, &pos.y, &dummy1, &vel.x, &vel.y, &dummy2, &dens, &eng, &pres, &pot, &ent);
 #else
-            fscanf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag,
-                   &mass, &pos.x, &pos.y, &pos.z, &vel.x, &vel.y, &vel.z, &dens, &eng, &pres, &pot, &ent, &temp);
+            fscanf(fp, "%lld\t%lld\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", &id, &tag,
+                   &mass, &pos.x, &pos.y, &pos.z, &vel.x, &vel.y, &vel.z, &dens, &eng, &pres, &pot, &ent, &temp, &snds);
 #endif
         }
 
