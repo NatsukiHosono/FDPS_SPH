@@ -139,14 +139,22 @@ int main(int argc, char *argv[]) {
         sph_system.exchangeParticle(dinfo);
         PROBLEM::setEoS(sph_system, silicate_material);
 
+        // calculate derivative
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
+        // calculate hydrodynamic forces
+        // acceleration and energy and calculated here
         hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
 #ifdef SELF_GRAVITY
+        // calculate gravity forces
         grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                            PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+        // calculate density in a smoothing length loop
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
+        // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
+        // interpolate internal energy against the appropriate EoS tables
+        // if the planet is to rotate, apply the specified angular velocity
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
             PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
@@ -155,11 +163,16 @@ int main(int argc, char *argv[]) {
                                                                      1e-4);;
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
             };
+        // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
         } else if (mode == 1) {
             PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
-        PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
+        // regardless of mode, interpolate the following against the appropriate EoS tables:
+        // pressure
+        // temperature
+        // soundspeed
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+        PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
 #endif
         PROBLEM::addExternalForce(sph_system, sysinfo);
