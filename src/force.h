@@ -81,6 +81,15 @@ namespace STD {
         }
     }
 
+    void SetPostiveEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+#pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            if (sph_system[i].eng < 0) {
+                sph_system[i].eng = 0;
+            }
+        }
+    }
+
 //    void CalcInternalEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system,
 //                            const unsigned int aneos_grid_size, const unsigned int tillotson_grid_size) {
 //#pragma omp parallel for

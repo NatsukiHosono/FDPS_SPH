@@ -140,6 +140,7 @@ int main(int argc, char *argv[]) {
         PROBLEM::setEoS(sph_system, silicate_material);
 
         // calculate derivative
+        PTCL::SetPostiveEnergy(sph_system);
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
         // calculate hydrodynamic forces
         // acceleration and energy and calculated here
