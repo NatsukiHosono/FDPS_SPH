@@ -153,6 +153,13 @@ int main(int argc, char *argv[]) {
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
+#endif
+        PROBLEM::addExternalForce(sph_system, sysinfo);
+#pragma omp parallel for
+        for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            sph_system[i].finalKick(sysinfo.dt);
+            sph_system[i].dampMotion(PROBLEM::damping);
+        }
         // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
         // interpolate internal energy against the appropriate EoS tables
         // if the planet is to rotate, apply the specified angular velocity
@@ -164,7 +171,7 @@ int main(int argc, char *argv[]) {
                                                                      1e-4);;
                 PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
             };
-        // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
+            // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
         } else if (mode == 1) {
             PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
@@ -175,13 +182,6 @@ int main(int argc, char *argv[]) {
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
         PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
-#endif
-        PROBLEM::addExternalForce(sph_system, sysinfo);
-#pragma omp parallel for
-        for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].finalKick(sysinfo.dt);
-            sph_system[i].dampMotion(PROBLEM::damping);
-        }
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
