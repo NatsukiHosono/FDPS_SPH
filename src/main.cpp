@@ -107,7 +107,6 @@ int main(int argc, char *argv[]) {
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
     }
 
-    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
     hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
 #ifdef SELF_GRAVITY
