@@ -157,8 +157,11 @@ int main(int argc, char *argv[]) {
         sph_system.exchangeParticle(dinfo);
         PROBLEM::setEoS(sph_system, silicate_material);
 
+        // calculate density in a smoothing length loop
+        for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
+            dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
+        }
         // calculate derivative
-        PTCL::SetPostiveEnergy(sph_system);
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
         // calculate hydrodynamic forces
         // acceleration and energy and calculated here
@@ -167,10 +170,6 @@ int main(int argc, char *argv[]) {
         // calculate gravity forces
         grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                            PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
-        // calculate density in a smoothing length loop
-        for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
-            dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
-        }
 #endif
         PROBLEM::addExternalForce(sph_system, sysinfo);
 #pragma omp parallel for
