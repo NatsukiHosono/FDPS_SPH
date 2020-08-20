@@ -81,7 +81,7 @@ namespace STD {
         }
     }
 
-    void SetPostiveEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+    void SetPositiveEnergy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
 #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].eng < 0) {
