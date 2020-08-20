@@ -15,6 +15,7 @@
 #include "force.h"
 #include "io.h"
 #include "integral.h"
+#include "debug.h"
 
 
 template<class Ptcl> double GI_universal<Ptcl>::end_time;
@@ -27,6 +28,7 @@ int main(int argc, char *argv[]) {
     //////////////////
     //Create vars.
     //////////////////
+    EnergyOutFile e;
     PS::Initialize(argc, argv);
     PS::ParticleSystem<PTCL::RealPtcl> sph_system;
     sph_system.initialize();
@@ -113,6 +115,7 @@ int main(int argc, char *argv[]) {
     grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                        PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
 #endif
+    e.write_timestep(sph_system, sysinfo);
     PTCL::SetPositiveEnergy(sph_system);
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
