@@ -113,25 +113,25 @@ int main(int argc, char *argv[]) {
     grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                        PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
 #endif
-    if (mode == 2) {
-        PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-        PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-        if (sysinfo.step % 100 == 0) {
-            PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
-                                                                 1e-4);;
-            PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
-        };
-        // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
-    } else if (mode == 1) {
-        PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
-    }
-    // regardless of mode, interpolate the following against the appropriate EoS tables:
-    // pressure
-    // temperature
-    // soundspeed
-    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-    PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
-    PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
+//    if (mode == 2) {
+//        PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
+//        PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
+//        if (sysinfo.step % 100 == 0) {
+//            PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
+//                                                                 1e-4);;
+//            PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
+//        };
+//        // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
+//    } else if (mode == 1) {
+//        PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
+//    }
+//    // regardless of mode, interpolate the following against the appropriate EoS tables:
+//    // pressure
+//    // temperature
+//    // soundspeed
+//    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+//    PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
+//    PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
     sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
     PROBLEM::addExternalForce(sph_system, sysinfo);
     OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
