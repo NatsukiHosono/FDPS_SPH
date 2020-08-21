@@ -115,7 +115,6 @@ int main(int argc, char *argv[]) {
     grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                        PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
 #endif
-    e.write_timestep(sph_system, sysinfo);
     PTCL::SetPositiveEnergy(sph_system);
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
@@ -180,6 +179,9 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             sph_system[i].finalKick(sysinfo.dt);
             sph_system[i].dampMotion(PROBLEM::damping);
+        }
+        if (sysinfo.step % 10 == 0) {
+            e.write_timestep(sph_system, sysinfo);
         }
         PTCL::SetPositiveEnergy(sph_system);
         // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
