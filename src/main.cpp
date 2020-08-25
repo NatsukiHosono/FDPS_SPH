@@ -180,9 +180,6 @@ int main(int argc, char *argv[]) {
             sph_system[i].finalKick(sysinfo.dt);
             sph_system[i].dampMotion(PROBLEM::damping);
         }
-        if (sysinfo.step % 10 == 0) {
-            e.write_timestep(sph_system, sysinfo);
-        }
         PTCL::SetPositiveEnergy(sph_system);
         // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
         // interpolate internal energy against the appropriate EoS tables
