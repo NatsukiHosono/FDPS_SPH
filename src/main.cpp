@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
     grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                        PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
 #endif
-    PTCL::SetPositiveEnergy(sph_system);
+    PTCL::SetPositiveEnergy(sph_system); // positive energy rule
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
         PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
     // temperature
     // soundspeed
     PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+    PTCL::SetPositivePressure(sph_system);  // positive pressure rule
     PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
     PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
     sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
@@ -180,7 +181,7 @@ int main(int argc, char *argv[]) {
             sph_system[i].finalKick(sysinfo.dt);
             sph_system[i].dampMotion(PROBLEM::damping);
         }
-        PTCL::SetPositiveEnergy(sph_system);
+        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
         // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
         // interpolate internal energy against the appropriate EoS tables
         // if the planet is to rotate, apply the specified angular velocity
@@ -201,6 +202,7 @@ int main(int argc, char *argv[]) {
         // temperature
         // soundspeed
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
         PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
