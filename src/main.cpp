@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
         PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
         PROBLEM::setEoS(sph_system, silicate_material);
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+        PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
     } else {
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo);
         PROBLEM::setEoS(sph_system, silicate_material);
