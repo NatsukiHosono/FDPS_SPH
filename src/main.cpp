@@ -24,11 +24,10 @@ template<class Ptcl> double GI_universal<Ptcl>::damping;
 
 int main(int argc, char *argv[]) {
     namespace PTCL = STD;
-    typedef GI_universal<PTCL::RealPtcl> PROBLEM;  // note: this must be changed to GI_imp for impact simulations...come up with a fix soon for mode dependence
+    typedef GI_universal<PTCL::RealPtcl> PROBLEM;
     //////////////////
     //Create vars.
     //////////////////
-    EnergyOutFile e;
     PS::Initialize(argc, argv);
     PS::ParticleSystem<PTCL::RealPtcl> sph_system;
     sph_system.initialize();

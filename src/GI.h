@@ -69,7 +69,7 @@ public:
                     Ptcl ith;
                     fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
                         >> ith.vel.y
-                        >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
+                        >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp >> ith.snds;
                     tar.push_back(ith);
                 }
                 tar.pop_back();
@@ -84,7 +84,7 @@ public:
                     Ptcl ith;
                     fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
                         >> ith.vel.y
-                        >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
+                        >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp >> ith.snds;
                     imp.push_back(ith);
                 }
                 imp.pop_back();
