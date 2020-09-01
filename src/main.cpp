@@ -81,7 +81,6 @@ int main(int argc, char *argv[]) {
     }
     PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
 
-
 #pragma omp parallel for
     for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
         sph_system[i].initialize();
