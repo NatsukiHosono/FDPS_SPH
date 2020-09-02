@@ -107,14 +107,9 @@ int main(int argc, char *argv[]) {
     for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
     }
-
-    drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
-    hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
-#ifdef SELF_GRAVITY
-    grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
-                                       PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
-#endif
-    PTCL::SetPositiveEnergy(sph_system); // positive energy rule
+    if (mode == 1) {
+        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
+    }
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
         PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
@@ -132,9 +127,17 @@ int main(int argc, char *argv[]) {
     // temperature
     // soundspeed
     PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-    PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+    if (mode == 1) {
+        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+    }
     PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
     PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
+    drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
+    hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
+#ifdef SELF_GRAVITY
+    grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
+                                       PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+#endif
     sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
     PROBLEM::addExternalForce(sph_system, sysinfo);
     OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
@@ -164,23 +167,9 @@ int main(int argc, char *argv[]) {
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
-        // calculate derivative
-        drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
-        // calculate hydrodynamic forces
-        // acceleration and energy and calculated here
-        hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
-#ifdef SELF_GRAVITY
-        // calculate gravity forces
-        grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
-                                           PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
-#endif
-        PROBLEM::addExternalForce(sph_system, sysinfo);
-#pragma omp parallel for
-        for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
-            sph_system[i].finalKick(sysinfo.dt);
-            sph_system[i].dampMotion(PROBLEM::damping);
+        if (mode == 1) {
+            PTCL::SetPositiveEnergy(sph_system); // positive energy rule
         }
-        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
         // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
         // interpolate internal energy against the appropriate EoS tables
         // if the planet is to rotate, apply the specified angular velocity
@@ -201,9 +190,27 @@ int main(int argc, char *argv[]) {
         // temperature
         // soundspeed
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+        if (mode == 1) {
+            PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+        }
         PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
+        // calculate derivative
+        drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
+        // calculate hydrodynamic forces
+        // acceleration and energy and calculated here
+        hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
+#ifdef SELF_GRAVITY
+        // calculate gravity forces
+        grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
+                                           PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
+#endif
+        PROBLEM::addExternalForce(sph_system, sysinfo);
+#pragma omp parallel for
+        for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            sph_system[i].finalKick(sysinfo.dt);
+            sph_system[i].dampMotion(PROBLEM::damping);
+        }
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
