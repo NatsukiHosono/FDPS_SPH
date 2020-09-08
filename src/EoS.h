@@ -2,12 +2,13 @@
 
 #include <sstream>
 #include "interpolation.h"
-//#include "io.h"
+#include "parse.h"
 
 namespace EoS {
     //////////////////
     //abstract class
     //////////////////
+
     template<typename type>
     class EoS_t {
     public:
@@ -66,57 +67,75 @@ namespace EoS {
     };
 
     //Tillotson equation "is applicable to the prediction of the shock and release of materials undergoing hypervelocity impacts."
-    template <typename type> class Tillotson : public EoS_t<type>{
-        type rho0, a, b, A, B, u0, alpha, beta, uiv, ucv;
-        inline type P_co(const type dens, const type eng) const{
+    template<typename type>
+    class Tillotson : public EoS_t<type> {
+        type rho0, a, b, A, B, u0, alpha, beta, uiv, ucv, const_internal_energy;
+
+        inline type P_co(const type dens, const type eng) const {
             const type eta = dens / rho0;
-            const type mu  = eta - 1.0;
+            const type mu = eta - 1.0;
             return (a + b / (eng / u0 / eta / eta + 1.0)) * dens * eng + A * mu + B * mu * mu;
         }
-        inline type P_ex(const type dens, const type eng) const{
+
+        inline type P_ex(const type dens, const type eng) const {
             const type eta = dens / rho0;
-            const type mu  = eta - 1.0;
-            return a * dens * eng + (b * dens * eng / (eng / u0 / eta / eta + 1.0) + A * mu * exp(- alpha * (1.0 / eta - 1.0))) * exp(- beta * (1.0 / eta - 1.0) * (1.0 / eta - 1.0));
+            const type mu = eta - 1.0;
+            return a * dens * eng +
+                   (b * dens * eng / (eng / u0 / eta / eta + 1.0) + A * mu * exp(-alpha * (1.0 / eta - 1.0))) *
+                   exp(-beta * (1.0 / eta - 1.0) * (1.0 / eta - 1.0));
         }
-        inline type dPdrho(const type rho, const type u) const{
+
+        inline type dPdrho(const type rho, const type u) const {
             const type drho = 0.0001;
             return (Pressure(rho + drho, u, 0.0) - Pressure(rho - drho, u, 0.0)) / (2.0 * drho);
         }
-        inline type dPdu(const type rho, const type u) const{
+
+        inline type dPdu(const type rho, const type u) const {
             const type du = 0.0001;
             return (Pressure(rho, u + du, 0.0) - Pressure(rho, u - du, 0.0)) / (2.0 * du);
         }
+
+        inline type constant_internal_energy(PS::F64 &const_eng) {
+            return const_eng;
+        }
+
     public:
-        Tillotson(const type a_rho0, const type a_u0, const type a_uiv, const type a_ucv, const type a_A, const type a_B, const type a_a, const type a_b, const type a_alpha, const type a_beta){
+        Tillotson(const type a_rho0, const type a_u0, const type a_uiv, const type a_ucv, const type a_A,
+                  const type a_B, const type a_a, const type a_b, const type a_alpha, const type a_beta, PS::F64 &eng) {
             //in MKS unit...
             //From Brundage 2013
             //"Implementation of Tillotson Equation of State for Hypervelocity Impact of Metals, Geologic Materials, and Liquids"
-            rho0  = a_rho0; // Density                          [kg/m^3]
-            u0    = a_u0;   // Initial Energy                   [J/kg]
-            uiv   = a_uiv;  // Energy at incipient vaporization [J/kg]
-            ucv   = a_ucv;  // Energy at complete vaporization  [J/kg]
-            A     = a_A;    // Bulk modulus                     [Pa]
-            B     = a_B;    // Tillotson parameter              [Pa]
-            a     = a_a;    // Tillotson parameter              [dimension-less]
-            b     = a_b;    // Tillotson parameter
+            rho0 = a_rho0; // Density                          [kg/m^3]
+            u0 = a_u0;   // Initial Energy                   [J/kg]
+            uiv = a_uiv;  // Energy at incipient vaporization [J/kg]
+            ucv = a_ucv;  // Energy at complete vaporization  [J/kg]
+            A = a_A;    // Bulk modulus                     [Pa]
+            B = a_B;    // Tillotson parameter              [Pa]
+            a = a_a;    // Tillotson parameter              [dimension-less]
+            b = a_b;    // Tillotson parameter
             alpha = a_alpha;// Tillotson parameter
-            beta  = a_beta; // Tillotson parameter
+            beta = a_beta; // Tillotson parameter
+            const_internal_energy = eng; // Tillotson parameter
         }
-        inline type Pressure(const type dens, const type eng, const type grid_size) const{
+
+        inline type Pressure(const type dens, const type eng, const type grid_size) const {
             const type p_min = 1.0e+7;
-            if(dens >= rho0 || eng < uiv){
+            if (dens >= rho0 || eng < uiv) {
                 return std::max(P_co(dens, eng), p_min);
-            }else if(dens < rho0 && eng > ucv){
+            } else if (dens < rho0 && eng > ucv) {
                 return std::max(P_ex(dens, eng), p_min);
-            }else{
+            } else {
                 return std::max(((eng - uiv) * P_ex(dens, eng) + (ucv - eng) * P_co(dens, eng)) / (ucv - uiv), p_min);
             }
         }
-        inline type SoundSpeed(const type dens, const type eng, const type grid_size) const{
-            return sqrt(std::max(Pressure(dens, eng, 0.0) / (dens * dens) * dPdu(dens, eng) + dPdrho(dens, eng), 0.0) + 1.0e-16);
+
+        inline type SoundSpeed(const type dens, const type eng, const type grid_size) const {
+            return sqrt(std::max(Pressure(dens, eng, 0.0) / (dens * dens) * dPdu(dens, eng) + dPdrho(dens, eng), 0.0) +
+                        1.0e-16);
         }
+
         inline type InternalEnergy(const type dens, const type ent, const type grid_size) const {
-            return 0;
+            return const_internal_energy;
         }
 
         inline type Entropy(const type dens, const type eng, const type grid_size) const {
@@ -333,9 +352,13 @@ namespace EoS {
     };
 }
 
+std::string input_file_eos("input.txt");
+
+ParameterFile parameter_file_eos(input_file_eos);
+
 static const EoS::IdealGas<PS::F64> Monoatomic(5. / 3.);
 static const EoS::IdealGas<PS::F64> Diatomic(1.4);
-static const EoS::Tillotson<PS::F64> Granite(2680.0, 16.0e+6, 3.5e+6, 18.00e+6, 18.0e+9, 18.0e+9, 0.5, 1.3, 5.0, 5.0);
+//static const EoS::Tillotson<PS::F64> Granite(2680.0, 16.0e+6, 3.5e+6, 18.00e+6, 18.0e+9, 18.0e+9, 0.5, 1.3, 5.0, 5.0);
 //static const EoS::Tillotson<PS::F64> Iron(7800.0,  9.5e+6, 2.4e+6 , 8.67e+6, 128.0e+9, 105.0e+9, 0.5, 1.5, 5.0, 5.0);
 static const EoS::ANEOS<PS::F64> Iron("eos/ironC.rho_u.txt");
 static const EoS::ANEOS<PS::F64> AGranite("eos/granite.rho_u.txt");

@@ -64,7 +64,6 @@ int main(int argc, char *argv[]) {
     const unsigned int iron_grid_size = parameter_file.getValueOf("iron_grid_size",
                                                                   120); // get grid size of Tillotson input file
 
-
     std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     if (output_directory.back() != '/')
         output_directory.back() += '/';
@@ -107,9 +106,9 @@ int main(int argc, char *argv[]) {
     for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
     }
-    if (mode == 1) {
-        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
-    }
+//    if (mode == 1) {
+//        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
+//    }
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
         PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
@@ -167,9 +166,9 @@ int main(int argc, char *argv[]) {
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
-        if (mode == 1) {
-            PTCL::SetPositiveEnergy(sph_system); // positive energy rule
-        }
+//        if (mode == 1) {
+//            PTCL::SetPositiveEnergy(sph_system); // positive energy rule
+//        }
         // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
         // interpolate internal energy against the appropriate EoS tables
         // if the planet is to rotate, apply the specified angular velocity
