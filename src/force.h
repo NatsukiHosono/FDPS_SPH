@@ -23,15 +23,6 @@ namespace STD {
         }
     };
 
-    PS::F64 getConstantEnergy(ParameterFile &parameter_file) {
-        PS::F64 UnitMass = parameter_file.getValueOf("UnitMass", 6.0e+24);
-        PS::F64 UnitRadi = parameter_file.getValueOf("UnitRadi", 6400e+3);
-        const PS::F64 tarMass = UnitMass;
-        const PS::F64 tarRadi = UnitRadi;
-        const PS::F64 Grav = 6.67e-11;
-        return 0.1 * Grav * tarMass / tarRadi;  // constant energy value
-    }
-
     class AngularVelocity {
     private:
         static std::pair<PS::F64, PS::F64> velocity_xy(PS::F64 &position_x, PS::F64 &position_y, PS::F64 &angular_velocity, PS::F64 &dt) {

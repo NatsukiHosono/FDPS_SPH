@@ -1,3 +1,5 @@
+#pragma once
+
 #include "parse.h"
 #include <unordered_set>
 
