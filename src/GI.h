@@ -33,7 +33,7 @@ public:
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&AGranite);
+                sph_system[i].setPressure(&Granite);
             } else {
                 sph_system[i].setPressure(&Iron);
             }
@@ -335,7 +335,7 @@ public:
                         ith.mass = tarMass + impMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
-                        ith.setPressure(&AGranite);
+                        ith.setPressure(&Granite);
                         ith.tag = 0;
 
                         if (removal_list.count(index)) {
@@ -645,7 +645,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
                             ith.mass = tarMass + impMass;
                             ith.eng  = 0.1 * Grav * tarMass / tarRadi;
                             ith.id   = id++;
-                            ith.setPressure(&AGranite);
+                            ith.setPressure(&Granite);
                             ith.tag = 0;
 
 			    if (removal_list.count(index)){
@@ -756,7 +756,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			// TODO: Modify the lines below for all particles that need new EoS
 			if(sph_system[i].tag % 2 == 0){
-				sph_system[i].setPressure(&AGranite);
+				sph_system[i].setPressure(&Granite);
 			}else{
 				sph_system[i].setPressure(&Iron);
 			}
