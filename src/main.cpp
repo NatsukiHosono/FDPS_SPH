@@ -106,31 +106,27 @@ int main(int argc, char *argv[]) {
     for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
     }
-//    if (mode == 1) {
+    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+    PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
+    //    if (mode == 1) {
 //        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
 //    }
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-        PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-        if (sysinfo.step % 100 == 0) {
-            PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
-                                                                 1e-4);;
-            PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
-        };
+//        PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
+//        if (sysinfo.step % 100 == 0) {
+//            PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
+//                                                                 1e-4);;
+//            PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
+//        };
         // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
     } else if (mode == 1) {
         PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
     }
-    // regardless of mode, interpolate the following against the appropriate EoS tables:
-    // pressure
-    // temperature
-    // soundspeed
-    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
     if (mode == 1) {
         PTCL::SetPositivePressure(sph_system);  // positive pressure rule
     }
     PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
-    PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
     hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
 #ifdef SELF_GRAVITY
@@ -174,26 +170,22 @@ int main(int argc, char *argv[]) {
         // if the planet is to rotate, apply the specified angular velocity
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-            PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-            if (sysinfo.step % 100 == 0) {
-                PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
-                                                                     1e-4);;
-                PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
-            };
+//            PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
+//            if (sysinfo.step % 100 == 0) {
+//                PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
+//                                                                     1e-4);;
+//                PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
+//            };
             // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
         } else if (mode == 1) {
             PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
-        // regardless of mode, interpolate the following against the appropriate EoS tables:
-        // pressure
-        // temperature
-        // soundspeed
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+        PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
         if (mode == 1) {
             PTCL::SetPositivePressure(sph_system);  // positive pressure rule
         }
         PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
-        PTCL::CalcSoundspeed(sph_system, iron_grid_size, silicate_grid_size);
         // calculate derivative
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
         // calculate hydrodynamic forces
