@@ -371,9 +371,11 @@ PS::F64 getConstantEnergy(ParameterFile &parameter_file) {
     }
 }
 
-std::string input_file_eos("input.txt");
-ParameterFile parameter_file_eos(input_file_eos);
-PS::F64 constant_internal_energy = getConstantEnergy(parameter_file_eos);
+//std::string input_file_eos("input.txt");
+//ParameterFile parameter_file_eos(input_file_eos);
+//PS::F64 constant_internal_energy = getConstantEnergy(parameter_file_eos);
+PS::F64 constant_internal_energy = 0.0;
+
 
 
 static const EoS::IdealGas<PS::F64> Monoatomic(5. / 3.);
