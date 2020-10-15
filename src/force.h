@@ -50,8 +50,10 @@ namespace STD {
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
+                sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
             } else {
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
+                sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
             }
         }
     }
