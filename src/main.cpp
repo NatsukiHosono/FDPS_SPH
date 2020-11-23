@@ -168,12 +168,14 @@ int main(int argc, char *argv[]) {
         // if the planet is to rotate, apply the specified angular velocity
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-//            PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-//            if (sysinfo.step % 100 == 0) {
-//                PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
-//                                                                     1e-4);;
-//                PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
-//            };
+            PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
+            if (sysinfo.step % 100 == 0) {
+                PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
+                                                                     1e-4);
+                if (angular_velocity != 0.0) {
+                    PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
+                }
+            };
             // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
         } else if (mode == 1) {
             PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
