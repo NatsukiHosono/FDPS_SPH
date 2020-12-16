@@ -121,9 +121,9 @@ int main(int argc, char *argv[]) {
     } else if (mode == 1) {
         PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
     }
-    if (mode == 1) {
-        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
-    }
+//    if (mode == 1) {
+//        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+//    }
     PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
     hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
@@ -181,9 +181,9 @@ int main(int argc, char *argv[]) {
             PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-        if (mode == 1) {
-            PTCL::SetPositivePressure(sph_system);  // positive pressure rule
-        }
+//        if (mode == 1) {
+//            PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+//        }
         PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         // calculate derivative
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
