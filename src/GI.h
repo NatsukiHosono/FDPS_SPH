@@ -47,6 +47,8 @@ public:
 
     static double end_time;
     static double damping;
+    static std::string impactor_fname;
+    static std::string target_fname;
 
     static void setupIC(PS::ParticleSystem<Ptcl> &sph_system, system_t &sysinfo, PS::DomainInfo &dinfo,
                         ParameterFile &parameter_file) {
@@ -59,11 +61,13 @@ public:
             static constexpr double Grav = 6.67e-11;
             static constexpr double L_EM = 3.5e+34;
             damping = parameter_file.getValueOf("damping", 1.0);
+            impactor_fname = parameter_file.getValueOf("impactor_fname", "imp.dat");
+            target_fname = parameter_file.getValueOf("target_fname", "tar.dat");
 
             if (PS::Comm::getRank() != 0) return;
             std::vector<Ptcl> tar, imp;
             {
-                std::ifstream fin("input/tar.dat");
+                std::ifstream fin("input/" + target_fname);
                 double time;
                 std::size_t N;
                 fin >> time;
@@ -78,7 +82,7 @@ public:
                 tar.pop_back();
             }
             {
-                std::ifstream fin("input/imp.dat");
+                std::ifstream fin("input/" + impactor_fname);
                 double time;
                 std::size_t N;
                 fin >> time;

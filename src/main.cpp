@@ -105,25 +105,24 @@ int main(int argc, char *argv[]) {
     for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
     }
-    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-    //    if (mode == 1) {
-//        PTCL::SetPositiveEnergy(sph_system); // positive energy rule
-//    }
+
     if (mode == 2) {
         PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-//        PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-//        if (sysinfo.step % 100 == 0) {
-//            PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
-//                                                                 1e-4);;
-//            PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
-//        };
-        // if mode 1 ("impact mode"), interpolate the entropy against the appropriate EoS table
+        PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
+        if (sysinfo.step % 100 == 0) {
+            PS::F64 angular_velocity = parameter_file.getValueOf("angular_velocity",
+                                                                 1e-4);;
+            PTCL::AngularVelocity::add_angular_velocity_xy(sph_system, angular_velocity, sysinfo.dt);
+        };
     } else if (mode == 1) {
         PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
     }
-//    if (mode == 1) {
-//        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
-//    }
+
+    PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
+    if (mode == 1) {
+        PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+    }
+
     PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
     hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
@@ -160,12 +159,7 @@ int main(int argc, char *argv[]) {
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
-//        if (mode == 1) {
-//            PTCL::SetPositiveEnergy(sph_system); // positive energy rule
-//        }
-        // for mode 2 ("planet-forming mode"), keep the entropy constant based on input file value for core/silicate
-        // interpolate internal energy against the appropriate EoS tables
-        // if the planet is to rotate, apply the specified angular velocity
+
         if (mode == 2) {
             PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
             PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
@@ -181,9 +175,9 @@ int main(int argc, char *argv[]) {
             PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
         }
         PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-//        if (mode == 1) {
-//            PTCL::SetPositivePressure(sph_system);  // positive pressure rule
-//        }
+        if (mode == 1) {
+            PTCL::SetPositivePressure(sph_system);  // positive pressure rule
+        }
         PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
         // calculate derivative
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
