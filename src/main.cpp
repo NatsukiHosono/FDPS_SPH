@@ -192,6 +192,7 @@ int main(int argc, char *argv[]) {
             PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
             PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
             PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
+        }
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
