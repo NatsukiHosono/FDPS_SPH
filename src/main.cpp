@@ -117,7 +117,6 @@ int main(int argc, char *argv[]) {
     } else if (mode == 1) {
         PTCL::CalcEntropy(sph_system, iron_grid_size, silicate_grid_size);
     }
-
     PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
     PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
@@ -188,10 +187,8 @@ int main(int argc, char *argv[]) {
             sph_system[i].dampMotion(PROBLEM::damping);
         }
         if (mode == 2) {
-            PTCL::SetConstantEntropy(sph_system, initial_mantle_entropy, initial_core_entropy);
-            PTCL::CalcInternalEnergy(sph_system, iron_grid_size, silicate_grid_size);
-            PTCL::CalcPressure(sph_system, iron_grid_size, silicate_grid_size);
-            PTCL::CalcTemperature(sph_system, iron_grid_size, silicate_grid_size);
+            PTCL::Mode2CalcAll(sph_system, iron_grid_size, silicate_grid_size, initial_mantle_entropy,
+                               initial_core_entropy);
         }
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         //    Calculate initial internal energy for mode 1 initial target/impactor creation

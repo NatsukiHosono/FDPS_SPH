@@ -221,7 +221,7 @@ namespace STD {
         void finalKick(const PS::F64 dt_glb) {
             //if(type == FREEZE) return;
             vel = vel_half + 0.5 * dt_glb * (acc + grav);
-            eng = eng_half + 0.5 * dt_glb * eng_dot;  // commented out for energy interpolation testing
+            eng = eng_half + 0.5 * dt_glb * eng_dot;
         }
 
         void dampMotion(double damping) {
