@@ -47,9 +47,10 @@ namespace STD{
         }
         momentum = PS::Comm::getSum(momentum);
         if (PS::Comm::getRank() == 0) {
-            printf("%.16e\n", momentum.x);
-            printf("%.16e\n", momentum.y);
-            printf("%.16e\n", momentum.z);
+            printf("momentum x: %.16e\n", momentum.x);
+            printf("momentum y: %.16e\n", momentum.y);
+            printf("momentum z: %.16e\n", momentum.z);
+            printf("momentum total: %.16e\n", momentum.x + momentum.y + momentum.z);
         }
     };
 
