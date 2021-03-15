@@ -146,6 +146,7 @@ int main(int argc, char* argv[]){
 			std::cout << "step = " << sysinfo.step << std::endl;
 			std::cout << "//================================" << std::endl;
 		}
+		PTCL::CalcMomentum(sph_system);
 		if(sysinfo.step % 30 == 0){
 			OutputBinary(sph_system, sysinfo, output_directory);
 		}

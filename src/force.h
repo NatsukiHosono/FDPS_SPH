@@ -40,6 +40,19 @@ namespace STD{
         }
     }
 
+    void CalcMomentum(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        PS::F64vec momentum = 0; // vector
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            momentum += sph_system[i].vel; // specific momentum, i.e. normalized to mass
+        }
+        momentum = PS::Comm::getSum(momentum);
+        if (PS::Comm::getRank() == 0) {
+            printf("%.16e\n", momentum.x);
+            printf("%.16e\n", momentum.y);
+            printf("%.16e\n", momentum.z);
+        }
+    };
+
 	class CalcDerivative{
 		kernel_t kernel;
 		public:
