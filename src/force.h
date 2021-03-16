@@ -42,6 +42,7 @@ namespace STD{
 
     void CalcMomentum(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
         PS::F64vec momentum = 0; // vector
+        #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             momentum += sph_system[i].vel; // specific momentum, i.e. normalized to mass
         }
@@ -54,7 +55,86 @@ namespace STD{
         }
     };
 
-	class CalcDerivative{
+    void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        const double mantle_entropy = 3000;
+        const double core_entropy = 1750;
+        #pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            if (sph_system[i].tag % 2 == 0) {
+                sph_system[i].ent = mantle_entropy;
+            } else {
+                sph_system[i].ent = core_entropy;
+            }
+        }
+    }
+
+    void CalcEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        unsigned int iron_grid_size = 120;
+        unsigned int silicate_grid_size = 120;
+        #pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            if (sph_system[i].tag % 2 == 0) {
+                sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng, silicate_grid_size);
+            } else {
+                sph_system[i].ent = sph_system[i].EoS->Entropy(sph_system[i].dens, sph_system[i].eng, iron_grid_size);
+            }
+        }
+    }
+
+    void CalcTemperature(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        unsigned int iron_grid_size = 120;
+        unsigned int silicate_grid_size = 120;
+        #pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            if (sph_system[i].tag % 2 == 0) {
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    silicate_grid_size);
+            } else {
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    iron_grid_size);
+            }
+        }
+    }
+
+    void Mode2CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        unsigned int iron_grid_size = 120;
+        unsigned int silicate_grid_size = 120;
+        const double mantle_entropy = 3000;
+        const double core_entropy = 1750;
+        #pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            if (sph_system[i].tag % 2 == 0) {
+                sph_system[i].ent = mantle_entropy;
+                sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
+                                                                      silicate_grid_size);
+                sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng,
+                                                                 silicate_grid_size);
+                if (sph_system[i].pres < 0) {
+                    sph_system[i].pres = 0;
+                };
+                sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng,
+                                                                   silicate_grid_size);
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    silicate_grid_size);
+            } else {
+                sph_system[i].ent = core_entropy;
+                sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
+                                                                      iron_grid_size);
+                sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng,
+                                                                 iron_grid_size);
+                if (sph_system[i].pres < 0) {
+                    sph_system[i].pres = 0;
+                };
+                sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng,
+                                                                   iron_grid_size);
+                sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
+                                                                    iron_grid_size);
+            }
+        }
+    }
+
+
+    class CalcDerivative{
 		kernel_t kernel;
 		public:
 		void operator () (const EPI::Drvt* ep_i, const PS::S32 Nip, const EPJ::Drvt* ep_j, const PS::S32 Njp, RESULT::Drvt* const drvt){
