@@ -81,6 +81,20 @@ namespace STD{
 		}
 	};
 
+    void CalcMomentum(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        PS::F64vec momentum = 0; // vector#pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            momentum += sph_system[i].vel; // specific momentum, i.e. normalized to mass
+        }
+        momentum = PS::Comm::getSum(momentum);
+        if (PS::Comm::getRank() == 0) {
+            printf("momentum x: %.16e\n", momentum.x);
+            printf("momentum y: %.16e\n", momentum.y);
+            printf("momentum z: %.16e\n", momentum.z);
+            printf("momentum total: %.16e\n", momentum.x + momentum.y + momentum.z);
+        }
+    };
+
 	template <class TPtclJ> class CalcGravityForce{
 		static const double G;
 		public:
@@ -129,6 +143,20 @@ namespace DI{
 			sph_system[i].snds = sph_system[i].EoS->SoundSpeed(sph_system[i].dens, sph_system[i].eng);
 		}
 	}
+
+    void CalcMomentum(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+        PS::F64vec momentum = 0; // vector#pragma omp parallel for
+        for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
+            momentum += sph_system[i].vel; // specific momentum, i.e. normalized to mass
+        }
+        momentum = PS::Comm::getSum(momentum);
+        if (PS::Comm::getRank() == 0) {
+            printf("momentum x: %.16e\n", momentum.x);
+            printf("momentum y: %.16e\n", momentum.y);
+            printf("momentum z: %.16e\n", momentum.z);
+            printf("momentum total: %.16e\n", momentum.x + momentum.y + momentum.z);
+        }
+    };
 
 	class CalcDerivative{
 		kernel_t kernel;

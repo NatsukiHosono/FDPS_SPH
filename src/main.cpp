@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
 	dinfo.initialize();
 	system_t sysinfo;
 
-    const double END_TIME = 1.0e+4;
+    const double END_TIME = 1.0e+5;
 
 	sph_system.setAverageTargetNumberOfSampleParticlePerProcess(200);
 	//////////////////
@@ -129,6 +129,7 @@ int main(int argc, char* argv[]){
 		if(sysinfo.step % 30 == 0){
 			OutputBinary(sph_system, sysinfo);
 		}
+		PTCL::CalcMomentum(sph_system);
 	}
 
 	PS::Finalize();
