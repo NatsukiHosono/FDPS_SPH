@@ -29,6 +29,8 @@ int main(int argc, char* argv[]){
 	dinfo.initialize();
 	system_t sysinfo;
 
+    const double END_TIME = 1.0e+4;
+
 	sph_system.setAverageTargetNumberOfSampleParticlePerProcess(200);
 	//////////////////
 	//Setup Initial
@@ -47,7 +49,7 @@ int main(int argc, char* argv[]){
 	for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 		sph_system[i].initialize();
 	}
-	OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::END_TIME);
+	OutputFileWithTimeInterval(sph_system, sysinfo, END_TIME);
 
 	//Dom. info
 	dinfo.decomposeDomainAll(sph_system);
@@ -78,7 +80,7 @@ int main(int argc, char* argv[]){
 	#endif
 	sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
 	PROBLEM::addExternalForce(sph_system, sysinfo);
-	OutputFileWithTimeInterval(sph_system, sysinfo, PROBLEM::END_TIME);
+	OutputFileWithTimeInterval(sph_system, sysinfo, END_TIME);
 
 	if(PS::Comm::getRank() == 0){
 		std::cout << "//================================" << std::endl;
@@ -87,7 +89,7 @@ int main(int argc, char* argv[]){
 		std::cout << "//================================" << std::endl;
 	}
 
-	while(sysinfo.time < PROBLEM::END_TIME){
+	while(sysinfo.time < END_TIME){
 		#pragma omp parallel for
 		for(int i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			sph_system[i].initialKick(sysinfo.dt);
@@ -116,7 +118,7 @@ int main(int argc, char* argv[]){
 		}
 		PROBLEM::postTimestepProcess(sph_system, sysinfo);
 		sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
-		OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, PROBLEM::END_TIME);
+		OutputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, END_TIME);
 		++ sysinfo.step;
 		if(PS::Comm::getRank() == 0){
 			std::cout << "//================================" << std::endl;

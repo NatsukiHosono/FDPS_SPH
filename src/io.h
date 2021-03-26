@@ -24,7 +24,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 		header.time = sysinfo.time;
 		header.Nbody = sph_system.getNumberOfParticleLocal();
 		char filename[256];
-		sprintf(filename, "result/%05d", sysinfo.output_id);
+		sprintf(filename, "result/results.%05d", sysinfo.output_id);
 		sph_system.writeParticleAscii(filename, "%s_%05d_%05d.dat", header);
 		if(PS::Comm::getRank() == 0){
 			std::cout << "//================================" << std::endl;
