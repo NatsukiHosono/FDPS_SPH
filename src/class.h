@@ -276,8 +276,8 @@ namespace STD{
 				return this->pos;
 			}
 			PS::F64 getEps2(void) const{
-				//return (1.0e-4 * 6400.0e+3) * (1.0e-4 * 6400.0e+3);//GI Unit
-				return eps2;
+				return (1.0e-2 * 6400.0e+3) * (1.0e-2 * 6400.0e+3);//GI Unit
+				//return eps2;
 			}
 			void copyFromFP(const RealPtcl& rp){
 				pos = rp.pos;

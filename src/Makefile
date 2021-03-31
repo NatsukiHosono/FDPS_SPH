@@ -2,7 +2,7 @@ PS_PATH = -I ../FDPS/src/
 CC = g++
 #CC = g++-mp-6
 #CC = mpicxx-openmpi-gcc6
-CFLAGS = -O3 -ffast-math -funroll-loops 
+CFLAGS = -O3 -ffast-math -funroll-loops -std=c++11
 CFLAGS += -DPARTICLE_SIMULATOR_THREAD_PARALLEL -fopenmp
 #CFLAGS += -DPARTICLE_SIMULATOR_MPI_PARALLEL
 #CFLAGS += -Wall -Wformat=2 -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wfloat-equal -Wpointer-arith

@@ -9,7 +9,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	public:
 	static constexpr double END_TIME = 1.0e+4;
 	static void setupIC(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo, PS::DomainInfo& dinfo){
-		const bool createTarget = false;//set false if you make an impactor.
+		const bool createTarget = true;//set false if you make an impactor.
 		const double Corr = .98;//Correction Term
 		/////////
 		//place ptcls
@@ -143,7 +143,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
-					ith.setPressure(&Granite);
+					ith.setPressure(&Dunite);
 					ith.tag = 0;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
 				}
@@ -182,7 +182,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 					ith.mass = tarMass + impMass;
 					ith.eng  = 0.1 * Grav * tarMass / tarRadi;
 					ith.id   = id++;
-					ith.setPressure(&Granite);
+					ith.setPressure(&Dunite);
 					ith.tag = 2;
 					if(ith.id / NptclIn1Node == PS::Comm::getRank()) imp.push_back(ith);
 				}
@@ -234,10 +234,32 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 		std::cout << "setup..." << std::endl;
 	}
 
+	static void postTimestepProcess(PS::ParticleSystem<Ptcl>& sph_system, system_t& sys){
+		if(1){
+			//Shift Origin
+			PS::F64vec com_loc = 0;//center of mass
+			PS::F64vec mom_loc = 0;//moment
+			PS::F64 mass_loc = 0;//
+			PS::F64 eng_loc = 0;//
+			for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+				com_loc += sph_system[i].pos * sph_system[i].mass;
+				mom_loc += sph_system[i].vel * sph_system[i].mass;
+				mass_loc += sph_system[i].mass;
+				eng_loc += sph_system[i].mass * (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
+			}
+			PS::F64vec com = PS::Comm::getSum(com_loc);
+			PS::F64vec mom = PS::Comm::getSum(mom_loc);
+			PS::F64 mass = PS::Comm::getSum(mass_loc);
+			PS::F64 eng = PS::Comm::getSum(eng_loc);
+			std::cout << "Mom: " << mom << std::endl;
+			std::cout << "Eng: " << eng << std::endl;
+		}
+	}
+
 	static void setEoS(PS::ParticleSystem<Ptcl>& sph_system){
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			if(sph_system[i].tag % 2 == 0){
-				sph_system[i].setPressure(&Granite);
+				sph_system[i].setPressure(&Dunite);
 			}else{
 				sph_system[i].setPressure(&Iron);
 			}
@@ -245,6 +267,7 @@ template <class Ptcl> class GI : public Problem<Ptcl>{
 	}
 
 	static void addExternalForce(PS::ParticleSystem<Ptcl>& sph_system, system_t& sysinfo){
+		return;
 		if(sysinfo.time >= 5000) return;
 		std::cout << "Add Ext. Force!!!" << std::endl;
 		#pragma omp parallel for
@@ -457,7 +480,7 @@ template <class Ptcl> class GI_imp : public Problem<Ptcl>{
 		#pragma omp parallel for
 		for(PS::U64 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
 			if(sph_system[i].tag % 2 == 0){
-				sph_system[i].setPressure(&Granite);
+				sph_system[i].setPressure(&Dunite);
 			}else{
 				sph_system[i].setPressure(&Iron);
 			}

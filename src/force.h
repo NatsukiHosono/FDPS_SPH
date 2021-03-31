@@ -91,7 +91,7 @@ namespace STD{
 					const TPtclJ& jth = ep_j[j];
 					const PS::F64vec dr = ith.pos - jth.pos;
 					const PS::F64 dr2 = dr * dr;
-					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1.0e-6);
+					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + ith.getEps2());
 					const PS::F64 m_dr3_inv = jth.mass * math::pow3(dr_inv);
 					grav[i].acc -= G * m_dr3_inv * dr;
 					grav[i].pot -= G * jth.mass * dr_inv;
@@ -194,7 +194,7 @@ namespace DI{
 					const TPtclJ& jth = ep_j[j];
 					const PS::F64vec dr = ith.pos - jth.pos;
 					const PS::F64 dr2 = dr * dr;
-					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1.0e-6);
+					const PS::F64 dr_inv = 1.0 / sqrt(dr2 + ith.getEps2());
 					const PS::F64 m_dr3_inv = jth.mass * math::pow3(dr_inv);
 					grav[i].acc -= G * m_dr3_inv * dr;
 					grav[i].pot -= G * jth.mass * dr_inv;
