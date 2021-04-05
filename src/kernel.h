@@ -36,11 +36,16 @@ struct WendlandC6{
         const PS::F64 H = supportRadius() * h;
         const PS::F64 s = sqrt(dr * dr) / H;
         PS::F64 r_value;
-        r_value = ((65.0 / 12.0) * math::pow12(s)) - ((519.0 / 11.0) * math::pow11(s)) +
-                ((906.0 / 5.0) * math::pow10(s)) - ((1204 / 3.0) * math::pow9(s)) + ((2247.0 / 4.0) * math::pow8(s)) -
-                (510.0 * math::pow7(s)) + (294.0 * math::pow6(s)) - ((492.0 / 5.0) * math::pow5(s)) +
-                ((57.0 / 4.0) * math::pow4(s)) + (math::pow3(s) / 3);
-        r_value *= (1365.0 / 16.0);
+        if (s > 2) {
+            return 0.0;
+        } else {
+            r_value = ((65.0 / 12.0) * math::pow12(s)) - ((519.0 / 11.0) * math::pow11(s)) +
+                      ((906.0 / 5.0) * math::pow10(s)) - ((1204 / 3.0) * math::pow9(s)) +
+                      ((2247.0 / 4.0) * math::pow8(s)) -
+                      (510.0 * math::pow7(s)) + (294.0 * math::pow6(s)) - ((492.0 / 5.0) * math::pow5(s)) +
+                      ((57.0 / 4.0) * math::pow4(s)) + (math::pow3(s) / 3);
+            r_value *= (1365.0 / 16.0);
+        }
         return r_value;
 	}
 };

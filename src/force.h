@@ -106,40 +106,10 @@ namespace STD {
         }
     };
 
-    template<class TPtclJ>
-    class CalcGravityForce {
-        static const double G;
-        kernel_t kernel;
-    public:
-        void operator()(const EPI::Grav *const __restrict ep_i, const PS::S32 Nip, const TPtclJ *const __restrict ep_j,
-                        const PS::S32 Njp, RESULT::Grav *const grav) {
-            for (PS::S32 i = 0; i < Nip; ++i) {  // loop through ith particles
-                const EPI::Grav &ith = ep_i[i];
-                for (PS::S32 j = 0; j < Njp; ++j) { // loop through jth particles
-                    const TPtclJ &jth = ep_j[j];
-                    const EPI::Grav &jth2 = ep_i[j];
-                    const PS::F64vec dr = ith.pos - jth.pos;
-                    const PS::F64 dr2 = dr * dr;
-                    PS::F64 mj_smth = 0.0;
-                    const PS::F64 abs_dist = sqrt(dr2);
-                    if (abs_dist < (2 * ith.smth)) {
-                        mj_smth = jth.mass;
-                    } else {
-                        mj_smth = (4.0 / 3.0) * 3.1415 * jth2.dens * math::pow3(abs_dist);
-                    }
-                    std::cout << jth2.dens << std::endl;
-                    const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1e-6);
-                    const PS::F64 m_dr3_inv = mj_smth * math::pow3(dr_inv);
-                    grav[i].acc -= G * m_dr3_inv * dr;
-                    grav[i].pot -= G * mj_smth * dr_inv;
-                }
-            }
-        }
-    };
-
 //    template<class TPtclJ>
 //    class CalcGravityForce {
 //        static const double G;
+//        kernel_t kernel;
 //    public:
 //        void operator()(const EPI::Grav *const __restrict ep_i, const PS::S32 Nip, const TPtclJ *const __restrict ep_j,
 //                        const PS::S32 Njp, RESULT::Grav *const grav) {
@@ -150,13 +120,35 @@ namespace STD {
 //                    const PS::F64vec dr = ith.pos - jth.pos;
 //                    const PS::F64 dr2 = dr * dr;
 //                    const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1e-6);
-//                    const PS::F64 m_dr3_inv = jth.mass * math::pow3(dr_inv);
+//                    const PS::F64 mj_smth = jth.mass * kernel.intW(dr, ith.smth);
+//                    const PS::F64 m_dr3_inv = mj_smth * math::pow3(dr_inv);
 //                    grav[i].acc -= G * m_dr3_inv * dr;
 //                    grav[i].pot -= G * jth.mass * dr_inv;
 //                }
 //            }
 //        }
 //    };
+
+    template<class TPtclJ>
+    class CalcGravityForce {
+        static const double G;
+    public:
+        void operator()(const EPI::Grav *const __restrict ep_i, const PS::S32 Nip, const TPtclJ *const __restrict ep_j,
+                        const PS::S32 Njp, RESULT::Grav *const grav) {
+            for (PS::S32 i = 0; i < Nip; ++i) {
+                const EPI::Grav &ith = ep_i[i];
+                for (PS::S32 j = 0; j < Njp; ++j) {
+                    const TPtclJ &jth = ep_j[j];
+                    const PS::F64vec dr = ith.pos - jth.pos;
+                    const PS::F64 dr2 = dr * dr;
+                    const PS::F64 dr_inv = 1.0 / sqrt(dr2 + 1e-6);
+                    const PS::F64 m_dr3_inv = jth.mass * math::pow3(dr_inv);
+                    grav[i].acc -= G * m_dr3_inv * dr;
+                    grav[i].pot -= G * jth.mass * dr_inv;
+                }
+            }
+        }
+    };
 
     template<class TPtclJ>
     const double CalcGravityForce<TPtclJ>::G = 6.67e-11;

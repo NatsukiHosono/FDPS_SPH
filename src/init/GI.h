@@ -1,6 +1,6 @@
 #include "../parse.h"
 
-#define SELF_GRAVITY
+//#define SELF_GRAVITY
 #define FLAG_GI
 #ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
 #error
