@@ -13,7 +13,7 @@ struct WendlandC6{
 		r_value *= (78./7.) / (H * H * math::pi);
 		#else
 		r_value *= (1365./64.) / (H * H * H * math::pi);
-		#endif
+        #endif
 		return r_value;
 	}
 	//gradW
@@ -31,6 +31,25 @@ struct WendlandC6{
 	}
 	static PS::F64 supportRadius(){
 		return 2.5;
+	}
+	PS::F64 intWs2(const PS::F64vec dr, const PS::F64 h) const {
+        // int_0^s_ij W(s) s^2 ds
+        const PS::F64 H = supportRadius() * h;
+        const PS::F64 s = sqrt(dr * dr) / H;
+        const PS::F64 coeff = (1.0 / (64.0 * math::pi * math::pow3(H)));
+        const PS::F64 var1 = ((624.0 * math::pow2(s)) - (4851.0 * s) + 16016.0);
+        const PS::F64 var2 = s * var1 - 28665.0;
+        const PS::F64 var3 = (5.0 * s) * var2 + 144144.0;
+        const PS::F64 var4 = s * var3 - 70070.0;
+        const PS::F64 var5 = var4 * math::pow6(s);
+        PS::F64 r_value;
+        r_value = math::pow3(s) * ((12870.0 * math::pow4(s)) - (3003.0 * math::pow2(s)) + var5 + 455.0);
+        #ifdef PARTICLE_SIMULATOR_TWO_DIMENSION
+        r_value *= (78./7.) / (H * H * math::pi);
+        #else
+        r_value *= coeff;
+        #endif
+        return r_value;
 	}
 };
 

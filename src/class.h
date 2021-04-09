@@ -277,6 +277,8 @@ namespace STD{
 			PS::F64vec pos;
 			PS::F64    eps2;
 			PS::S64    id;
+            PS::F64    smth;
+            PS::F64    mass;
 			PS::F64vec getPos() const{
 				return this->pos;
 			}
@@ -289,6 +291,8 @@ namespace STD{
 				id  = rp.id;
 				//eps2 = 1.0e-2 * rp.smth * rp.smth;
 				eps2 = rp.smth * rp.smth;
+				smth = rp.smth;
+				mass = rp.mass;
 			}
 		};
 	}
