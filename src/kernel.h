@@ -36,6 +36,9 @@ struct WendlandC6{
         // int_0^s_ij W(s) s^2 ds
         const PS::F64 H = supportRadius() * h;
         const PS::F64 s = sqrt(dr * dr) / H;
+        if ((1 - s) < 0.0) {
+            return 0.0;
+        }
         const PS::F64 coeff = (1.0 / (64.0 * math::pi * math::pow3(H)));
         const PS::F64 var1 = ((624.0 * math::pow2(s)) - (4851.0 * s) + 16016.0);
         const PS::F64 var2 = s * var1 - 28665.0;
