@@ -204,12 +204,15 @@ namespace STD{
                     const PS::F64 dr_inv = 1.0 / sqrt(dr2 + ith.getEps2());
                     const PS::F64 H = kernel.supportRadius() * ith.smth;
                     const PS::F64 m_j = 4.0 * math::pi * math::pow3(H) * jth.mass * kernel.intWs2(dr, ith.smth);
+                    if (m_j == 0) {
+                        m_j = jth.mass;
+                    }
                     const PS::F64 m_dr3_inv = m_j * math::pow3(dr_inv);
                     grav[i].acc -= G * m_dr3_inv * dr;
                     grav[i].pot -= G * ith.mass * dr_inv;
-                    if (m_j > jth.mass) {
-                        std::cout << "m " << jth.mass << "m_j " << m_j << "h " << ith.smth << "dr " << sqrt(dr2) << "W " << kernel.intWs2(dr, ith.smth) << std::endl;
-                    }
+//                    if (m_j > jth.mass) {
+//                        std::cout << "m " << jth.mass << "m_j " << m_j << "h " << ith.smth << "dr " << sqrt(dr2) << "W " << kernel.intWs2(dr, ith.smth) << std::endl;
+//                    }
                 }
             }
         }
