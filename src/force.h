@@ -207,6 +207,9 @@ namespace STD{
                     const PS::F64 m_dr3_inv = m_j * math::pow3(dr_inv);
                     grav[i].acc -= G * m_dr3_inv * dr;
                     grav[i].pot -= G * ith.mass * dr_inv;
+                    if (m_j > jth.mass) {
+                        std::cout << "m " << jth.mass << "m_j " << m_j << "h " << ith.smth << "dr " << sqrt(dr2) << "W " << kernel.intWs2(dr, ith.smth) << std::endl;
+                    }
                 }
             }
         }
