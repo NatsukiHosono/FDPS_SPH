@@ -520,6 +520,8 @@ namespace DI {
         PS::F64vec pos, vel, acc;
         PS::F64 dens, dens_smth;//DENSity
         PS::F64 eng; //ENerGy
+        PS::F64 ent; //ENtropy
+        PS::F64 temp; //Temperature
         PS::F64 pres_smth;//PRESsure
         PS::F64 smth;//SMooTHing length
         PS::F64 snds; //SouND Speed
