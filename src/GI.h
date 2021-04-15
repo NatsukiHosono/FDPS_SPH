@@ -129,10 +129,10 @@ public:
                 }
             }
             //accumulate
-//            pos_tar = PS::Comm::getSum(pos_tar);
-//            pos_imp = PS::Comm::getSum(pos_imp);
-//            mass_tar = PS::Comm::getSum(mass_tar);
-//            mass_imp = PS::Comm::getSum(mass_imp);
+            pos_tar = PS::Comm::getSum(pos_tar);
+            pos_imp = PS::Comm::getSum(pos_imp);
+            mass_tar = PS::Comm::getSum(mass_tar);
+            mass_imp = PS::Comm::getSum(mass_imp);
             mass_total = mass_tar + mass_imp;
             pos_tar /= mass_tar;
             pos_imp /= mass_imp;
