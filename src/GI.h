@@ -59,7 +59,6 @@ public:
             damping = parameter_file.getValueOf("damping", 1.0);
 //            impactor_fname = parameter_file.getValueOf("impactor_fname", "imp.dat");
 //            target_fname = parameter_file.getValueOf("target_fname", "tar.dat");
-
             if (PS::Comm::getRank() != 0) return;
             std::vector<Ptcl> tar, imp;
             {
@@ -129,10 +128,10 @@ public:
                 }
             }
             //accumulate
-            pos_tar = PS::Comm::getSum(pos_tar);
-            pos_imp = PS::Comm::getSum(pos_imp);
-            mass_tar = PS::Comm::getSum(mass_tar);
-            mass_imp = PS::Comm::getSum(mass_imp);
+//            pos_tar = PS::Comm::getSum(pos_tar);
+//            pos_imp = PS::Comm::getSum(pos_imp);
+//            mass_tar = PS::Comm::getSum(mass_tar);
+//            mass_imp = PS::Comm::getSum(mass_imp);
             mass_total = mass_tar + mass_imp;
             pos_tar /= mass_tar;
             pos_imp /= mass_imp;
