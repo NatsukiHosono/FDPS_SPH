@@ -202,6 +202,12 @@ public:
             std::cout << "angle = " << impAngle << std::endl;
 
             std::cout << "setup..." << std::endl;
+
+
+
+
+
+
         } else if (mode == 2) {
             const double Corr = .98;//Correction Term
 
@@ -337,7 +343,7 @@ public:
                         ith.dens = (tarMass - tarCoreMass) / (4.0 / 3.0 * math::pi * (tarRadi * tarRadi * tarRadi -
                                                                                       tarCoreRadi * tarCoreRadi *
                                                                                       tarCoreRadi));
-                        ith.mass = tarMass + impMass;
+                        ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
                         ith.setPressure(&ADunite);
@@ -375,7 +381,7 @@ public:
                         ith.dens = tarCoreMass /
                                    (4.0 / 3.0 * math::pi * tarCoreRadi * tarCoreRadi * tarCoreRadi * Corr * Corr *
                                     Corr);
-                        ith.mass = tarMass + impMass;
+                        ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
                         ith.setPressure(&Iron);
