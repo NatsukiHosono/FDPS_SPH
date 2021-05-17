@@ -144,7 +144,7 @@ public:
                 }
             }
 
-            const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
+//            const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
             const double v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
@@ -157,6 +157,7 @@ public:
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
 
 //            const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
+            double x_init = cos(impAngle) * (radi_imp + radi_tar);
             double y_init = sin(impAngle) * (radi_imp + radi_tar);
 //            double v_init = 0;
 //            std::cout << "v_esc = " << v_esc << std::endl;
