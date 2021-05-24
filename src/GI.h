@@ -150,8 +150,13 @@ public:
             const double v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
 
             const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
-            const double v_impactor = (mass_imp / mass_total) * v_imp;
-            const double v_target = (mass_tar / mass_total) * v_imp;
+
+            // the momentum balance must be M_imp  * M_tar/Mtotal * Vimp - M_tar * M_imp/Mtotal * Vimp = 0
+            // where p_imp = M_imp  * M_tar/Mtotal * Vimp
+            // and p_tar = M_tar * M_imp/Mtotal * Vimp
+            // such that p_imp - p_tar = 0
+            const double v_impactor = (mass_tar / mass_total) * v_imp;
+            const double v_target = (mass_imp / mass_total) * v_imp;
 
             PS::F64 impAngle =
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
