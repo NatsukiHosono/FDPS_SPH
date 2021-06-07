@@ -34,7 +34,7 @@ public:
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&ADunite);
+                sph_system[i].setPressure(&AGranite);
             } else {
                 sph_system[i].setPressure(&Iron);
             }
@@ -164,11 +164,6 @@ public:
 //            const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
             double x_init = cos(impAngle) * (radi_imp + radi_tar);
             double y_init = sin(impAngle) * (radi_imp + radi_tar);
-//            double v_init = 0;
-//            std::cout << "v_esc = " << v_esc << std::endl;
-//            for (int it = 0; it < 10; ++it) {
-//                v_init = sqrt(v_inf * v_inf + 2.0 * Grav * mass_tar / sqrt(x_init * x_init + y_init * y_init));
-//            }
 
 //            std::cout << "v_init = " << v_init << std::endl;
             std::cout << "y_init / Rtar = " << y_init / radi_tar << std::endl;
@@ -177,6 +172,9 @@ public:
             //shift'em
             for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
                 // target particles
+                sph_system[i].vel.x = 0.0;
+                sph_system[i].vel.y = 0.0;
+                sph_system[i].vel.z = 0.0;
                 if (sph_system[i].tag >= 2) { // this currently sets parameters for impactor-tagged particles
                     sph_system[i].pos -= pos_imp;
                     sph_system[i].pos.x += x_init;
@@ -348,7 +346,7 @@ public:
                         ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
-                        ith.setPressure(&ADunite);
+                        ith.setPressure(&AGranite);
                         ith.tag = 0;
 
                         if (removal_list.count(index)) {
@@ -432,7 +430,7 @@ public:
             std::cout << "    mean density     : " << tarMass / (4.0 * math::pi / 3.0 * tarRadi * tarRadi * tarRadi)
                       << std::endl;
 
-            assert(Nptcl == tarNptcl + impNptcl);
+            //assert(Nptcl == tarNptcl + impNptcl);
 
             std::cout << "Total number of particles:" << Nptcl << std::endl;
 
