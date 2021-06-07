@@ -34,7 +34,7 @@ public:
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&AGranite);
+                sph_system[i].setPressure(&ADunite);
             } else {
                 sph_system[i].setPressure(&Iron);
             }
@@ -147,23 +147,23 @@ public:
 //            const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
-            const double v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
+            PS::F64 v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
 
-            const double v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
+            PS::F64 v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
 
             // the momentum balance must be M_imp  * M_tar/Mtotal * Vimp - M_tar * M_imp/Mtotal * Vimp = 0
             // where p_imp = M_imp  * M_tar/Mtotal * Vimp
             // and p_tar = M_tar * M_imp/Mtotal * Vimp
             // such that p_imp - p_tar = 0
-            const double v_impactor = (mass_tar / mass_total) * v_imp;
-            const double v_target = (mass_imp / mass_total) * v_imp;
+            PS::F64 v_impactor = (mass_tar / mass_total) * v_imp;
+            PS::F64 v_target = (mass_imp / mass_total) * v_imp;
 
             PS::F64 impAngle =
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
 
 //            const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
-            double x_init = cos(impAngle) * (radi_imp + radi_tar);
-            double y_init = sin(impAngle) * (radi_imp + radi_tar);
+            PS::F64 x_init = cos(impAngle) * (radi_imp + radi_tar);
+            PS::F64 y_init = sin(impAngle) * (radi_imp + radi_tar);
 
 //            std::cout << "v_init = " << v_init << std::endl;
             std::cout << "y_init / Rtar = " << y_init / radi_tar << std::endl;
@@ -346,7 +346,7 @@ public:
                         ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
-                        ith.setPressure(&AGranite);
+                        ith.setPressure(&ADunite);
                         ith.tag = 0;
 
                         if (removal_list.count(index)) {
