@@ -448,11 +448,12 @@ public:
     static void postTimestepProcess(PS::ParticleSystem<Ptcl>& sph_system, system_t& sys){
         if(1){
             //Shift Origin
-            PS::F64vec com_loc = 0;//center of mass
-            PS::F64vec mom_loc = 0;//moment
-            PS::F64 mass_loc = 0;//
-            PS::F64 eng_loc = 0;//
-            for(PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
+            PS::F64vec com_loc;  //center of mass
+            PS::F64vec mom_loc;  //moment
+            PS::F64vec mom_ang_loc; // angular momentum
+            PS::F64 mass_loc = 0;  // mass
+            PS::F64 eng_loc = 0;  // energy
+            for (PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
                 com_loc += sph_system[i].pos * sph_system[i].mass;
                 mom_loc += sph_system[i].vel * sph_system[i].mass;
                 mass_loc += sph_system[i].mass;
@@ -461,12 +462,28 @@ public:
             PS::F64vec com = PS::Comm::getSum(com_loc);
             PS::F64vec mom = PS::Comm::getSum(mom_loc);
             PS::F64 mass = PS::Comm::getSum(mass_loc);
+            com /= mass;
             PS::F64 eng = PS::Comm::getSum(eng_loc);
             PS::F64 mom2 = mom * mom;
             PS::F64 total_mom = sqrt(mom2);
-            std::cout << "Mom: " << mom << std::endl;
-            std::cout << "Total Mom: " << total_mom << std::endl;
-            std::cout << "Eng: " << eng << std::endl;
+            for (PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i) {
+                PS::F64 x = sph_system[i].pos.x - com.x;
+                PS::F64 y = sph_system[i].pos.y - com.y;
+                PS::F64 z = sph_system[i].pos.z - com.x;
+                mom_ang_loc.x += sph_system[i].mass * ((y * sph_system[i].vel.z) - (z * sph_system[i].vel.y));
+                mom_ang_loc.y += sph_system[i].mass * ((x * sph_system[i].vel.z) - (z * sph_system[i].vel.x));
+                mom_ang_loc.z += sph_system[i].mass * ((x * sph_system[i].vel.y) - (y * sph_system[i].vel.x));
+            }
+            PS::F64vec mom_ang = PS::Comm::getSum(mom_ang_loc);
+            PS::F64 mom_ang2 = mom_ang * mom_ang;
+            PS::F64 total_mom_ang = sqrt(mom_ang2);
+            if (PS::Comm::getRank() == 0) {
+                std::cout << "Linear Momentum: " << mom << std::endl;
+                std::cout << "Total Linear Momentum: " << total_mom << std::endl;
+                std::cout << "Angular Momentum: " << mom_ang << std::endl;
+                std::cout << "Total Angular Momentum: " << total_mom_ang << std::endl;
+                std::cout << "Energy: " << eng << std::endl;
+            }
         }
     }
 };

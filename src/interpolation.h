@@ -32,10 +32,10 @@ class BilinearInterpolation {
 private:
 //    create a static function that returns a pair of index values of the nearest neighbor values
     static std::pair<unsigned int, unsigned int> get_neighbors(
-            double val1, //val1 is the value which will get a nearest neighbor from var1_vector
-            double val2, //val1 is the value which will get a nearest neighbor from var2_vector
-            const std::vector<double> &var1_vector, //the vector from with var1 will be interpolated
-            const std::vector<double> &var2_vector //the vector from with var2 will be interpolated
+            PS::F64 val1, //val1 is the value which will get a nearest neighbor from var1_vector
+            PS::F64 val2, //val1 is the value which will get a nearest neighbor from var2_vector
+            const std::vector<PS::F64> &var1_vector, //the vector from with var1 will be interpolated
+            const std::vector<PS::F64> &var2_vector //the vector from with var2 will be interpolated
     ) {
         auto line = std::lower_bound(var1_vector.begin(), var1_vector.end(),
                                      val1); //returns an iterator that points to the first value in var1_vector that is not < val1
@@ -58,13 +58,13 @@ private:
 
 //allow these functions and variables to be externally accessible
 public:
-    static double interpolate(
-            double val1,
-            double val2,
-            const std::vector<double> &var1_vector,
-            const std::vector<double> &var2_vector,
+    static PS::F64 interpolate(
+            PS::F64 val1,
+            PS::F64 val2,
+            const std::vector<PS::F64> &var1_vector,
+            const std::vector<PS::F64> &var2_vector,
             const unsigned int property_index,
-            const std::vector<std::vector<std::array<double, 6>>> &eos_data
+            const std::vector<std::vector<std::array<PS::F64, 6>>> &eos_data
     ) {
         std::pair<unsigned int, unsigned int> neighbors;
 
@@ -89,7 +89,7 @@ public:
                              (var2_vector[neighbors.second] - var2_vector[neighbors.second - 1]);
 
             // use these coordinates for a bilinear interpolation
-            const double interpolated_value =
+            const PS::F64 interpolated_value =
                     (1 - xi) * (1 - eta) * eos_data[neighbors.first - 1][neighbors.second - 1][property_index] +
                     xi * (1 - eta) * eos_data[neighbors.first][neighbors.second - 1][property_index] +
                     (1 - xi) * eta * eos_data[neighbors.first - 1][neighbors.second][property_index] +
@@ -97,7 +97,7 @@ public:
             return interpolated_value;
         } else {
             // Return the boundary value
-            const double interpolated_value = eos_data[neighbors.first][neighbors.second][property_index];
+            const PS::F64 interpolated_value = eos_data[neighbors.first][neighbors.second][property_index];
             return interpolated_value;
         }
     };
@@ -108,8 +108,8 @@ public:
 class RestrictedBilinearInterpolation {
 private:
     static std::pair<unsigned int, unsigned int> get_neighbors_restricted_indices(
-            double val, //val1 is the value which will get a nearest neighbor from var1_vector
-            const std::vector<double> &var_vector //the vector from with var1 will be interpolated
+            PS::F64 val, //val1 is the value which will get a nearest neighbor from var1_vector
+            const std::vector<PS::F64> &var_vector //the vector from with var1 will be interpolated
     ) {
 
         auto lower_bound = std::lower_bound(var_vector.begin(), var_vector.end(),
@@ -123,8 +123,8 @@ private:
     }
 
     // basic function for calculating directional 1D distances
-    static double calc_distance(double &given_value, double &sample_value) {
-        double distance = given_value - sample_value;
+    static PS::F64 calc_distance(PS::F64 &given_value, PS::F64 &sample_value) {
+        PS::F64 distance = given_value - sample_value;
         return distance;
     }
 
@@ -132,8 +132,8 @@ private:
     // specify "upper" or "lower" bounds for the "upper" or "lower" neighbors
     // these indices will be used to further restrict the var2/var3 vectors for nearest-neighbor searches
     static std::pair<unsigned int, unsigned int> get_neighbors_restricted_indices(
-            const std::vector<double> &v,
-            double value,
+            const std::vector<PS::F64> &v,
+            PS::F64 value,
             unsigned int grid_length,
             const std::string &bound
     ) {
@@ -143,7 +143,7 @@ private:
 
         if (bound == "upper") {
             for (unsigned int a = 0; a < v.size(); a = a + 1) {
-                double val = v[a];
+                PS::F64 val = v[a];
                 if (val >= value) {
                     b1 = a;
                     b2 = a + grid_length;
@@ -154,12 +154,12 @@ private:
                 }
             }
         } else {
-            std::vector<double> reversed_vector(
+            std::vector<PS::F64> reversed_vector(
                     v.size()); // declare a new vector which will be the reversed original vector given in the function
             std::reverse_copy(std::begin(v), std::end(v), std::begin(reversed_vector)); // reverse the vector
 
             for (unsigned int a = 0; a < reversed_vector.size(); a = a + 1) {
-                double val = reversed_vector[a];
+                PS::F64 val = reversed_vector[a];
                 if (val <= value) {
 //                    b2 = v_size - (a - 1) - grid_length - 1;
 //                    b1 = v_size - (a - 1) - (2 * grid_length);
@@ -189,19 +189,19 @@ private:
     // these neighbors are within the upper and lower var1 bounds
     static std::pair<int, int> get_var2_neighbors(
             std::pair<unsigned int, unsigned int> &restricted_indices,
-            const std::vector<double> &v,
-            double &given_var2,
+            const std::vector<PS::F64> &v,
+            PS::F64 &given_var2,
             unsigned int &grid_length
     ) {
-        std::vector<double> var2_v_restricted = slice(v, restricted_indices.first, restricted_indices.second);
+        std::vector<PS::F64> var2_v_restricted = slice(v, restricted_indices.first, restricted_indices.second);
 
         bool initial_calc = true;
-        double min_distance = 0;
+        PS::F64 min_distance = 0;
         unsigned int min_distance_index = 0;
 
         for (unsigned int a = 0; a < var2_v_restricted.size(); a = a + 1) {
-            double val = var2_v_restricted[a];
-            double distance = calc_distance(given_var2, val);
+            PS::F64 val = var2_v_restricted[a];
+            PS::F64 distance = calc_distance(given_var2, val);
             if (initial_calc) {
                 min_distance = distance;
                 min_distance_index = a;
@@ -236,25 +236,25 @@ private:
         }
     };
 
-    static double interpolate_restricted(
-            double &p1, // lower var1 neighbor value
-            double &p2, // upper var1 neighbor value
-            double &s11, // lower var1 neighbor lower var2 neighbor value
-            double &s12, // lower var1 neighbor upper var2 neighbor value
-            double &s21, // upper var1 neighbor lower var2 neighbor value
-            double &s22, // upper var1 neighbor upper var2 neighbor value
-            double &u11, // lower var1 neighbor lower var3 neighbor value
-            double &u12, // lower var1 neighbor upper var3 neighbor value
-            double &u21, // upper var1 neighbor lower var3 neighbor value
-            double &u22, // upper var1 neighbor upper var3 neighbor value
-            double &val1, // the var1 value being interpolated
-            double &val2 // the var2 value being interpolated
+    static PS::F64 interpolate_restricted(
+            PS::F64 &p1, // lower var1 neighbor value
+            PS::F64 &p2, // upper var1 neighbor value
+            PS::F64 &s11, // lower var1 neighbor lower var2 neighbor value
+            PS::F64 &s12, // lower var1 neighbor upper var2 neighbor value
+            PS::F64 &s21, // upper var1 neighbor lower var2 neighbor value
+            PS::F64 &s22, // upper var1 neighbor upper var2 neighbor value
+            PS::F64 &u11, // lower var1 neighbor lower var3 neighbor value
+            PS::F64 &u12, // lower var1 neighbor upper var3 neighbor value
+            PS::F64 &u21, // upper var1 neighbor lower var3 neighbor value
+            PS::F64 &u22, // upper var1 neighbor upper var3 neighbor value
+            PS::F64 &val1, // the var1 value being interpolated
+            PS::F64 &val2 // the var2 value being interpolated
     ) {
 
         // perform a series of 3 linear interpolations in order to arrive at the final interpolated var3 value
-        double u1 = 0.0;
-        double u2 = 0.0;
-        double u = 0.0;
+        PS::F64 u1 = 0.0;
+        PS::F64 u2 = 0.0;
+        PS::F64 u = 0.0;
         if (s11 == s12) {
             u1 = u11;
         } else {
@@ -275,14 +275,14 @@ private:
     };
 
     // a class for performing simple linear interpolations
-    static double linear_interpolate(
-            double &x1,
-            double &x2,
-            double &x,
-            double &q1,
-            double &q2
+    static PS::F64 linear_interpolate(
+            PS::F64 &x1,
+            PS::F64 &x2,
+            PS::F64 &x,
+            PS::F64 &q1,
+            PS::F64 &q2
     ) {
-        double f = (((x2 - x) / (x2 - x1)) * q1) + (((x - x1) / (x2 - x1)) * q2);
+        PS::F64 f = (((x2 - x) / (x2 - x1)) * q1) + (((x - x1) / (x2 - x1)) * q2);
 
         return f;
     };
@@ -290,14 +290,14 @@ private:
 public:
 
     // the public interpolation function for forming the var3 interpolation
-    static double interpolate(
-            double val1,
-            double val2,
-            const std::vector<double> &var1_vector,
-            const std::vector<double> &var2_vector,
-            const std::vector<double> &val3_vector,
+    static PS::F64 interpolate(
+            PS::F64 val1,
+            PS::F64 val2,
+            const std::vector<PS::F64> &var1_vector,
+            const std::vector<PS::F64> &var2_vector,
+            const std::vector<PS::F64> &val3_vector,
             const unsigned int property_index,
-            const std::vector<std::vector<std::array<double, 6>>> &eos_data,
+            const std::vector<std::vector<std::array<PS::F64, 6>>> &eos_data,
             unsigned int grid_length
     ) {
 
@@ -313,20 +313,20 @@ public:
                                              grid_length); // upper var2 neighbors
 
 
-        double var1_vector_lower_neighbor = slice(
+        PS::F64 var1_vector_lower_neighbor = slice(
                 var1_vector, restricted_index_pair_lower_bound.first, restricted_index_pair_lower_bound.second)[0];
-        double var1_vector_upper_neighbor = slice(
+        PS::F64 var1_vector_upper_neighbor = slice(
                 var1_vector, restricted_index_pair_upper_bound.first, restricted_index_pair_upper_bound.second)[0];
-        std::vector<double> var2_vector_restricted_lower = slice(var2_vector,
+        std::vector<PS::F64> var2_vector_restricted_lower = slice(var2_vector,
                                                                  restricted_index_pair_lower_bound.first,
                                                                  restricted_index_pair_lower_bound.second);
-        std::vector<double> var2_vector_restricted_upper = slice(var2_vector,
+        std::vector<PS::F64> var2_vector_restricted_upper = slice(var2_vector,
                                                                  restricted_index_pair_upper_bound.first,
                                                                  restricted_index_pair_upper_bound.second);
-        std::vector<double> val3_vector_restricted_lower = slice(val3_vector,
+        std::vector<PS::F64> val3_vector_restricted_lower = slice(val3_vector,
                                                                  restricted_index_pair_lower_bound.first,
                                                                  restricted_index_pair_lower_bound.second);
-        std::vector<double> val3_vector_restricted_upper = slice(val3_vector,
+        std::vector<PS::F64> val3_vector_restricted_upper = slice(val3_vector,
                                                                  restricted_index_pair_upper_bound.first,
                                                                  restricted_index_pair_upper_bound.second);
 
@@ -347,7 +347,7 @@ public:
 //        std::cout << val2 << std::endl;
 //        std::cout << "~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
-        const double interpolated_value = interpolate_restricted(
+        const PS::F64 interpolated_value = interpolate_restricted(
                 var1_vector_lower_neighbor,
                 var1_vector_upper_neighbor,
                 var2_vector_restricted_lower[neighbors_lower.first],
