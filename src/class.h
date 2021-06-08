@@ -928,7 +928,7 @@ public:
     }
 
     static void addExternalForce(PS::ParticleSystem<Ptcl> &, system_t &) {
-        std::cout << "No Ext. Force" << std::endl;
+        //std::cout << "No Ext. Force" << std::endl;
     }
 
     static void postTimestepProcess(PS::ParticleSystem<Ptcl> &, system_t &) {

@@ -455,7 +455,7 @@ public:
             PS::F64 eng_loc = 0;  // energy
             for (PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i){
                 com_loc += sph_system[i].pos * sph_system[i].mass;
-                mom_loc += sph_system[i].vel * sph_system[i].mass;
+                mom_loc += sph_system[i].vel;
                 mass_loc += sph_system[i].mass;
                 eng_loc += (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
             }
@@ -478,10 +478,10 @@ public:
             PS::F64 mom_ang2 = mom_ang * mom_ang;
             PS::F64 total_mom_ang = sqrt(mom_ang2);
             if (PS::Comm::getRank() == 0) {
-                std::cout << "Specific Linear Momentum: " << mom << std::endl;
-                std::cout << "Specific Total Linear Momentum: " << total_mom << std::endl;
-                std::cout << "Specific Angular Momentum: " << mom_ang << std::endl;
-                std::cout << "Specific Total Angular Momentum: " << total_mom_ang << std::endl;
+                std::cout << "Linear Momentum: " << mom << std::endl;
+                std::cout << "Total Linear Momentum: " << total_mom << std::endl;
+                std::cout << "Angular Momentum: " << mom_ang << std::endl;
+                std::cout << "Total Angular Momentum: " << total_mom_ang << std::endl;
                 std::cout << "Specific Energy: " << eng << std::endl;
             }
         }
