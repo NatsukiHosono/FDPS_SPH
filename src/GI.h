@@ -457,7 +457,7 @@ public:
                 com_loc += sph_system[i].pos * sph_system[i].mass;
                 mom_loc += sph_system[i].vel * sph_system[i].mass;
                 mass_loc += sph_system[i].mass;
-                eng_loc += sph_system[i].mass * (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
+                eng_loc += (sph_system[i].eng + sph_system[i].vel * sph_system[i].vel + sph_system[i].pot);
             }
             PS::F64vec com = PS::Comm::getSum(com_loc);
             PS::F64vec mom = PS::Comm::getSum(mom_loc);
@@ -469,20 +469,20 @@ public:
             for (PS::S32 i = 0 ; i < sph_system.getNumberOfParticleLocal() ; ++ i) {
                 PS::F64 x = sph_system[i].pos.x - com.x;
                 PS::F64 y = sph_system[i].pos.y - com.y;
-                PS::F64 z = sph_system[i].pos.z - com.x;
-                mom_ang_loc.x += sph_system[i].mass * ((y * sph_system[i].vel.z) - (z * sph_system[i].vel.y));
-                mom_ang_loc.y += sph_system[i].mass * ((x * sph_system[i].vel.z) - (z * sph_system[i].vel.x));
-                mom_ang_loc.z += sph_system[i].mass * ((x * sph_system[i].vel.y) - (y * sph_system[i].vel.x));
+                PS::F64 z = sph_system[i].pos.z - com.z;
+                mom_ang_loc.x += ((y * sph_system[i].vel.z) - (z * sph_system[i].vel.y));
+                mom_ang_loc.y += ((x * sph_system[i].vel.z) - (z * sph_system[i].vel.x));
+                mom_ang_loc.z += ((x * sph_system[i].vel.y) - (y * sph_system[i].vel.x));
             }
             PS::F64vec mom_ang = PS::Comm::getSum(mom_ang_loc);
             PS::F64 mom_ang2 = mom_ang * mom_ang;
             PS::F64 total_mom_ang = sqrt(mom_ang2);
             if (PS::Comm::getRank() == 0) {
-                std::cout << "Linear Momentum: " << mom << std::endl;
-                std::cout << "Total Linear Momentum: " << total_mom << std::endl;
-                std::cout << "Angular Momentum: " << mom_ang << std::endl;
-                std::cout << "Total Angular Momentum: " << total_mom_ang << std::endl;
-                std::cout << "Energy: " << eng << std::endl;
+                std::cout << "Specific Linear Momentum: " << mom << std::endl;
+                std::cout << "Specific Total Linear Momentum: " << total_mom << std::endl;
+                std::cout << "Specific Angular Momentum: " << mom_ang << std::endl;
+                std::cout << "Specific Total Angular Momentum: " << total_mom_ang << std::endl;
+                std::cout << "Specific Energy: " << eng << std::endl;
             }
         }
     }

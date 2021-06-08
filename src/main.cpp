@@ -73,13 +73,11 @@ int main(int argc, char *argv[]) {
     for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
         sph_system[i].initialize();
     }
-//    OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
+    OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
 
     //Dom. info
     dinfo.decomposeDomainAll(sph_system);
     sph_system.exchangeParticle(dinfo);
-    OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
-    ++sysinfo.step;
     //plant tree
     PS::TreeForForceShort<PTCL::RESULT::Dens, PTCL::EPI::Dens, PTCL::EPJ::Dens>::Gather dens_tree;
     PS::TreeForForceShort<PTCL::RESULT::Drvt, PTCL::EPI::Drvt, PTCL::EPJ::Drvt>::Gather drvt_tree;
