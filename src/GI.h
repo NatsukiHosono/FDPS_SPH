@@ -34,7 +34,7 @@ public:
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&ADunite);
+                sph_system[i].setPressure(&AGranite);
             } else {
                 sph_system[i].setPressure(&Iron);
             }
@@ -346,7 +346,7 @@ public:
                         ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
-                        ith.setPressure(&ADunite);
+                        ith.setPressure(&AGranite);
                         ith.tag = 0;
 
                         if (removal_list.count(index)) {
