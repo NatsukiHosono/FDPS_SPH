@@ -34,7 +34,7 @@ public:
 #pragma omp parallel for
         for (PS::U64 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].setPressure(&AGranite);
+                sph_system[i].setPressure(&ADunite);
             } else {
                 sph_system[i].setPressure(&Iron);
             }
@@ -147,9 +147,19 @@ public:
 //            const double x_init = radi_tar + radi_imp + parameter_file.getValueOf("delta_x", 0.0);
             double input = parameter_file.getValueOf("L_init_vs_L_em", 0.10);
             const double L_init = L_EM * input;
-            PS::F64 v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
+//            PS::F64 v_imp = parameter_file.getValueOf("impVel", 0.0); // the impact velocity
 
             PS::F64 v_esc = sqrt(2.0 * Grav * (mass_tar + mass_imp) / (radi_tar + radi_imp));
+            PS::F64 v_target_x_init = parameter_file.getValueOf("v_tar_x_v_esc", 0.0) * v_esc;
+            PS::F64 v_target_y_init = parameter_file.getValueOf("v_tar_y_v_esc", 0.0) * v_esc;
+            PS::F64 v_target_z_init = parameter_file.getValueOf("v_tar_z_v_esc", 0.0) * v_esc;
+            PS::F64 v_impactor_x_init = parameter_file.getValueOf("v_imp_x_v_esc", 0.0) * v_esc;
+            PS::F64 v_impactor_y_init = parameter_file.getValueOf("v_imp_y_v_esc", 0.0) * v_esc;
+            PS::F64 v_impactor_z_init = parameter_file.getValueOf("v_imp_z_v_esc", 0.0) * v_esc;
+
+            PS::F64 impactor_init_x = parameter_file.getValueOf("imp_x_init", 0.0);
+            PS::F64 impactor_init_y = parameter_file.getValueOf("imp_y_init", 0.0);
+            PS::F64 impactor_init_z = parameter_file.getValueOf("imp_z_init", 0.0);
 
             // the momentum balance must be M_imp  * M_tar/Mtotal * Vimp - M_tar * M_imp/Mtotal * Vimp = 0
             // where p_imp = M_imp  * M_tar/Mtotal * Vimp
@@ -162,13 +172,13 @@ public:
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
 
 //            const double v_inf = sqrt(std::max(v_imp * v_imp - v_esc * v_esc, 0.0));
-            PS::F64 x_init = cos(impAngle) * (radi_imp + radi_tar);
-            PS::F64 y_init = sin(impAngle) * (radi_imp + radi_tar);
+//            PS::F64 x_init = cos(impAngle) * (radi_imp + radi_tar);
+//            PS::F64 y_init = sin(impAngle) * (radi_imp + radi_tar);
 
 //            std::cout << "v_init = " << v_init << std::endl;
-            std::cout << "y_init / Rtar = " << y_init / radi_tar << std::endl;
+//            std::cout << "y_init / Rtar = " << y_init / radi_tar << std::endl;
 //            std::cout << "v_imp  = " << v_imp << " = " << v_imp / v_esc << "v_esc" << std::endl;
-            std::cout << "m_imp  = " << mass_imp / M << std::endl;
+//            std::cout << "m_imp  = " << mass_imp / M << std::endl;
             //shift'em
             for (PS::U32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
                 // target particles
@@ -177,12 +187,16 @@ public:
                 sph_system[i].vel.z = 0.0;
                 if (sph_system[i].tag >= 2) { // this currently sets parameters for impactor-tagged particles
                     sph_system[i].pos -= pos_imp;
-                    sph_system[i].pos.x += x_init;
-                    sph_system[i].pos.y += y_init;
-//                    sph_system[i].vel.x -= v_init;
-                    sph_system[i].vel.x -= v_impactor;
+                    sph_system[i].pos.x += impactor_init_x;
+                    sph_system[i].pos.y += impactor_init_y;
+                    sph_system[i].pos.z += impactor_init_z;
+                    sph_system[i].vel.x -= v_impactor_x_init;
+                    sph_system[i].vel.y -= v_impactor_y_init;
+                    sph_system[i].vel.z -= v_impactor_z_init;
                 } else { // this currently sets parameters for target-tagged particles
-                    sph_system[i].vel.x += v_target;
+                    sph_system[i].vel.x += v_target_x_init;
+                    sph_system[i].vel.y += v_target_y_init;
+                    sph_system[i].vel.z += v_target_z_init;
                 }
             }
 
@@ -346,7 +360,7 @@ public:
                         ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
-                        ith.setPressure(&AGranite);
+                        ith.setPressure(&ADunite);
                         ith.tag = 0;
 
                         if (removal_list.count(index)) {
