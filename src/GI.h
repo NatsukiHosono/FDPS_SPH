@@ -207,8 +207,8 @@ public:
 //            const double r_imp = 2.0 / (v_imp * v_imp / (Grav * mass_tar) + 1.0 / a);
             std::cout << "target radius: " << radi_tar << std::endl;
             std::cout << "impactor radius: " << radi_imp << std::endl;
-            std::cout << "impactor initial x: " << x_init << std::endl;
-            std::cout << "impactor initial y: " << y_init << std::endl;
+//            std::cout << "impactor initial x: " << x_init << std::endl;
+//            std::cout << "impactor initial y: " << y_init << std::endl;
 //            std::cout << "a = " << a / radi_tar << " R_tar" << std::endl;
 //            std::cout << "b = " << b / radi_tar << " R_tar" << std::endl;
 //            std::cout << "r_imp = " << r_imp / radi_tar << " R_tar" << std::endl;
