@@ -160,13 +160,16 @@ public:
             PS::F64 impactor_init_x = parameter_file.getValueOf("imp_x_init", 0.0);
             PS::F64 impactor_init_y = parameter_file.getValueOf("imp_y_init", 0.0);
             PS::F64 impactor_init_z = parameter_file.getValueOf("imp_z_init", 0.0);
+            PS::F64 target_init_x = parameter_file.getValueOf("tar_x_init", 0.0);
+            PS::F64 target_init_y = parameter_file.getValueOf("tar_y_init", 0.0);
+            PS::F64 target_init_z = parameter_file.getValueOf("tar_z_init", 0.0);
 
             // the momentum balance must be M_imp  * M_tar/Mtotal * Vimp - M_tar * M_imp/Mtotal * Vimp = 0
             // where p_imp = M_imp  * M_tar/Mtotal * Vimp
             // and p_tar = M_tar * M_imp/Mtotal * Vimp
             // such that p_imp - p_tar = 0
-            PS::F64 v_impactor = (mass_tar / mass_total) * v_imp;
-            PS::F64 v_target = (mass_imp / mass_total) * v_imp;
+//            PS::F64 v_impactor = (mass_tar / mass_total) * v_imp;
+//            PS::F64 v_target = (mass_imp / mass_total) * v_imp;
 
             PS::F64 impAngle =
                     parameter_file.getValueOf("impact_angle", 0.0) / 180.0 * math::pi; //converting from degree to radian
