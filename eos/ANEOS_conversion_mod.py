@@ -144,7 +144,7 @@ def rho_u(energy_list, density_list, temperature_list, u_in, rho_in):
             temp_i_1[k]=temperature[len(energy_i_1)-1]
             
         else:
-            n_i[k] = energy_list_i_1.index(energy_i_1[energy_i_1 > u_in][0])
+            n_i[k] = energy_list_i_1.index(energy_i_1[energy_i_1 >= u_in][0])
 
             if n_i[k]==0:
                 alpha_i=0.0
