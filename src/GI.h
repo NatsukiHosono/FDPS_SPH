@@ -193,9 +193,9 @@ public:
                     sph_system[i].pos.x += impactor_init_x;
                     sph_system[i].pos.y += impactor_init_y;
                     sph_system[i].pos.z += impactor_init_z;
-                    sph_system[i].vel.x -= v_impactor_x_init;
-                    sph_system[i].vel.y -= v_impactor_y_init;
-                    sph_system[i].vel.z -= v_impactor_z_init;
+                    sph_system[i].vel.x += v_impactor_x_init;
+                    sph_system[i].vel.y += v_impactor_y_init;
+                    sph_system[i].vel.z += v_impactor_z_init;
                 } else { // this currently sets parameters for target-tagged particles
                     sph_system[i].vel.x += v_target_x_init;
                     sph_system[i].vel.y += v_target_y_init;
