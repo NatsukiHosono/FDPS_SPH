@@ -98,11 +98,10 @@ namespace STD{
         }
     }
 
-    void Mode2CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
+    void Mode2CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double mantle_entropy,
+                      const double iron_entropy) {
         unsigned int iron_grid_size = 120;
         unsigned int silicate_grid_size = 120;
-        const double mantle_entropy = 3000;
-        const double core_entropy = 1750;
         #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
