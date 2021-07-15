@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (mode == 2) {
-        PTCL::Mode2CalcAll(sph_system);
+        PTCL::Mode2CalcAll(sph_system, silicate_entropy, iron_entropy);
     } else if (mode == 1) {
         PTCL::CalcEntropy(sph_system);
         PTCL::CalcPressure(sph_system);
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
         }
         if (mode == 2) {
-            PTCL::Mode2CalcAll(sph_system);
+            PTCL::Mode2CalcAll(sph_system, silicate_entropy, iron_entropy);
         } else if (mode == 1) {
             PTCL::CalcEntropy(sph_system);
             PTCL::CalcPressure(sph_system);

@@ -57,14 +57,14 @@ namespace STD{
         }
     };
 
-    void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double mantle_entropy,
-                            const double core_entropy) {
+    void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double silicate_entropy,
+                            const double iron_entropy) {
         #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].ent = mantle_entropy;
+                sph_system[i].ent = silicate_entropy;
             } else {
-                sph_system[i].ent = core_entropy;
+                sph_system[i].ent = iron_entropy;
             }
         }
     }
@@ -97,14 +97,14 @@ namespace STD{
         }
     }
 
-    void Mode2CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double mantle_entropy,
+    void Mode2CalcAll(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double silicate_entropy,
                       const double iron_entropy) {
         unsigned int iron_grid_size = 120;
         unsigned int silicate_grid_size = 120;
         #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
-                sph_system[i].ent = mantle_entropy;
+                sph_system[i].ent = silicate_entropy;
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       silicate_grid_size);
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng,
@@ -117,7 +117,7 @@ namespace STD{
                 sph_system[i].temp = sph_system[i].EoS->Temperature(sph_system[i].dens, sph_system[i].eng,
                                                                     silicate_grid_size);
             } else {
-                sph_system[i].ent = core_entropy;
+                sph_system[i].ent = iron_entropy;
                 sph_system[i].eng = sph_system[i].EoS->InternalEnergy(sph_system[i].dens, sph_system[i].ent,
                                                                       iron_grid_size);
                 sph_system[i].pres = sph_system[i].EoS->Pressure(sph_system[i].dens, sph_system[i].eng,
