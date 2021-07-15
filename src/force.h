@@ -57,9 +57,8 @@ namespace STD{
         }
     };
 
-    void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system) {
-        const double mantle_entropy = 3000;
-        const double core_entropy = 1750;
+    void SetConstantEntropy(PS::ParticleSystem<STD::RealPtcl> &sph_system, const double mantle_entropy,
+                            const double core_entropy) {
         #pragma omp parallel for
         for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             if (sph_system[i].tag % 2 == 0) {
