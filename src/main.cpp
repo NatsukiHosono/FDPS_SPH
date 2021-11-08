@@ -163,6 +163,9 @@ int main(int argc, char *argv[]) {
             sph_system[i].finalKick(sysinfo.dt);
             sph_system[i].dampMotion(PROBLEM::damping);
         }
+        if (mode == 2) {
+            PTCL::Mode2CalcAll(sph_system, silicate_entropy, iron_entropy);
+        }
         sysinfo.dt = getTimeStepGlobal<PTCL::RealPtcl>(sph_system);
         //    Calculate initial internal energy for mode 1 initial target/impactor creation
         PROBLEM::postTimestepProcess(sph_system, sysinfo);
