@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     ParameterFile parameter_file(input_file);
     std::cout << "Reading parameters from " << input_file << std::endl;
 
-    const unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
+    unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
 
     std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     const double silicate_entropy = parameter_file.getValueOf("silicate_entropy", 2000);
@@ -76,6 +76,10 @@ int main(int argc, char *argv[]) {
         sph_system[i].initialize();
     }
     OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
+
+    if (mode == 3) {
+        mode = 2; // we only need mode 3 for GI initialization. swap out to make mode 2 features elsewhere work
+    }
 
     //Dom. info
     dinfo.decomposeDomainAll(sph_system);
