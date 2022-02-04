@@ -70,16 +70,16 @@ int main(int argc, char *argv[]) {
         PROBLEM::setEoS(sph_system);
     }
     PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
+    if (mode == 3) {
+        sysinfo.output_time = sysinfo.time;
+        mode = 2; // we only need mode 3 for GI initialization. swap out to make mode 2 features elsewhere work
+    }
 
 #pragma omp parallel for
     for (PS::S32 i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
         sph_system[i].initialize();
     }
     OutputFileWithTimeInterval(sph_system, sysinfo, output_interval, output_directory);
-
-    if (mode == 3) {
-        mode = 2; // we only need mode 3 for GI initialization. swap out to make mode 2 features elsewhere work
-    }
 
     //Dom. info
     dinfo.decomposeDomainAll(sph_system);
