@@ -460,6 +460,36 @@ public:
             std::cout << "# of ptcls = " << ptcl.size() << std::endl;
             std::cout << "setup..." << std::endl;
         }
+
+        else if (mode == 3) { // mode 3 is for running mode 2 with a combined mode 2 output file, in case a sim runs too long
+
+            std::cout << "in mode 3" << std::endl;
+            std::vector<Ptcl> body;
+            {
+                std::ifstream fin("input/body.dat");  // generically just call the file "body.dat"
+                double time;
+                std::size_t N;
+                fin >> time;
+                sysinfo.time = time;  // continue from last time
+                fin >> N;
+                while (!fin.eof()) {
+                    Ptcl ith;
+                    fin >> ith.id >> ith.tag >> ith.mass >> ith.pos.x >> ith.pos.y >> ith.pos.z >> ith.vel.x
+                        >> ith.vel.y
+                        >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
+                    body.push_back(ith);
+                }
+                body.pop_back();
+            }
+            {
+                sph_system.setNumberOfParticleLocal(body.size());
+                std::size_t cnt = 0;
+                for (int i = 0; i < body.size(); ++i) {
+                    sph_system[cnt] = body[i];
+                    ++cnt;
+                }
+            }
+        }
     }
 
     static void postTimestepProcess(PS::ParticleSystem<Ptcl>& sph_system, system_t& sys){

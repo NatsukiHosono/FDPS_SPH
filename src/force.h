@@ -173,6 +173,7 @@ namespace STD{
 					if(PARAM::FLAG_R00 == true){
 						AV *= 0.5 * (ith.AVa + jth.AVa);
 					}
+
 					#if 1
 					const PS::F64vec gradW = 0.5 * (kernel.gradW(dr, ith.smth) * ith.grad_smth + kernel.gradW(dr, jth.smth) * jth.grad_smth);
 					hydro[i].acc     -= jth.mass * (ith.grad_smth * ith.pres / (ith.dens * ith.dens) * kernel.gradW(dr, ith.smth) + jth.grad_smth * jth.pres / (jth.dens * jth.dens) * kernel.gradW(dr, jth.smth) + AV * gradW);
