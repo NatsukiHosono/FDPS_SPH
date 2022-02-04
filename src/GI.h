@@ -462,8 +462,7 @@ public:
         }
 
         else if (mode == 3) { // mode 3 is for running mode 2 with a combined mode 2 output file, in case a sim runs too long
-
-            std::cout << "in mode 3" << std::endl;
+            if (PS::Comm::getRank() != 0) return;  // only want to run on 1 proc
             std::vector<Ptcl> body;
             {
                 std::ifstream fin("input/body.dat");  // generically just call the file "body.dat"
