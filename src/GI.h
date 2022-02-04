@@ -462,6 +462,7 @@ public:
         }
 
         else if (mode == 3) { // mode 3 is for running mode 2 with a combined mode 2 output file, in case a sim runs too long
+            end_time = parameter_file.getValueOf("end_time", 100000.0);
             if (PS::Comm::getRank() != 0) return;  // only want to run on 1 proc
             std::vector<Ptcl> body;
             {
