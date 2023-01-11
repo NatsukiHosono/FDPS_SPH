@@ -12,7 +12,7 @@ namespace STD{
 					dens[i].dens += jth.mass * kernel.W(dr, ith.smth);
 				}
 				#ifdef FLAG_GI
-				dens[i].dens = std::max(500.0, dens[i].dens); 
+				dens[i].dens = std::max(500.0, dens[i].dens); // setting the minimum density. See Hull et al 2023 (?)
 				#endif
 				dens[i].smth = PARAM::SMTH * pow(ith.mass / dens[i].dens, 1.0/(PS::F64)(PARAM::Dim));
 			}
