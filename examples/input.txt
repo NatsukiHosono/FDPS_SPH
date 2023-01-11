@@ -11,3 +11,5 @@ damping = 1
 output_directory = test2/
 output_interval = 10.0 
 impact_angle = 45
+silicate_entropy = 3165
+iron_entropy = 1500
