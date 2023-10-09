@@ -1,0 +1,13 @@
+This folder is a simple pipeline to use to generate input files for FDPS_SPH.
+
+Use bodies_inputtxt.py for generating input files for bodies/mode 1. This creates imp.txt, tar.txt and a .sh job file, that are moved to their respective folders. Use the job file to start the bodies relaxation in the main directory of FDPS_SPH!
+
+For a quick check, use the profiles.py script to look at profiles after their relaxation/at a given time of the relaxation.
+Recombine output files with combine_prepare_files.py after the relaxation/a given time of the relaxation.
+
+Finally, use collision_inputtxt.py to generate an input file for a collision. This creates gi.txt and job file, which are to the folders. Start the collision in the main directory!
+
+We tried to documents all inputs and their units to be given. If anything misses, please feel free to edit.
+As a general rule, if prompted to give a time when playing with files, give it in seconds. For paths, give the absolute path, e.g., in the form /scratch/username/folder/.
+
+For more info, refer to the manual.
