@@ -16,6 +16,9 @@
 #include "io.h"
 #include "integral.h"
 
+#ifdef ENABLE_GPU
+#include "kernel.cuh"
+#endif
 
 template<class Ptcl> double GI_universal<Ptcl>::end_time;
 template<class Ptcl> double GI_universal<Ptcl>::damping;
@@ -90,12 +93,21 @@ int main(int argc, char *argv[]) {
     grav_tree.initialize(sph_system.getNumberOfParticleLocal(), 0.5, 8, 256);
 #endif
     for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
+#ifdef ENABLE_GPU
+        dens_tree.calcForceAllAndWriteBackMultiWalk(DENS::DispatchKernel, DENS::RetrieveKernel, 1, sph_system, dinfo, N_WALK_LIMIT, true);
+#else
         dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
+#endif
     }
 
     PTCL::CalcPressure(sph_system);
+#ifdef ENABLE_GPU
+    drvt_tree.calcForceAllAndWriteBackMultiWalk(DrvtDispatchKernel, DrvtRetrieveKernel, 1, sph_system, dinfo, N_WALK_LIMIT, true);
+    hydr_tree.calcForceAllAndWriteBackMultiWalk(HydrDispatchKernel, HydrRetrieveKernel, 1, sph_system, dinfo, N_WALK_LIMIT, true);
+#else
     drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
     hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
+#endif
 #ifdef SELF_GRAVITY
     grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                        PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
@@ -136,11 +148,20 @@ int main(int argc, char *argv[]) {
         PROBLEM::setEoS(sph_system);
 
         for (short int loop = 0; loop <= PARAM::NUMBER_OF_DENSITY_SMOOTHING_LENGTH_LOOP; ++loop) {
+#ifdef ENABLE_GPU
+            dens_tree.calcForceAllAndWriteBackMultiWalk(DENS::DispatchKernel, DENS::RetrieveKernel, 1, sph_system, dinfo, N_WALK_LIMIT, true);
+#else
             dens_tree.calcForceAllAndWriteBack(PTCL::CalcDensity(), sph_system, dinfo);
+#endif
         }
         PTCL::CalcPressure(sph_system);
+#ifdef ENABLE_GPU
+        drvt_tree.calcForceAllAndWriteBackMultiWalk(DrvtDispatchKernel, DrvtRetrieveKernel, 1, sph_system, dinfo, N_WALK_LIMIT, true);
+        hydr_tree.calcForceAllAndWriteBackMultiWalk(HydrDispatchKernel, HydrRetrieveKernel, 1, sph_system, dinfo, N_WALK_LIMIT, true);
+#else
         drvt_tree.calcForceAllAndWriteBack(PTCL::CalcDerivative(), sph_system, dinfo);
         hydr_tree.calcForceAllAndWriteBack(PTCL::CalcHydroForce(), sph_system, dinfo);
+#endif
 #ifdef SELF_GRAVITY
         grav_tree.calcForceAllAndWriteBack(PTCL::CalcGravityForce<PTCL::EPJ::Grav>(),
                                            PTCL::CalcGravityForce<PS::SPJMonopole>(), sph_system, dinfo);
