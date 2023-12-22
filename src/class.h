@@ -126,7 +126,8 @@ namespace STD {
         //Copy functions
         void copyFromForce(const RESULT::Dens &dens) {
             this->dens = dens.dens;
-            this->smth = dens.smth;
+            //this->smth = dens.smth;
+            this->smth = PARAM::SMTH * pow(this->mass / this->dens, 1.0 / (PS::F64) (PARAM::Dim));
         }
 
         void copyFromForce(const RESULT::Drvt &drvt) {
