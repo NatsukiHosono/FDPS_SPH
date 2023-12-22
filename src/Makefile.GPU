@@ -1,0 +1,36 @@
+FDPS_HOME = ../FDPS/src
+NVCC = nvcc
+INC = -I$(FDPS_HOME)
+CXXFLAGS = -O3 -std=c++11
+CXXFLAGS += -DPARTICLE_SIMULATOR_THREAD_PARALLEL
+CXXFLAGS += -DPARTICLE_SIMULATOR_MPI_PARALLEL
+CXXFLAGS += -DENABLE_GPU
+#COMP = --compiler-bindir=g++ --compiler-options=-fopenmp --ptxas-options=-v -gencode arch=compute_70,code=sm_70
+COMP = --compiler-bindir=mpic++ --compiler-options=-fopenmp --ptxas-options=-v -gencode arch=compute_70,code=sm_70
+
+PROGRAM = sph.out
+CPPOBJS = main.cpp
+CUOBJS  = $(patsubst %.cu, %.o, $(wildcard *.cu))
+CPPHDRS = $(wildcard *.h)
+CPPHDRS += $(wildcard *.cuh)
+
+all:	$(CPPOBJS) $(CUOBJS) $(CPPHDRS)
+	@echo "Linking object files..."
+	$(NVCC) $(CXXFLAGS) $(COMP) $(INC) $(CPPOBJS) $(CUOBJS) -o $(PROGRAM) -lgomp
+	@echo "Link Success! [$(PROGRAM)]"
+
+%.o:	%.cpp $(CPPHDRS)
+	@echo "Building $< ..."
+	$(NVCC) $(INC) -c $< $(CXXFLAGS) $(COMP) -lgomp
+	@echo "[CPP $< OK]"
+	@echo ""
+
+%.o:	%.cu $(CPPHDRS)
+	@echo "Building $< ..."
+	@$(NVCC) $(COMP) $(INC) -c $< $(CXXFLAGS) -o $@
+	@echo "[CUDA $< OK]"
+	@echo ""
+
+clean:
+	rm *.o *.out
+
