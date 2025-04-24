@@ -37,9 +37,9 @@ with open('tar.txt','wt') as f:
     f.write("output_directory = "+TarOut+"\n")
     f.write("silicate_entropy = 3165.0\n")
     f.write("iron_entropy = 1500.0\n")
-    f.write("impact_angle = 43\n")
-    f.write("impVel = 9300\n")
-    f.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n")
+    f.write("impact_angle = 43\n") #dummy parameter
+    f.write("impVel = 9300\n") #dummy parameter
+    f.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n") #dummy parameter
 f.closed
 
 with open('imp.txt','wt') as f2:
@@ -55,9 +55,9 @@ with open('imp.txt','wt') as f2:
     f2.write("output_directory = "+ImpOut+"\n")
     f2.write("silicate_entropy = 3165.0\n")
     f2.write("iron_entropy = 1500.0\n")
-    f2.write("impact_angle = 43\n")
-    f2.write("impVel = 9300 \n")
-    f2.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n")
+    f2.write("impact_angle = 43\n") #dummy parameter
+    f2.write("impVel = 9300 \n") #dummy parameter
+    f2.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n") #dummy parameter
 f2.closed
 
 with open('launch_relaxation.sh','wrt') as fb:
