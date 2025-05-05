@@ -68,7 +68,7 @@ with open('launch_relaxation.sh','wrt') as fb:
     fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
     fb.write("module load openmpi/4.0.3/b3\n")
     fb.write("mpirun -n 100 ./sph.out -i "+TarOut+"tar.txt\n")
-    fb.write("mpirun -np 100 ./sph.out -i "+ImpOut+"imp.txt\n")
+    fb.write("mpirun -n 100 ./sph.out -i "+ImpOut+"imp.txt\n")
 fb.closed
 
 os.chmod("launch_relaxation.sh",stat.S_IRWXU)
