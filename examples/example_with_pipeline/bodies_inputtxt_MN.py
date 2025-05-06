@@ -1,27 +1,32 @@
-import numpy as np
+from __future__ import print_function, division
 import os
 import sys
 import shutil
 import stat
-import argparse
 from math import sqrt, asin, pi
+from optparse import OptionParser
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Process simulation parameters.')
-    parser.add_argument('--config', type=str, help='Path to configuration file')
-    parser.add_argument('params', nargs='*', help='Manual input parameters')
+    usage = "usage: %prog [options] <12 parameters>"
+    parser = OptionParser(usage=usage)
+    parser.add_option("-c", "--config", dest="config",
+                      help="Path to configuration file")
 
-    args = parser.parse_args()
+    (options, args) = parser.parse_args()
 
-    if args.config:
-        with open(args.config, 'r') as f:
-            lines = [line.strip() for line in f if line.strip()]
+    if options.config:
+        try:
+            with open(options.config, 'r') as f:
+                lines = [line.strip() for line in f if line.strip()]
+        except IOError:
+            print("Error: Cannot open configuration file.")
+            sys.exit(1)
         if len(lines) != 12:
             print("Error: Configuration file must contain exactly 12 parameters.")
             sys.exit(1)
         return lines
-    elif len(args.params) == 12:
-        return args.params
+    elif len(args) == 12:
+        return args
     else:
         print("Error: Provide either a configuration file with 12 parameters or 12 manual parameters.")
         sys.exit(1)
@@ -44,60 +49,60 @@ ImpOut = params[10]
 end_time = params[11]
 
 # Create output directories
-for p in [TarOut, ImpOut]:   
+for p in [TarOut, ImpOut]:
     if os.path.exists(p):
         shutil.rmtree(p)
     os.mkdir(p)
 
 # Write target configuration
-with open('tar.txt', 'wt') as f:
+with open('tar.txt', 'w') as f:
     f.write("mode = 2\n")
-    f.write(f"UnitMass = {TarMass}\n")
-    f.write(f"UnitRadi = {TarRad}\n")
-    f.write(f"coreFracMass = {TarCMF}\n")
-    f.write(f"coreFracRadi = {TarCRF}\n")
-    f.write(f"total_number_of_particles = {int(Npart)}\n")
-    f.write(f"end_time = {end_time}\n")
+    f.write("UnitMass = {}\n".format(TarMass))
+    f.write("UnitRadi = {}\n".format(TarRad))
+    f.write("coreFracMass = {}\n".format(TarCMF))
+    f.write("coreFracRadi = {}\n".format(TarCRF))
+    f.write("total_number_of_particles = {}\n".format(int(Npart)))
+    f.write("end_time = {}\n".format(end_time))
     f.write("damping = 1\n")
     f.write("output_interval = 100\n")
-    f.write(f"output_directory = {TarOut}\n")
+    f.write("output_directory = {}\n".format(TarOut))
     f.write("silicate_entropy = 3165.0\n")
     f.write("iron_entropy = 1500.0\n")
     f.write("impact_angle = 43\n")  # dummy parameter
     f.write("impVel = 9300\n")      # dummy parameter
-    f.write(f"imptarMassRatio = {ImpMass / TarMass}\n")  # dummy parameter
+    f.write("imptarMassRatio = {}\n".format(ImpMass / TarMass))  # dummy parameter
 
 # Write impactor configuration
-with open('imp.txt', 'wt') as f2:
+with open('imp.txt', 'w') as f2:
     f2.write("mode = 2\n")
-    f2.write(f"UnitMass = {ImpMass}\n")
-    f2.write(f"UnitRadi = {ImpRad}\n")
-    f2.write(f"coreFracMass = {ImpCMF}\n")
-    f2.write(f"coreFracRadi = {ImpCRF}\n")
-    f2.write(f"total_number_of_particles = {int(Npart * ImpMass / TarMass)}\n")
-    f2.write(f"end_time = {end_time}\n")
+    f2.write("UnitMass = {}\n".format(ImpMass))
+    f2.write("UnitRadi = {}\n".format(ImpRad))
+    f2.write("coreFracMass = {}\n".format(ImpCMF))
+    f2.write("coreFracRadi = {}\n".format(ImpCRF))
+    f2.write("total_number_of_particles = {}\n".format(int(Npart * ImpMass / TarMass)))
+    f2.write("end_time = {}\n".format(end_time))
     f2.write("damping = 1\n")
     f2.write("output_interval = 100\n")
-    f2.write(f"output_directory = {ImpOut}\n")
+    f2.write("output_directory = {}\n".format(ImpOut))
     f2.write("silicate_entropy = 3165.0\n")
     f2.write("iron_entropy = 1500.0\n")
     f2.write("impact_angle = 43\n")  # dummy parameter
     f2.write("impVel = 9300\n")      # dummy parameter
-    f2.write(f"imptarMassRatio = {ImpMass / TarMass}\n")  # dummy parameter
+    f2.write("imptarMassRatio = {}\n".format(ImpMass / TarMass))  # dummy parameter
 
 # Create launch script
-with open('launch_relaxation.sh', 'wt') as fb:
+with open('launch_relaxation.sh', 'w') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
     fb.write("#SBATCH -J TarImpRelax\n")
     fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
     fb.write("module load openmpi/4.0.3/b3\n")
-    fb.write(f"mpirun -n 100 ./sph.out -i {TarOut}tar.txt\n")
-    fb.write(f"mpirun -n 100 ./sph.out -i {ImpOut}imp.txt\n")
+    fb.write("mpirun -n 100 ./sph.out -i {}tar.txt\n".format(TarOut))
+    fb.write("mpirun -n 100 ./sph.out -i {}imp.txt\n".format(ImpOut))
 
 # Set execute permissions and move files
 os.chmod("launch_relaxation.sh", stat.S_IRWXU)
-os.system(f'mv imp.txt {ImpOut}')
-os.system(f'mv tar.txt {TarOut}')
-os.system('mv launch_relaxation.sh ../../')
+os.rename('imp.txt', os.path.join(ImpOut, 'imp.txt'))
+os.rename('tar.txt', os.path.join(TarOut, 'tar.txt'))
+os.rename('launch_relaxation.sh', os.path.join('..', '..', 'launch_relaxation.sh'))
