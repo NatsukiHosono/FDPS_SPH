@@ -1,5 +1,9 @@
 import numpy as np
-import os, sys, shutil, stat
+import os
+import sys
+import shutil
+import stat
+import argparse
 from math import sqrt, asin, pi
 
 def parse_args():
@@ -21,6 +25,9 @@ def parse_args():
     else:
         print("Error: Provide either a configuration file with 12 parameters or 12 manual parameters.")
         sys.exit(1)
+
+# Parse arguments
+params = parse_args()
 
 
 Npart=np.double(sys.argv[1])
