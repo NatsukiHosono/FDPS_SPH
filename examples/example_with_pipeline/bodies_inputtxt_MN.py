@@ -29,19 +29,19 @@ def parse_args():
 # Parse arguments
 params = parse_args()
 
-
-Npart=np.double(sys.argv[1])
-TarMass = np.double(sys.argv[2])
-TarRad =np.double(sys.argv[3])
-TarCMF = np.double(sys.argv[4])
-TarCRF = np.double(sys.argv[5])
-TarOut = sys.argv[6]
-ImpMass = np.double(sys.argv[7])
-ImpRad = np.double(sys.argv[8])
-ImpCMF = np.double(sys.argv[9])
-ImpCRF = np.double(sys.argv[10])
-ImpOut = sys.argv[11]
-end_time = sys.argv[12]
+# Assign parameters
+Npart = float(params[0])
+TarMass = float(params[1])
+TarRad = float(params[2])
+TarCMF = float(params[3])
+TarCRF = float(params[4])
+TarOut = params[5]
+ImpMass = float(params[6])
+ImpRad = float(params[7])
+ImpCMF = float(params[8])
+ImpCRF = float(params[9])
+ImpOut = params[10]
+end_time = params[11]
 
 for p in [TarOut, ImpOut]:   
     if os.path.exists(p):
