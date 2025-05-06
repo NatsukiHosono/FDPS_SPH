@@ -43,59 +43,61 @@ ImpCRF = float(params[9])
 ImpOut = params[10]
 end_time = params[11]
 
+# Create output directories
 for p in [TarOut, ImpOut]:   
     if os.path.exists(p):
         shutil.rmtree(p)
     os.mkdir(p)
 
-with open('tar.txt','wt') as f:
+# Write target configuration
+with open('tar.txt', 'wt') as f:
     f.write("mode = 2\n")
-    f.write("UnitMass = "+str(TarMass)+"\n")
-    f.write("UnitRadi = "+str(TarRad)+"\n")
-    f.write("coreFracMass = "+str(TarCMF)+"\n")
-    f.write("coreFracRadi = "+str(TarCRF)+"\n")
-    f.write("total_number_of_particles ="+str(int(Npart))+"\n")
-    f.write("end_time = "+str(end_time)+"\n")
+    f.write(f"UnitMass = {TarMass}\n")
+    f.write(f"UnitRadi = {TarRad}\n")
+    f.write(f"coreFracMass = {TarCMF}\n")
+    f.write(f"coreFracRadi = {TarCRF}\n")
+    f.write(f"total_number_of_particles = {int(Npart)}\n")
+    f.write(f"end_time = {end_time}\n")
     f.write("damping = 1\n")
     f.write("output_interval = 100\n")
-    f.write("output_directory = "+TarOut+"\n")
+    f.write(f"output_directory = {TarOut}\n")
     f.write("silicate_entropy = 3165.0\n")
     f.write("iron_entropy = 1500.0\n")
-    f.write("impact_angle = 43\n") #dummy parameter
-    f.write("impVel = 9300\n") #dummy parameter
-    f.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n") #dummy parameter
-f.closed
+    f.write("impact_angle = 43\n")  # dummy parameter
+    f.write("impVel = 9300\n")      # dummy parameter
+    f.write(f"imptarMassRatio = {ImpMass / TarMass}\n")  # dummy parameter
 
-with open('imp.txt','wt') as f2:
+# Write impactor configuration
+with open('imp.txt', 'wt') as f2:
     f2.write("mode = 2\n")
-    f2.write("UnitMass = "+str(ImpMass)+"\n")
-    f2.write("UnitRadi = "+str(ImpRad)+"\n")
-    f2.write("coreFracMass = "+str(ImpCMF)+"\n")
-    f2.write("coreFracRadi = "+str(ImpCRF)+"\n")
-    f2.write("total_number_of_particles = "+str(int(Npart*ImpMass/TarMass))+"\n")
-    f2.write("end_time = "+str(end_time)+"\n")
+    f2.write(f"UnitMass = {ImpMass}\n")
+    f2.write(f"UnitRadi = {ImpRad}\n")
+    f2.write(f"coreFracMass = {ImpCMF}\n")
+    f2.write(f"coreFracRadi = {ImpCRF}\n")
+    f2.write(f"total_number_of_particles = {int(Npart * ImpMass / TarMass)}\n")
+    f2.write(f"end_time = {end_time}\n")
     f2.write("damping = 1\n")
     f2.write("output_interval = 100\n")
-    f2.write("output_directory = "+ImpOut+"\n")
+    f2.write(f"output_directory = {ImpOut}\n")
     f2.write("silicate_entropy = 3165.0\n")
     f2.write("iron_entropy = 1500.0\n")
-    f2.write("impact_angle = 43\n") #dummy parameter
-    f2.write("impVel = 9300 \n") #dummy parameter
-    f2.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n") #dummy parameter
-f2.closed
+    f2.write("impact_angle = 43\n")  # dummy parameter
+    f2.write("impVel = 9300\n")      # dummy parameter
+    f2.write(f"imptarMassRatio = {ImpMass / TarMass}\n")  # dummy parameter
 
-with open('launch_relaxation.sh','wrt') as fb:
+# Create launch script
+with open('launch_relaxation.sh', 'wt') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
     fb.write("#SBATCH -J TarImpRelax\n")
     fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
     fb.write("module load openmpi/4.0.3/b3\n")
-    fb.write("mpirun -n 100 ./sph.out -i "+TarOut+"tar.txt\n")
-    fb.write("mpirun -n 100 ./sph.out -i "+ImpOut+"imp.txt\n")
-fb.closed
+    fb.write(f"mpirun -n 100 ./sph.out -i {TarOut}tar.txt\n")
+    fb.write(f"mpirun -n 100 ./sph.out -i {ImpOut}imp.txt\n")
 
-os.chmod("launch_relaxation.sh",stat.S_IRWXU)
-os.system('mv imp.txt '+ImpOut)
-os.system('mv tar.txt '+TarOut)
-os.system('mv launch_relaxation.sh ../../')            
+# Set execute permissions and move files
+os.chmod("launch_relaxation.sh", stat.S_IRWXU)
+os.system(f'mv imp.txt {ImpOut}')
+os.system(f'mv tar.txt {TarOut}')
+os.system('mv launch_relaxation.sh ../../')
