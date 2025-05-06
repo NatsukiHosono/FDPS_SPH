@@ -1,0 +1,12 @@
+100000
+5.97e24
+6e6
+0.3
+0.54
+/scratch/mnakaji2/FDPS_SPH2/FDPS_SPH/target_folder/
+5.97e23
+4e6
+0.3
+0.43
+/scratch/mnakaji2/FDPS_SPH2/FDPS_SPH/impactor_folder/
+2e5
