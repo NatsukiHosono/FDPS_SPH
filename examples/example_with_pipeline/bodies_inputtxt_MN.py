@@ -90,8 +90,18 @@ with open('imp.txt', 'w') as f2:
     f2.write("impVel = 9300\n")      # dummy parameter
     f2.write("imptarMassRatio = {}\n".format(ImpMass / TarMass))  # dummy parameter
 
-# Create launch script
-with open('launch_relaxation.sh', 'w') as fb:
+# Create impactor launch script
+with open('imp_relaxation.sh', 'w') as fb:
+    fb.write("#!/bin/bash\n")
+    fb.write("#SBATCH -p luna\n")
+    fb.write("#SBATCH -n 100\n")
+    fb.write("#SBATCH -J TarImpRelax\n")
+    fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
+    fb.write("module load openmpi/4.0.3/b3\n")
+    fb.write("mpirun -n 100 ./sph.out -i {}imp.txt\n".format(ImpOut))
+
+#Create target launch script
+with open('tar_relaxation.sh', 'w') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
@@ -99,7 +109,6 @@ with open('launch_relaxation.sh', 'w') as fb:
     fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
     fb.write("module load openmpi/4.0.3/b3\n")
     fb.write("mpirun -n 100 ./sph.out -i {}tar.txt\n".format(TarOut))
-    fb.write("mpirun -n 100 ./sph.out -i {}imp.txt\n".format(ImpOut))
 
 # Set execute permissions and move files
 os.chmod("launch_relaxation.sh", stat.S_IRWXU)
