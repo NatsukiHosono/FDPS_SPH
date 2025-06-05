@@ -60,7 +60,7 @@ with open('imp.txt','wt') as f2:
     f2.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n") #dummy parameter
 f2.closed
 
-with open('imp_relaxation.sh','wrt') as fb:
+with open('imp_relaxation.sbatch','wrt') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
@@ -72,7 +72,7 @@ with open('imp_relaxation.sh','wrt') as fb:
     fb.write("mpirun -n 100 ./sph.out -i "+ImpOut+"imp.txt\n")
 fb.closed
 
-with open('tar_relaxation.sh','wrt') as fa:
+with open('tar_relaxation.sbatch','wrt') as fa:
     fa.write("#!/bin/bash\n")
     fa.write("#SBATCH -p luna\n")
     fa.write("#SBATCH -n 100\n")
