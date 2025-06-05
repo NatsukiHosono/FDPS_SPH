@@ -96,19 +96,23 @@ with open('imp_relaxation.sh', 'w') as fb:
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
     fb.write("#SBATCH -J TarImpRelax\n")
-    fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
+    fb.write("#SBATCH -o my_sim_%j\n")
+    fb.write("#SBATCH --mem-per-cpu=5GB\n")
+    fb.write("#SBATCH -t 32:00:00\n")
     fb.write("module load openmpi/4.0.3/b3\n")
     fb.write("mpirun -n 100 ./sph.out -i {}imp.txt\n".format(ImpOut))
 
 #Create target launch script
-with open('tar_relaxation.sh', 'w') as fb:
-    fb.write("#!/bin/bash\n")
-    fb.write("#SBATCH -p luna\n")
-    fb.write("#SBATCH -n 100\n")
-    fb.write("#SBATCH -J TarImpRelax\n")
-    fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
-    fb.write("module load openmpi/4.0.3/b3\n")
-    fb.write("mpirun -n 100 ./sph.out -i {}tar.txt\n".format(TarOut))
+with open('tar_relaxation.sh', 'w') as fa:
+    fa.write("#!/bin/bash\n")
+    fa.write("#SBATCH -p luna\n")
+    fa.write("#SBATCH -n 100\n")
+    fa.write("#SBATCH -J TarImpRelax\n")
+    fa.write("#SBATCH -o my_sim_%j\n")
+    fa.write("#SBATCH --mem-per-cpu=5GB\n")
+    fa.write("#SBATCH -t 32:00:00\n")
+    fa.write("module load openmpi/4.0.3/b3\n")
+    fa.write("mpirun -n 100 ./sph.out -i {}tar.txt\n".format(TarOut))
 
 # Set execute permissions and move files
 os.chmod("launch_relaxation.sh", stat.S_IRWXU)
