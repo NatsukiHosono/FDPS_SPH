@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import matplotlib, sys
 
 if len(sys.argv) != 4:
-    print "Usage inputs: <path> <time [s]> <ncores>"
+    print "Usage inputs: <path> <output number> <ncores>"
     exit(1)
 
 path = sys.argv[1]
-timestep = np.int(np.float(sys.argv[2]))/100
+timestep = np.int(np.float(sys.argv[2]))
 n = np.int(np.float(sys.argv[3]))
 
 def readfile(path,step,ncores):
