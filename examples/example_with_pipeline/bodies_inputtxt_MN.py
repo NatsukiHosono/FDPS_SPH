@@ -91,7 +91,7 @@ with open('imp.txt', 'w') as f2:
     f2.write("imptarMassRatio = {}\n".format(ImpMass / TarMass))  # dummy parameter
 
 # Create impactor launch script
-with open('imp_relaxation.sh', 'w') as fb:
+with open('imp_relaxation.sbatch', 'w') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
@@ -103,7 +103,7 @@ with open('imp_relaxation.sh', 'w') as fb:
     fb.write("mpirun -n 100 ./sph.out -i {}imp.txt\n".format(ImpOut))
 
 #Create target launch script
-with open('tar_relaxation.sh', 'w') as fa:
+with open('tar_relaxation.sbatch', 'w') as fa:
     fa.write("#!/bin/bash\n")
     fa.write("#SBATCH -p luna\n")
     fa.write("#SBATCH -n 100\n")
