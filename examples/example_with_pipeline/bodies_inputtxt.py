@@ -65,7 +65,9 @@ with open('imp_relaxation.sh','wrt') as fb:
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
     fb.write("#SBATCH -J ImpRelax\n")
-    fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
+    fb.write("#SBATCH -o my_sim_%j\n")
+    fb.write("#SBATCH --mem-per-cpu=5GB\n")
+    fb.write("#SBATCH -t 32:00:00\n")
     fb.write("module load openmpi/4.0.3/b3\n")
     fb.write("mpirun -n 100 ./sph.out -i "+ImpOut+"imp.txt\n")
 fb.closed
@@ -75,7 +77,9 @@ with open('tar_relaxation.sh','wrt') as fa:
     fa.write("#SBATCH -p luna\n")
     fa.write("#SBATCH -n 100\n")
     fa.write("#SBATCH -J TarRelax\n")
-    fa.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
+    fa.write("#SBATCH -o my_sim_%j\n")
+    fa.write("#SBATCH --mem-per-cpu=5GB\n")
+    fa.write("#SBATCH -t 32:00:00\n") 
     fa.write("module load openmpi/4.0.3/b3\n")
     fa.write("mpirun -n 100 ./sph.out -i "+TarOut+"tar.txt\n")
 fa.closed
