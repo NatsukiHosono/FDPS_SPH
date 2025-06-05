@@ -60,16 +60,25 @@ with open('imp.txt','wt') as f2:
     f2.write("imptarMassRatio = "+str(ImpMass/TarMass)+"\n") #dummy parameter
 f2.closed
 
-with open('launch_relaxation.sh','wrt') as fb:
+with open('imp_relaxation.sh','wrt') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
-    fb.write("#SBATCH -J TarImpRelax\n")
+    fb.write("#SBATCH -J ImpRelax\n")
     fb.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
     fb.write("module load openmpi/4.0.3/b3\n")
-    fb.write("mpirun -n 100 ./sph.out -i "+TarOut+"tar.txt\n")
     fb.write("mpirun -n 100 ./sph.out -i "+ImpOut+"imp.txt\n")
 fb.closed
+
+with open('tar_relaxation.sh','wrt') as fa:
+    fa.write("#!/bin/bash\n")
+    fa.write("#SBATCH -p luna\n")
+    fa.write("#SBATCH -n 100\n")
+    fa.write("#SBATCH -J TarRelax\n")
+    fa.write("#SBATCH -t 32:00:00 -o out.%a.txt -a 1-2\n")
+    fa.write("module load openmpi/4.0.3/b3\n")
+    fa.write("mpirun -n 100 ./sph.out -i "+TarOut+"tar.txt\n")
+fa.closed
 
 os.chmod("launch_relaxation.sh",stat.S_IRWXU)
 os.system('mv imp.txt '+ImpOut)
