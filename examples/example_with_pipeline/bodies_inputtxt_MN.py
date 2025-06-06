@@ -115,7 +115,8 @@ with open('tar_relaxation.sbatch', 'w') as fa:
     fa.write("mpirun -n 100 ./sph.out -i {}tar.txt\n".format(TarOut))
 
 # Set execute permissions and move files
-os.chmod("launch_relaxation.sh", stat.S_IRWXU)
+os.chmod("imp_relaxation.sbatch",stat.S_IRWXU)
+os.chmod("tar_relaxation.sbatch",stat.S_IRWXU)
 os.rename('imp.txt', os.path.join(ImpOut, 'imp.txt'))
 os.rename('tar.txt', os.path.join(TarOut, 'tar.txt'))
 os.rename('launch_relaxation.sh', os.path.join('..', '..', 'launch_relaxation.sh'))
