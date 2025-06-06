@@ -4,12 +4,12 @@ import os, sys, shutil, stat
 
 
 if len(sys.argv) != 6:
-    print "Usage inputs: <target path> <impactor path> <ncores> <tar time> <impactor time>"
+    print "Usage inputs: <target path> <impactor path> <ncores> <tar output number> <impactor output number>"
     exit(1)
 
 paths=[sys.argv[1],sys.argv[2]]
 ncores=np.int(np.float(sys.argv[3]))
-steps=[np.int(np.float(sys.argv[4]))/100,np.int(np.float(sys.argv[5]))/100]
+steps=[np.int(np.float(sys.argv[4])),np.int(np.float(sys.argv[5]))]
 output_paths=["../../input/tar.dat","../../input/imp.dat"]
 
 def concatenate(path,step,ncores,output):
