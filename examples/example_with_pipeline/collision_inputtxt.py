@@ -123,17 +123,19 @@ with open('gi.txt','wt') as f:
     f.write("tar_z_init = 0.0\n")
 f.closed
 
-with open('launch_gi.sh','wrt') as fb:
+with open('launch_gi.sbatch','wrt') as fb:
     fb.write("#!/bin/bash\n")
     fb.write("#SBATCH -p luna\n")
     fb.write("#SBATCH -n 100\n")
-    fb.write("#SBATCH -J TarImpRelax\n")
+    fb.write("#SBATCH -J Collision\n")
+    fb.write("#SBATCH --mem-per-cpu=5GB\n")
+    fb.write("#SBATCH -o my_sim_%j\n")
     fb.write("#SBATCH -t 32:00:00\n")
     fb.write("module load openmpi/4.0.3/b3\n")
-    fb.write("mpirun -np 100 ./sph.out -i "+output_path+"gi.txt\n")
+    fb.write("mpirun -n 100 ./sph.out -i "+output_path+"gi.txt\n")
 fb.closed
 
-os.chmod("launch_gi.sh",stat.S_IRWXU)
+os.chmod("launch_gi.sbatch",stat.S_IRWXU)
 os.system('mv gi.txt '+output_path)
 os.system('mv launch_gi.sh ../../')
 
