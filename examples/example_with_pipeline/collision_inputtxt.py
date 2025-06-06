@@ -137,5 +137,5 @@ fb.closed
 
 os.chmod("launch_gi.sbatch",stat.S_IRWXU)
 os.system('mv gi.txt '+output_path)
-os.system('mv launch_gi.sh ../../')
+os.system('mv launch_gi.sbatch ../../')
 
