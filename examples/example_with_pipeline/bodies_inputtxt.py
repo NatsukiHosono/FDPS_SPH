@@ -84,7 +84,9 @@ with open('tar_relaxation.sbatch','wrt') as fa:
     fa.write("mpirun -n 100 ./sph.out -i "+TarOut+"tar.txt\n")
 fa.closed
 
-os.chmod("launch_relaxation.sh",stat.S_IRWXU)
+os.chmod("imp_relaxation.sbatch",stat.S_IRWXU)
+os.chmod("tar_relaxation.sbatch",stat.S_IRWXU)
 os.system('mv imp.txt '+ImpOut)
 os.system('mv tar.txt '+TarOut)
-os.system('mv launch_relaxation.sh ../../')            
+os.system('mv imp_relaxation.sbatch ../../')
+os.system('mv tar_relaxation.sbatch ../../')     
