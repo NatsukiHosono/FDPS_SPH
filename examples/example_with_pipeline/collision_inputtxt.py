@@ -44,6 +44,7 @@ while rt.distance < separation * rt.radius_target:
 #        fig = rt.plot_current_position()
 #        plt.savefig(output_path + "/{}.png".format(plotted), format='png')
         plotted += 1
+    print("Step {}, distance is {} target radii".format(loop,rt.distance/rt.radius_target))
     loop += 1
 
 # fig = rt.plot_current_position()
