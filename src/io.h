@@ -42,11 +42,12 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 	}
 }
 
-template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo){
+template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, std::string &out_dir){
 	FileHeader header;
 	char filename[256];
-    sprintf(filename, "results/%05lld", sysinfo.step);
-	sph_system.readParticleAscii(filename, "%s_%05d_%05d.dat", header);
+    sprintf(filename, "results.%05lld", sysinfo.step);
+	std::string full_filename = out_dir + filename;
+	sph_system.readParticleAscii(full_filename.c_str(), "%s_%05d_%05d.dat", header);
 	sysinfo.time = header.time;
 	std::cout << header.time << std::endl;
 }
