@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
 
-    std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results."));
+    std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     const double silicate_entropy = parameter_file.getValueOf("silicate_entropy", 2000);
     const double iron_entropy = parameter_file.getValueOf("iron_entropy", 2000);
     if (output_directory.back() != '/')
