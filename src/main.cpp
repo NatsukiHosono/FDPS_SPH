@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_directory);
         PROBLEM::setEoS(sph_system);
         PROBLEM::damping = parameter_file.getValueOf("damping", 1);
-        PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000);
+        PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000.0);
         sysinfo.output_id=sysinfo.time / output_interval;
         std::cout << "Output interval is: " << output_interval << std::endl;
         std::cout << "Time is: " << sysinfo.time << std::endl;
