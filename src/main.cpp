@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
     } else {
         InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_directory);
         PROBLEM::setEoS(sph_system);
-        PROBLEM::damping = parameter_file.getValueOf("damping", 1)
-        PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000)
+        PROBLEM::damping = parameter_file.getValueOf("damping", 1);
+        PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000);
     }
     PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
     if (mode == 3) {
