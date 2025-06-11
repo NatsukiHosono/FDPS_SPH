@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
     std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     const double silicate_entropy = parameter_file.getValueOf("silicate_entropy", 2000);
     const double iron_entropy = parameter_file.getValueOf("iron_entropy", 2000);
+    PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
     if (output_directory.back() != '/')
         output_directory.back() += '/';
     createOutputDirectory(output_directory);
@@ -70,8 +71,11 @@ int main(int argc, char *argv[]) {
         PROBLEM::setEoS(sph_system);
         PROBLEM::damping = parameter_file.getValueOf("damping", 1);
         PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000);
+        sysinfo.output_id=sysinfo.time / output_interval
+        std::cout << "Output interval is: " << output_interval << std::endl;
+        std::cout << "Time is: " << sysinfo.time << std::endl;
+        std::cout << "Resume step is: " << sysinfo.output_id << std::endl;
     }
-    PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
     if (mode == 3) {
         sysinfo.output_time = sysinfo.time;
         mode = 2; // we only need mode 3 for GI initialization. swap out to make mode 2 features elsewhere work
