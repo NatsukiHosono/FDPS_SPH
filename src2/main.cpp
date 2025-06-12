@@ -79,6 +79,7 @@ int main(int argc, char *argv[]) {
     }
     if (mode == 3) {
         sysinfo.output_time = sysinfo.time;
+	sysinfo.output_id=sysinfo.time / output_interval;
         mode = 2; // we only need mode 3 for GI initialization. swap out to make mode 2 features elsewhere work
     }
 
