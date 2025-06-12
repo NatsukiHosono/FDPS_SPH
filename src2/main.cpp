@@ -142,9 +142,9 @@ int main(int argc, char *argv[]) {
             sph_system[i].fullDrift(sysinfo.dt);
             sph_system[i].predict(sysinfo.dt);
 
-			/*if (i % 1000 == 0) {
+			if (i % 1000 == 0) {
 						std::cout << "After " << i << sph_system[i].vel.x << sph_system[i].vel.y << sph_system[i].vel.z << std::endl;
-			}*/
+			}
         }
         sysinfo.time += sysinfo.dt;
         sph_system.adjustPositionIntoRootDomain(dinfo);
@@ -185,10 +185,10 @@ int main(int argc, char *argv[]) {
             sph_system[i].finalKick(sysinfo.dt);
 			double damping = parameter_file.getValueOf("damping",1.0);
             sph_system[i].dampMotion(damping);
-			/* if (i % 1000 == 0) {
+			if (i % 1000 == 0) {
 						std::cout << "Before " << i << sph_system[i].vel.x << sph_system[i].vel.y << sph_system[i].vel.z << std::endl;
 						std::cout << "damping is " << damping << std::endl;
-			} */
+			} 
         }
         if (mode == 2) {
             PTCL::Mode2CalcAll(sph_system, silicate_entropy, iron_entropy);
