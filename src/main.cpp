@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         PROBLEM::setEoS(sph_system);
         PTCL::CalcPressure(sph_system);
     } else {
-        PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file)
+        PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
         PROBLEM::setEoS(sph_system);
         PROBLEM::damping = parameter_file.getValueOf("damping", 1);
         PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000.0);
