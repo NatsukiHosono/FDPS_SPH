@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         PROBLEM::setEoS(sph_system);
         PTCL::CalcPressure(sph_system);
     } else {
-        InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_directory);
+        PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file)
         PROBLEM::setEoS(sph_system);
         PROBLEM::damping = parameter_file.getValueOf("damping", 1);
         PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000.0);
@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for
         for (int i = 0; i < sph_system.getNumberOfParticleLocal(); ++i) {
             sph_system[i].finalKick(sysinfo.dt);
+            double damping = parameter_file.getValueOf("damping",1.0);
             sph_system[i].dampMotion(PROBLEM::damping);
         }
         if (mode == 2) {
