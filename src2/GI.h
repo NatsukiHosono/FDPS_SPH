@@ -479,10 +479,10 @@ public:
                         >> ith.vel.y
                         >> ith.vel.z >> ith.dens >> ith.eng >> ith.pres >> ith.pot >> ith.ent >> ith.temp;
                     body.push_back(ith);
-					if (body.size() % 100 == 0) {
-						std::cout << body.size() << ith.vel.x << ith.vel.y << ith.vel.z << std::endl;
-					}
-                }
+					//if (body.size() % 100 == 0) {
+					//	std::cout << body.size() << ith.vel.x << ith.vel.y << ith.vel.z << std::endl;
+					//}
+               // }
                 body.pop_back();
 					
             }
