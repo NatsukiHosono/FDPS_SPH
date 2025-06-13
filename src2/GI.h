@@ -463,8 +463,6 @@ public:
         }
 
         else if (mode == 3) { // mode 3 is for running mode 2 with a combined mode 2 output file, in case a sim runs too long
-			std::cout << "The mode is 3 now" << std::endl;
-			std::cout << "The rank is: " << PS::Comm::getRank() << std::endl;
             end_time = parameter_file.getValueOf("end_time", 100000.0);
             damping = parameter_file.getValueOf("damping", 1.);
             if (PS::Comm::getRank() != 0) return;  // only want to run on 1 proc
