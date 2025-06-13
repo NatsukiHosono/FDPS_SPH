@@ -71,17 +71,17 @@ int main(int argc, char *argv[]) {
         PTCL::CalcPressure(sph_system);
 		std::ifstream fin("input/body.dat");  // generically just call the file "body.dat"
         double time;
-		fin >> time;
+	fin >> time;
         sysinfo.time = time;
-		sysinfo.output_id=sysinfo.time/output_interval;
-		std::cout << "Output interval is: " << output_interval << std::endl;
+	sysinfo.output_id=sysinfo.time/output_interval;
+	std::cout << "Output interval is: " << output_interval << std::endl;
         std::cout << "Time is: " << sysinfo.time << std::endl;
         std::cout << "Resume step is: " << sysinfo.output_id << std::endl;
     } else {
         //InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_directory);
-		/*PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
+	/*PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
         PROBLEM::setEoS(sph_system);
-		PTCL::CalcPressure(sph_system);*/
+	PTCL::CalcPressure(sph_system);*/
         //PROBLEM::damping = parameter_file.getValueOf("damping", 1);
         //PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000.0);
         /*sysinfo.output_id=sysinfo.time / output_interval;
