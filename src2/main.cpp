@@ -74,9 +74,9 @@ int main(int argc, char *argv[]) {
 	fin >> time;
         sysinfo.time = time;
 	sysinfo.output_id=sysinfo.time/output_interval;
-	std::cout << "Output interval is: " << output_interval << std::endl;
+	/*std::cout << "Output interval is: " << output_interval << std::endl;
         std::cout << "Time is: " << sysinfo.time << std::endl;
-        std::cout << "Resume step is: " << sysinfo.output_id << std::endl;
+        std::cout << "Resume step is: " << sysinfo.output_id << std::endl;*/
     } else {
         //InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_directory);
 	/*PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
