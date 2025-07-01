@@ -5,8 +5,8 @@ from matplotlib.gridspec import GridSpec
 import gc
 
 round_number=4
-timestep1=int(input("Enter initial timestep: "))
-timestep2=int(input("Enter final timestep: "))
+timestep1=int(input("Enter initial output number: "))
+timestep2=int(input("Enter final output number: "))
 ncores=int(input("Enter the number of cores: "))
 inputparameter=str(raw_input("Enter Visualization Parameter (Density, Energy, Pressure, Entropy, Temperature, None): "))
 
