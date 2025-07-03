@@ -49,7 +49,7 @@ public:
     static void setupIC(PS::ParticleSystem<Ptcl> &sph_system, system_t &sysinfo, PS::DomainInfo &dinfo,
                         ParameterFile &parameter_file) {
         const unsigned int mode = parameter_file.getValueOf("mode", 2);
-		std::cout << "The mode is: " << mode << std::endl;
+		// std::cout << "The mode is: " << mode << std::endl;
 
         if (mode == 1) {
             end_time = parameter_file.getValueOf("end_time", 100000.0);
