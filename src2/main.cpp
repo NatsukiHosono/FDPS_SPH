@@ -54,9 +54,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Reading parameters from " << input_file << std::endl;
 
     unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
+	
 	if (mode == 3) {
 		newSim = false;
-	}
+	} /*RESUME EDITS: Added these lines - if mode is 3, then the program will not start a new simulation*/
 
     std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     const double silicate_entropy = parameter_file.getValueOf("silicate_entropy", 2000);
