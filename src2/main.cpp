@@ -61,7 +61,10 @@ int main(int argc, char *argv[]) {
     std::string output_directory = parameter_file.getValueOf("output_directory", std::string("results/"));
     const double silicate_entropy = parameter_file.getValueOf("silicate_entropy", 2000);
     const double iron_entropy = parameter_file.getValueOf("iron_entropy", 2000);
-    PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);
+	
+    PS::F64 output_interval = parameter_file.getValueOf("output_interval", 50.);  /* added this line to get the value of output interval -
+    used in making sure the outputs resume at the correct number*/
+										  
     if (output_directory.back() != '/')
         output_directory.back() += '/';
     createOutputDirectory(output_directory);
