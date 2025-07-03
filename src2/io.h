@@ -42,7 +42,7 @@ template <class ThisPtcl> void OutputFileWithTimeInterval(PS::ParticleSystem<Thi
 	}
 }
 
-template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, std::string &out_dir){
+/* template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo, std::string &out_dir){
 	FileHeader header;
 	char filename[256];
     sprintf(filename, "results.%05lld", sysinfo.step);
@@ -50,7 +50,10 @@ template <class ThisPtcl> void InputFileWithTimeInterval(PS::ParticleSystem<This
 	sph_system.readParticleAscii(full_filename.c_str(), "%s_%05d_%05d.dat", header);
 	sysinfo.time = header.time;
 	std::cout << header.time << std::endl;
-}
+} */
+
+/*RESUME EDITS: I commented out the InputFileWithTimeInterval as it was incorrectly naming the resumed files.  I tried to fix it but
+I found it was just easier to do the naming of the output files directly in main*/
 
 template <class ThisPtcl> void InputBinary(PS::ParticleSystem<ThisPtcl>& sph_system, system_t& sysinfo){
 	char filename[256];
