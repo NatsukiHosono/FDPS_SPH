@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
 	/*std::cout << "Output interval is: " << output_interval << std::endl;
         std::cout << "Time is: " << sysinfo.time << std::endl;
         std::cout << "Resume step is: " << sysinfo.output_id << std::endl;*/
+	    
     } else {
 		PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
         PROBLEM::setEoS(sph_system);
@@ -83,16 +84,12 @@ int main(int argc, char *argv[]) {
 		fin >> time;
         sysinfo.time = time;
 		sysinfo.output_id=sysinfo.time/output_interval;
-        //InputFileWithTimeInterval<PTCL::RealPtcl>(sph_system, sysinfo, output_directory);
-		/*PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
-        PROBLEM::setEoS(sph_system);
-		PTCL::CalcPressure(sph_system);*/
-        //PROBLEM::damping = parameter_file.getValueOf("damping", 1);
-        //PROBLEM::end_time = parameter_file.getValueOf("end_time", 100000.0);
-        /*sysinfo.output_id=sysinfo.time / output_interval;
-        std::cout << "Output interval is: " << output_interval << std::endl;
-        std::cout << "Time is: " << sysinfo.time << std::endl;
-        std::cout << "Resume step is: " << sysinfo.output_id << std::endl;*/
+
+	/*RESUME EDITS: Removed the line that calls InputFileWithTimeInterval as it was incorrectly naming the resumed
+ 	files to start back at an output number of 0.  Also called the steupIC, setEoS, and CalcPressure functions as
+  	the simulation crashes without them.  The remaining lines read the stored data in the body.dat file and find the
+   	output id from that which ensures the names of the output files resume at the correct number.*/
+	
     }
     if (mode == 3) {
         sysinfo.output_time = sysinfo.time;
