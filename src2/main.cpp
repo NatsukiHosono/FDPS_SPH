@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     unsigned int mode = parameter_file.getValueOf("mode", 1); // get modelling mode from input file
 	
-	if (mode == 3) {
+	if (mode == 3 or mode == 4) {
 		newSim = false;
 	} /*RESUME EDITS: Added these lines - if mode is 3, then the program will not start a new simulation*/
 
@@ -94,6 +94,11 @@ int main(int argc, char *argv[]) {
     if (mode == 3) {
         sysinfo.output_time = sysinfo.time;
         mode = 2; // we only need mode 3 for GI initialization. swap out to make mode 2 features elsewhere work
+    }
+
+    if (mode == 4) {
+	sysinfo.output_time = sysinfo.time;
+	mode = 1;
     }
 
 #pragma omp parallel for
