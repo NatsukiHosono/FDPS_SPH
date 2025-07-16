@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 		PROBLEM::setupIC(sph_system, sysinfo, dinfo, parameter_file);
         PROBLEM::setEoS(sph_system);
         PTCL::CalcPressure(sph_system);
-		std::ifstream fin("input/body.dat");  // generically just call the file "body.dat"
+		std::ifstream fin("input/resume.dat");  // generically just call the file "resume.dat"
         double time;
 		fin >> time;
         sysinfo.time = time;
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
 	/*RESUME EDITS: Removed the line that calls InputFileWithTimeInterval as it was incorrectly naming the resumed
  	files to start back at an output number of 0.  Also called the steupIC, setEoS, and CalcPressure functions as
-  	the simulation crashes without them.  The remaining lines read the stored data in the body.dat file and find the
+  	the simulation crashes without them.  The remaining lines read the stored data in the resume.dat file and find the
    	output id from that which ensures the names of the output files resume at the correct number.*/
 	
     }
