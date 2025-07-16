@@ -20,6 +20,10 @@ elif body=="imp":
 
     output_path="../../input/imp.dat"
 
+elif body=="resume":
+
+    output_path="../../input/resume.dat"
+
 def concatenate(path,step,ncores,output):
     frames=[pd.read_csv(path+"results."+'%05d'%step+"_"+'%05d'%ncores+"_"'%05d'%f+".dat",skiprows=2,header=None,sep='\t') for f in range(ncores)]
     body=pd.concat(frames,ignore_index=True).sort_values(by=[0])
