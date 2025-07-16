@@ -468,11 +468,11 @@ public:
             if (PS::Comm::getRank() != 0) return;  // only want to run on 1 proc
             std::vector<Ptcl> body;
             {
-                std::ifstream fin("input/body.dat");  // generically just call the file "body.dat"
+                std::ifstream fin("input/resume.dat");  // generically just call the file "resume.dat"
                 double time;
                 std::size_t N;
                 fin >> time;
-				//std::cout << "From body.dat, time is: " << time << std::endl;
+				//std::cout << "From resume.dat, time is: " << time << std::endl;
                 sysinfo.time = time;  // continue from last time
                 fin >> N;
                 while (!fin.eof()) {
