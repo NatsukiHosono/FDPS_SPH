@@ -4,18 +4,18 @@ import numpy as np
 
 #USER INPUTS ---------------------------------------------
 
-path=r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\CMAPData\\"
-outputpath=r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\Outputs\\"
-ncores = 200
-timestep1=50
-timestep2=120
-parameter="Entropy"
-minimum=1000
-maximum=5000
-axesdim=40
-axesscale=1e6
-axes="No"
-background="Black"
+path =
+outputpath =
+ncores = 
+timestep1 =
+timestep2 =
+parameter =
+minimum =
+maximum =
+axesdim =
+axesscale =
+axes =
+background =
 
 #---------------------------------------------------------
 
@@ -51,7 +51,7 @@ if parameter != "None":
 
         for j in range(ncores):
 
-            filename=fr"{path}\results.{i:05d}_{ncores:05d}_{j:05d}.dat"
+            filename=fr"{path}/results.{i:05d}_{ncores:05d}_{j:05d}.dat"
 
             with open (filename, "r") as file:
                 timevalue=float(file.readline().strip())
@@ -117,7 +117,7 @@ if parameter != "None":
         title.set_position([0.5, 1.02])
         ax.set_aspect('equal')
         print(f"Outputted snap_{i:05d}.png")
-        plt.savefig(f"{outputpath}\snap_{i:05d}.png", dpi=300)
+        plt.savefig(f"{outputpath}/snap_{i:05d}.png", dpi=300)
         plt.close()
 
 else:
@@ -130,7 +130,7 @@ else:
 
         for i in range(ncores):
 
-            filename=f"{path}results.{j:05d}_{ncores:05d}_{i:05d}.dat"
+            filename=f"{path}/results.{j:05d}_{ncores:05d}_{i:05d}.dat"
 
             with open (filename, "r") as file:
                 timevalue=float(file.readline().strip())
@@ -174,7 +174,7 @@ else:
         ax.set_aspect('equal')
 
         print(f"Outputted snap_{j:05d}.png")
-        plt.savefig(f"{outputpath}\snap_{j:05d}.png", dpi=300)
+        plt.savefig(f"{outputpath}/snap_{j:05d}.png", dpi=300)
         plt.close()
 
 
