@@ -4,18 +4,18 @@ import numpy as np
 
 #USER INPUTS ---------------------------------------------
 
-path=r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\CMAPData\\"
-outputpath=r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\Outputs\\"
-ncores = 200
-timestep1=50
-timestep2=120
-parameter="Entropy"
-minimum=1000
-maximum=5000
-axesdim=40
-axesscale=1e6
-axes="No"
-background="Black"
+path =
+outputpath =
+ncores = 
+timestep1 =
+timestep2 =
+parameter =
+minimum =
+maximum =
+axesdim =
+axesscale =
+axes =
+background =
 
 #---------------------------------------------------------
 
