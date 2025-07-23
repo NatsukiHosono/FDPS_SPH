@@ -171,7 +171,7 @@ else:
 
         ax.set_title(f"Visualization at t={timevalue:.2e}")
 
-        ax.set_aspect('equal')
+        ax.set_box_aspect([1,1,1])
 
         print(f"Outputted snap_{j:05d}.png")
         plt.savefig(f"{outputpath}/snap_{j:05d}.png", dpi=300)
