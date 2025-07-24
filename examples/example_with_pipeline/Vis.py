@@ -76,7 +76,7 @@ if parameter != "None":
         ax=fig.add_subplot(gs[0],projection='3d')
 
         norm=plt.Normalize(minimum/normfactor, maximum/normfactor)
-        scatter=ax.scatter(xlist,ylist,zlist,c=valuelist,cmap='inferno',norm=norm,marker='.',s=0.07)
+        scatter=ax.scatter(xlist,ylist,zlist,c=valuelist,cmap='inferno',norm=norm,marker='.',s=0.5)
         
         if axes == "No":
             cbarax=fig.add_subplot(gs[1])
@@ -151,7 +151,7 @@ else:
 
         fig=plt.figure(figsize=(5,5))
         ax=fig.add_subplot(111,projection='3d')
-        ax.scatter(xlist,ylist,zlist,marker='.',s=0.07)  
+        ax.scatter(xlist,ylist,zlist,marker='.',s=0.5)  
 
         ax.set_xlabel(f"x ({axesscale:.0e} m)")
         ax.set_ylabel(f"y ({axesscale:.0e} m)")
