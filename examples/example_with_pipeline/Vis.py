@@ -7,8 +7,8 @@ import numpy as np
 path =
 outputpath =
 ncores = 
-timestep1 =
-timestep2 =
+outputnumber1 =
+outputnumber2 =
 parameter =
 minimum =
 maximum =
