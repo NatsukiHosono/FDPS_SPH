@@ -4,28 +4,28 @@ import numpy as np
 
 #USER INPUTS ---------------------------------------------
 
-path = r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\CMAPData\\"
-outputpath =r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\Outputs\\"
-ncores = 200
-outputnumber1 = 720
-outputnumber2 = 720
-axesdim = 35
-axesscale = 1e6
-axes = "Yes"
-elevation = 30
-azimuth = -60
-background = "Black"
-particlesize = 1
+path = 
+outputpath =
+ncores = 
+outputnumber1 = 
+outputnumber2 =
+axesdim = 
+axesscale = 
+axes = 
+elevation = 
+azimuth = 
+background = 
+particlesize = 
 
-parameter = "Entropy"
-minimum = 1000
-maximum = 7000
-colormap= "magma"
+parameter = 
+minimum = 
+maximum = 
+colormap = 
 
-tarmantlecolor = "cmap"
-tarcorecolor = "cmap"
-impmantlecolor = "cmap"
-impcorecolor = "cmap"
+tarmantlecolor = 
+tarcorecolor = 
+impmantlecolor = 
+impcorecolor = 
 
 #---------------------------------------------------------
 
