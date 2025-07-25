@@ -19,7 +19,7 @@ particlesize =
 parameter = 
 minimum = 
 maximum = 
-colormap= 
+colormap = 
 
 tarmantlecolor = 
 tarcorecolor = 
@@ -183,7 +183,7 @@ for j in range(outputnumber1,outputnumber2+1):
     pos = ax.get_position()
     title.set_position([0.5, 1.02])
     ax.set_aspect('equal')
-    print(f"Outputted snap_{j:05d}.png")
     plt.savefig(f"{outputpath}/snap_{j:05d}.png", dpi=300)
+    print(f"Outputted snap_{j:05d}.png")
     #plt.show()
     plt.close()
