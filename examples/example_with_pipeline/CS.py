@@ -4,27 +4,27 @@ import numpy as np
 
 #USER INPUTS ---------------------------------------------
 
-path = r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\CMAPData\\"
-outputpath =r"C:\Users\nakaj\OneDrive\Desktop\CMAP2025\Outputs\\"
-ncores = 200
-outputnumber1 = 90
-outputnumber2 = 90
-axesdim = 22
-axesscale = 1e6
-axes = "No"
-background = "White"
-thickness = 1
-particlesize = 3
+path = 
+outputpath = 
+ncores = 
+outputnumber1 = 
+outputnumber2 = 
+axesdim = 
+axesscale =
+axes = 
+background =
+thickness = 
+particlesize = 
 
-parameter = "Temperature"
-minimum = 0
-maximum = 15000
-colormap= "afmhot"
+parameter = 
+minimum = 
+maximum = 
+colormap= 
 
-tarmantlecolor = "gray"
-tarcorecolor = "cmap"
-impmantlecolor = "gray"
-impcorecolor = "cmap"
+tarmantlecolor = 
+tarcorecolor = 
+impmantlecolor = 
+impcorecolor = 
 
 #---------------------------------------------------------
 
