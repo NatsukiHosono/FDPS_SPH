@@ -122,24 +122,24 @@ for j in range(outputnumber1,outputnumber2+1):
     norm=plt.Normalize(minimum/normfactor, maximum/normfactor)
     
     if tarmantlecolor == "cmap":
-        scatter=ax.scatter(xtarmant,ytarmant,c=tarmantvalue,norm=norm,cmap=colormap,marker='.',s=particlesize)
+        scatter=ax.scatter(xtarmant,ytarmant,c=tarmantvalue,norm=norm,cmap=colormap,marker='.',s=particlesize,depthshade=False)
     else:
-        ax.scatter(xtarmant,ytarmant,c=tarmantlecolor,marker='.',s=particlesize)
+        ax.scatter(xtarmant,ytarmant,c=tarmantlecolor,marker='.',s=particlesize,depthshade=False)
 
     if tarcorecolor == "cmap":
-        scatter=ax.scatter(xtarcore,ytarcore,c=tarcorevalue,cmap=colormap,norm=norm,marker='.',s=particlesize)
+        scatter=ax.scatter(xtarcore,ytarcore,c=tarcorevalue,cmap=colormap,norm=norm,marker='.',s=particlesize,depthshade=False)
     else:
-        ax.scatter(xtarcore,ytarcore,c=tarcorecolor,marker='.',s=particlesize)
+        ax.scatter(xtarcore,ytarcore,c=tarcorecolor,marker='.',s=particlesize,depthshade=False)
 
     if impmantlecolor == "cmap":
-        scatter=ax.scatter(ximpmant,yimpmant,c=impmantvalue,cmap=colormap,norm=norm,marker='.',s=particlesize)
+        scatter=ax.scatter(ximpmant,yimpmant,c=impmantvalue,cmap=colormap,norm=norm,marker='.',s=particlesize,depthshade=False)
     else:
-        ax.scatter(ximpmant,yimpmant,c=impmantlecolor,marker='.',s=particlesize)
+        ax.scatter(ximpmant,yimpmant,c=impmantlecolor,marker='.',s=particlesize,depthshade=False)
     
     if impcorecolor == "cmap":
-        scatter=ax.scatter(ximpcore,yimpcore,c=impcorevalue,cmap=colormap,norm=norm,marker='.',s=particlesize)
+        scatter=ax.scatter(ximpcore,yimpcore,c=impcorevalue,cmap=colormap,norm=norm,marker='.',s=particlesize,depthshade=False)
     else:
-        ax.scatter(ximpcore,yimpcore,c=impcorecolor,marker='.',s=particlesize)
+        ax.scatter(ximpcore,yimpcore,c=impcorecolor,marker='.',s=particlesize,depthshade=False)
 
     if tarmantlecolor == 'cmap' or tarcorecolor == 'cmap' or impmantlecolor == 'cmap' or impcorecolor == 'cmap':
 
@@ -187,3 +187,4 @@ for j in range(outputnumber1,outputnumber2+1):
     print(f"Outputted snap_{j:05d}.png")
     #plt.show()
     plt.close()
+
