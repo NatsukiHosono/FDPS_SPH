@@ -369,7 +369,7 @@ public:
 
                         if (removal_list.count(index)) {
                             id += -1;
-                        } else if (ith.id / NptclIn1Node == PS::Comm::getRank()) {
+                        } else if (ith.id % PS::Comm::getNumberOfProc() == PS::Comm::getRank()) {
                             tar.push_back(ith);
                         }
                         index += 1;
@@ -407,8 +407,8 @@ public:
 
                         if (removal_list.count(index)) {
                             id += -1;
-                        } else {
-                            if (ith.id / NptclIn1Node == PS::Comm::getRank()) tar.push_back(ith);
+                        } else if (ith.id % PS::Comm::getNumberOfProc() == PS::Comm::getRank()) { 
+							tar.push_back(ith);
                         }
                         index += 1;
 
