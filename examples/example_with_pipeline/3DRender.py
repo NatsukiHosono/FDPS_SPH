@@ -201,7 +201,7 @@ def plot(lists,normfactor,units,timevalue,j):    # Plots the 3D Render
 
         textcolor = 'black'
 
-    if tarmantlecolor == 'cmap':
+    if tarmantlecolor == 'cmap' and len(xtarmant) != 0:
 
         points = np.column_stack([xtarmant, ytarmant, ztarmant])
         cloud = pv.PolyData(points)
@@ -211,13 +211,13 @@ def plot(lists,normfactor,units,timevalue,j):    # Plots the 3D Render
         p.add_scalar_bar(title=f"{parameter} ({units})\n",n_labels=6,vertical=False,color=textcolor,
                          title_font_size=30,label_font_size=26,position_x=position_x,width=width,height=height)
 
-    else:
+    elif len(xtarmant) != 0:
 
         points = np.column_stack([xtarmant, ytarmant, ztarmant])
         p.add_points(points, color=tarmantlecolor, point_size=particlesize,render_points_as_spheres=True,lighting=False,show_scalar_bar=False)
 
 
-    if tarcorecolor == 'cmap':
+    if tarcorecolor == 'cmap' and len(xtarcore) != 0:
 
         points = np.column_stack([xtarcore, ytarcore, ztarcore])
         cloud = pv.PolyData(points)
@@ -228,13 +228,13 @@ def plot(lists,normfactor,units,timevalue,j):    # Plots the 3D Render
         p.add_scalar_bar(title=f"{parameter} ({units})\n",n_labels=6,vertical=False,color=textcolor,
                          title_font_size=30,label_font_size=26,position_x=position_x,width=width,height=height)
         
-    else:
+    elif len(xtarcore) != 0:
 
         points = np.column_stack([xtarcore, ytarcore, ztarcore])
         p.add_points(points, color=tarcorecolor, point_size=particlesize,render_points_as_spheres=True,lighting=False,show_scalar_bar=False)
 
    
-    if impmantlecolor == 'cmap':
+    if impmantlecolor == 'cmap' and len(ximpmant) != 0:
 
         points = np.column_stack([ximpmant, yimpmant, zimpmant])
         cloud = pv.PolyData(points)
@@ -245,13 +245,13 @@ def plot(lists,normfactor,units,timevalue,j):    # Plots the 3D Render
         p.add_scalar_bar(title=f"{parameter} ({units})\n",n_labels=6,vertical=False,color=textcolor,
                          title_font_size=30,label_font_size=26,position_x=position_x,width=width,height=height)
         
-    else:
+    elif len(ximpmant) != 0:
 
         points = np.column_stack([ximpmant, yimpmant, zimpmant])
         p.add_points(points, color=impmantlecolor, point_size=particlesize,render_points_as_spheres=True,lighting=False,show_scalar_bar=False)
 
 
-    if impcorecolor == 'cmap':
+    if impcorecolor == 'cmap' and len(ximpcore) != 0:
 
         points = np.column_stack([ximpcore, yimpcore, zimpcore])
         cloud = pv.PolyData(points)
@@ -262,7 +262,7 @@ def plot(lists,normfactor,units,timevalue,j):    # Plots the 3D Render
         p.add_scalar_bar(title=f"{parameter} ({units})\n",n_labels=6,vertical=False,color=textcolor,
                          title_font_size=30,label_font_size=26,position_x=position_x,width=width,height=height)
         
-    else:
+    elif len(ximpcore) != 0:
 
         points = np.column_stack([ximpcore, yimpcore, zimpcore])
         p.add_points(points, color=impcorecolor,point_size=particlesize,render_points_as_spheres=True,lighting=False,show_scalar_bar=False)
@@ -304,6 +304,7 @@ def main():
         plot(lists,normfactor,units,timevalue,j)
 
     print()
+
 
 
 
