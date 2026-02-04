@@ -4,13 +4,13 @@ import os, sys, shutil, stat
 
 
 if len(sys.argv) != 5:
-    print "Usage inputs: <body (tar or imp)> <body path> <ncores> <output number>"
+    print "Usage inputs: <body (tar or imp)> <body path> <output number> <ncores>"
     exit(1)
 
 body=sys.argv[1]
 path=sys.argv[2]
-ncores=np.int(np.float(sys.argv[3]))
-step=np.int(np.float(sys.argv[4]))
+step=np.int(np.float(sys.argv[3]))
+ncores=np.int(np.float(sys.argv[4]))
 
 if body=="tar":
 
