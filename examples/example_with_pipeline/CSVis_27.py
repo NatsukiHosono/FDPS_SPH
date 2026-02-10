@@ -19,8 +19,8 @@ thickness = 10
 particlesize = 1
 
 parameter = 'Temperature'
-minimum = 2000
-maximum = 8000
+minimum = 1000
+maximum = 6000
 colormap = 'afmhot'
 
 tarmantlecolor = 'cmap'
