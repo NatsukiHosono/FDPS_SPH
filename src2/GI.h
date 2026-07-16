@@ -364,7 +364,7 @@ public:
                         ith.mass = tarMass;
                         ith.eng = 0.1 * Grav * tarMass / tarRadi;
                         ith.id = id++;
-                        ith.setPressure(&ADunite);
+                        ith.setPressure(&Water);
                         ith.tag = 0;
 
                         if (removal_list.count(index)) {
