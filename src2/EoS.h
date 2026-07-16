@@ -365,3 +365,4 @@ static const EoS::IdealGas<PS::F64> Diatomic(1.4);
 static const EoS::ANEOS<PS::F64> Iron("eos/iron_STS.rho_u.txt");
 static const EoS::ANEOS<PS::F64> AGranite("eos/granite.rho_u.txt");
 static const EoS::ANEOS<PS::F64> ADunite("eos/forst_STS.rho_u.txt");
+static const EoS::ANEOS<PS::F64> Water("eos/water_S.rho_u.txt");
