@@ -4,13 +4,15 @@ import scipy.constants
 import os as os
 
 filename = '2ME_b07_cold'
-pathinput = '../../output/Analysis/' + filename +'/'
+pathinput = '../../output/Analysis/'
 
 gi=pd.read_csv(pathinput+filename+'_identified_new.dat',sep='\t')
 
+Rp = 24*6.371e6
 disk=gi.loc[gi['tag2']==1]
 escaping=gi.loc[gi['tag2']==2]
 fullplanet = gi.loc[gi['tag2']==0]
+planet = fullplanet.loc[fullplanet['r'] < Rp]
 
 m = fullplanet['m'].sum()
 md = disk['m'].sum()
