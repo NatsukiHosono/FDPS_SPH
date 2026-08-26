@@ -132,6 +132,7 @@ with open('launch_gi.sbatch','wrt') as fb:
     fb.write("#SBATCH --mem-per-cpu=5GB\n")
     fb.write("#SBATCH -o my_sim_%j\n")
     fb.write("#SBATCH -t 32:00:00\n")
+	fb.write("module load bluehive/2.5\n")
     fb.write("module load openmpi/4.0.3/b3\n")
     fb.write("mpirun -n 100 ./sph.out -i "+output_path+"gi.txt\n")
 fb.closed
