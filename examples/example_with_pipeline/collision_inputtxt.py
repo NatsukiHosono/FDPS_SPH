@@ -108,6 +108,7 @@ with open('gi.txt','wt') as f:
     f.write("L_init_vs_L_em = 0.1\n")
     f.write("silicate_entropy = 3000.0\n")
     f.write("iron_entropy = 1750.0\n")
+	f.write("UnitRadi = 0\n")
     f.write("silicate_grid_size = 120\n")
     f.write("iron_grid_size = 120\n")
     f.write("v_imp_x_v_esc = "+str(rt.v_impactor_x/v_esc)+"\n")
